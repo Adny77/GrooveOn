@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GrooveOn.MailingService/GrooveOn.MailingService.csproj" Id="fb66cc13-cb15-4d2c-b0af-aeff17d75360" />
+  <Project Path="GrooveOn.Models/GrooveOn.Models.csproj" />
+  <Project Path="GrooveOn.Services/GrooveOn.Services.csproj" />
+  <Project Path="GrooveOn.WebAPI/GrooveOn.WebAPI.csproj" />
+</Solution>

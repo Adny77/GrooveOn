@@ -1,0 +1,120 @@
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.Text.RegularExpressions;
+using GrooveOn.Services.Interfaces;
+
+namespace GrooveOn.Services
+{
+    public class ImageService : IImageService
+    {
+        private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".webp"
+        };
+
+        private const long MaxBytes = 10 * 1024 * 1024;
+
+        private readonly IWebHostEnvironment _env;
+
+        public ImageService(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
+        public async Task<string> SaveAsync(
+            IFormFile file,
+            string nameOfTheFolder,
+            string? desiredFileName = null,
+            CancellationToken ct = default)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("Fajl nije poslan ili je prazan.");
+
+            if (file.Length > MaxBytes)
+                throw new ArgumentException("Slika je prevelika (max 10MB).");
+
+            var folder = NormalizeFolder(nameOfTheFolder);
+
+            var ext = Path.GetExtension(file.FileName);
+            if (string.IsNullOrWhiteSpace(ext) || !AllowedExtensions.Contains(ext))
+                throw new ArgumentException("Nedozvoljen format slike. Dozvoljeno: jpg, jpeg, png, webp.");
+
+            var safeFileName = MakeSafeFileName(desiredFileName);
+            if (string.IsNullOrWhiteSpace(safeFileName))
+            {
+                safeFileName = $"{DateTime.UtcNow:yyyyMMdd_HHmmss}_{Guid.NewGuid():N}{ext}";
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(Path.GetExtension(safeFileName)))
+                    safeFileName += ext;
+
+                var desiredExt = Path.GetExtension(safeFileName);
+                if (!AllowedExtensions.Contains(desiredExt))
+                    safeFileName = Path.ChangeExtension(safeFileName, ext);
+            }
+
+            var physicalFolder = GetPhysicalFolder(folder);
+            Directory.CreateDirectory(physicalFolder);
+
+            var fullPath = Path.Combine(physicalFolder, safeFileName);
+
+            await using var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            await file.CopyToAsync(stream, ct);
+
+            return safeFileName;
+        }
+
+        public Task<bool> DeleteAsync(string fileName, string nameOfTheFolder, CancellationToken ct = default)
+        {
+            var folder = NormalizeFolder(nameOfTheFolder);
+
+            var safeName = MakeSafeFileName(fileName);
+            if (string.IsNullOrWhiteSpace(safeName))
+                return Task.FromResult(false);
+
+            var physicalFolder = GetPhysicalFolder(folder);
+            var fullPath = Path.Combine(physicalFolder, safeName);
+
+            if (!File.Exists(fullPath))
+                return Task.FromResult(false);
+
+            File.Delete(fullPath);
+            return Task.FromResult(true);
+        }
+
+        public string GetPublicUrl(string fileName, string nameOfTheFolder)
+        {
+            var folder = NormalizeFolder(nameOfTheFolder);
+            var safeName = MakeSafeFileName(fileName);
+            return $"/images/{folder}/{safeName}";
+        }
+
+        private string GetPhysicalFolder(string folder)
+        {
+            var webRoot = _env.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot");
+            return Path.Combine(webRoot, "images", folder);
+        }
+
+        private static string NormalizeFolder(string folder)
+        {
+            return (folder ?? "").Trim().ToLowerInvariant();
+        }
+
+        private static string MakeSafeFileName(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return "";
+
+            var name = input.Trim();
+
+            name = name.Replace("\\", "/");
+            name = Path.GetFileName(name);
+
+            name = Regex.Replace(name, @"[^a-zA-Z0-9._-]", "");
+
+            if (name is "." or "..") return "";
+
+            return name;
+        }
+    }
+}

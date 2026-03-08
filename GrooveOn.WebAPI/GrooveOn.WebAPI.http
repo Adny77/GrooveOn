@@ -1,0 +1,6 @@
+@GrooveOn.WebAPI_HostAddress = http://localhost:5201
+
+GET {{GrooveOn.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
