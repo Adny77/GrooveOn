@@ -1,11 +1,12 @@
-using System.Collections;
 using DotNetEnv;
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Interfaces;
+using GrooveOn.Services.Services;
 using GrooveOn.WebAPI.Authentication;
 using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Stripe;
 
 Env.Load(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<GrooveOnDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "GrooveOn API", Version = "v1" });
@@ -38,7 +41,11 @@ builder.Services.AddSwaggerGen(c =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
             Array.Empty<string>()
         }
@@ -46,16 +53,17 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 TypeAdapterConfig.GlobalSettings.Default
-            .IgnoreNullValues(true)      
-            .PreserveReference(true)     
-            .ShallowCopyForSameType(true);
+    .IgnoreNullValues(true)
+    .PreserveReference(true)
+    .ShallowCopyForSameType(true);
+
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
+
+builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
-
-
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -63,6 +71,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.MapOpenApi();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -71,11 +80,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
