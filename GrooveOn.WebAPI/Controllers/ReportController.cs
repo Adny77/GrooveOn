@@ -29,5 +29,11 @@ namespace GrooveOn.API.Controllers
             var result = _reportService.GetUserGrowthByMonth(year);
             return Ok(result);
         }
+
+        [HttpGet("income-by-month")]
+        public ActionResult<List<IncomeByMonthResponse>> GetIncomeByMonth(int year)
+        {
+            return Ok(_reportService.GetIncomeByMonth(year));
+        }
     }
 }

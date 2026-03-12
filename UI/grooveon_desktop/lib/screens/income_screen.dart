@@ -26,6 +26,7 @@ class IncomeScreen extends StatefulWidget {
 
 class _IncomeScreenState extends State<IncomeScreen> {
   IncomeTab _selectedTab = IncomeTab.overview;
+  int _selectedYear = 2026;
 
   void _changeTab(IncomeTab tab) {
     setState(() {
@@ -33,12 +34,23 @@ class _IncomeScreenState extends State<IncomeScreen> {
     });
   }
 
+  void _changeSelectedYear(int year) {
+    setState(() {
+      _selectedYear = year;
+    });
+  }
+
   Widget _buildContent() {
     switch (_selectedTab) {
       case IncomeTab.overview:
-        return const IncomeOverContent();
+        return IncomeOverContent(
+          selectedYear: _selectedYear,
+          onYearChanged: _changeSelectedYear,
+        );
       case IncomeTab.detailedView:
-        return const IncomeDetailedContent();
+        return IncomeDetailedContent(
+          selectedYear: _selectedYear,
+        );
     }
   }
 

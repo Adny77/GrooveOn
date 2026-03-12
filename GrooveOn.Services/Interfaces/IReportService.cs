@@ -6,5 +6,6 @@ namespace GrooveOn.Services.Interfaces
     {
         SubscriptionAnalyticsResponse GetSubscriptionAnalytics(int year, int? month = null);
         List<UserGrowthPointResponse> GetUserGrowthByMonth(int year);
+        List<IncomeByMonthResponse> GetIncomeByMonth(int year);
     }
 }

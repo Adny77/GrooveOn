@@ -45,51 +45,85 @@ namespace GrooveOn.Services.Services
         }
 
         public List<UserGrowthPointResponse> GetUserGrowthByMonth(int year)
+{
+    var today = DateTime.Today;
+    int currentYear = today.Year;
+    int currentMonth = today.Month;
+
+    int maxMonth;
+
+    if (year < currentYear)
+    {
+        maxMonth = 12;
+    }
+    else if (year == currentYear)
+    {
+        maxMonth = currentMonth - 1;
+    }
+    else
+    {
+        return new List<UserGrowthPointResponse>();
+    }
+
+    if (maxMonth <= 0)
+    {
+        return new List<UserGrowthPointResponse>();
+    }
+
+    var result = _context.Users
+        .Where(x => x.JoinDate.Year == year && x.JoinDate.Month <= maxMonth)
+        .GroupBy(x => x.JoinDate.Month)
+        .Select(g => new UserGrowthPointResponse
         {
-            var currentYear = 2026; // ili DateTime.Now.Year
-            var currentMonth = DateTime.Now.Month;
-            var maxMonth = year == currentYear ? currentMonth : 12;
+            Month = g.Key,
+            Count = g.Count()
+        })
+        .OrderBy(x => x.Month)
+        .ToList();
 
-            var groupedData = _context.Users
-                .Where(x => x.JoinDate.Year == year)
-                .GroupBy(x => x.JoinDate.Month)
-                .Select(x => new
-                {
-                    Month = x.Key,
-                    Count = x.Count()
-                })
-                .ToList();
+    var monthLabels = new[]
+    {
+        "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
 
-            var monthLabels = new Dictionary<int, string>
+    var completed = Enumerable.Range(1, maxMonth)
+        .Select(month => new UserGrowthPointResponse
         {
-            { 1, "Jan" },
-            { 2, "Feb" },
-            { 3, "Mar" },
-            { 4, "Apr" },
-            { 5, "May" },
-            { 6, "Jun" },
-            { 7, "Jul" },
-            { 8, "Aug" },
-            { 9, "Sep" },
-            { 10, "Oct" },
-            { 11, "Nov" },
-            { 12, "Dec" }
-        };
+            Month = month,
+            Label = monthLabels[month],
+            Count = result.FirstOrDefault(x => x.Month == month)?.Count ?? 0
+        })
+        .ToList();
 
-            var result = new List<UserGrowthPointResponse>();
+    return completed;
+}
 
-            for (int month = 1; month <= maxMonth; month++)
-            {
-                var existing = groupedData.FirstOrDefault(x => x.Month == month);
+        public List<IncomeByMonthResponse> GetIncomeByMonth(int year)
+{
+    var result = _context.Subscriptions
+        .Where(x =>
+            x.SubscriptionPlanId == 2 &&
+            x.PaymentDate.HasValue &&
+            x.PaymentDate.Value.Year == year)
+        .GroupBy(x => x.PaymentDate!.Value.Month)
+        .Select(g => new IncomeByMonthResponse
+        {
+            Month = g.Key,
+            TotalIncome = g.Sum(x => x.PaymentAmount)
+        })
+        .OrderBy(x => x.Month)
+        .ToList();
 
-                result.Add(new UserGrowthPointResponse
-                {
-                    Label = monthLabels[month],
-                    Count = existing?.Count ?? 0
-                });
-            }
+    var completed = Enumerable.Range(1, 12)
+        .Select(month => new IncomeByMonthResponse
+        {
+            Month = month,
+            TotalIncome = result.FirstOrDefault(x => x.Month == month)?.TotalIncome ?? 0
+        })
+        .ToList();
 
-            return result;
-        }
+    return completed;
+}
     }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
+import 'package:grooveon_desktop/models/income_by_month_response.dart';
 import 'package:grooveon_desktop/models/subscription_analytics.dart';
 import 'package:grooveon_desktop/models/user_growth_point.dart';
 import 'package:grooveon_desktop/utils/session.dart';
@@ -53,4 +54,31 @@ class ReportProvider with ChangeNotifier {
     final data = jsonDecode(response.body) as List;
     return data.map((e) => UserGrowthPoint.fromJson(e)).toList();
   }
+
+  Future<List<IncomeByMonthResponse>> getIncomeByMonth({
+  required int year,
+}) async {
+  final url =
+      "${ApiConfig.apiBase}/api/Report/income-by-month?year=$year";
+
+  final response = await http.get(
+    Uri.parse(url),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${Session.token}",
+    },
+  );
+
+  if (response.statusCode < 200 || response.statusCode > 299) {
+    throw Exception("Greška pri učitavanju income podataka.");
+  }
+
+  final data = jsonDecode(response.body) as List;
+
+  return data
+      .map((e) => IncomeByMonthResponse.fromJson(e))
+      .toList();
+}
+
+  
 }

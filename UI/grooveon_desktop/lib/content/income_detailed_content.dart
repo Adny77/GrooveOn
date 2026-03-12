@@ -1,30 +1,58 @@
-import 'package:flutter/material.dart';
-import 'package:grooveon_desktop/screens/income_screen.dart';
+import 'dart:io';
 
-class IncomeDetailedContent extends StatelessWidget {
-  const IncomeDetailedContent({super.key});
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:grooveon_desktop/models/income_by_month_response.dart';
+import 'package:grooveon_desktop/providers/report_provider.dart';
+import 'package:grooveon_desktop/screens/income_screen.dart';
+import 'package:intl/intl.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:provider/provider.dart';
+
+class IncomeDetailedContent extends StatefulWidget {
+  final int selectedYear;
+
+  const IncomeDetailedContent({
+    super.key,
+    required this.selectedYear,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Expanded(
-          child: _IncomeDetailsTableCard(),
-        ),
-        SizedBox(width: 18),
-        _ProfitIncreaseCard(),
-      ],
-    );
-  }
+  State<IncomeDetailedContent> createState() => _IncomeDetailedContentState();
 }
 
-class _IncomeDetailsTableCard extends StatelessWidget {
-  const _IncomeDetailsTableCard();
+class _IncomeDetailedContentState extends State<IncomeDetailedContent> {
+  late Future<List<IncomeByMonthResponse>> _futureIncome;
 
   @override
-  Widget build(BuildContext context) {
-    final months = [
+  void initState() {
+    super.initState();
+    _futureIncome = _loadIncome();
+  }
+
+  @override
+  void didUpdateWidget(covariant IncomeDetailedContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.selectedYear != widget.selectedYear) {
+      setState(() {
+        _futureIncome = _loadIncome();
+      });
+    }
+  }
+
+  Future<List<IncomeByMonthResponse>> _loadIncome() {
+    final provider = context.read<ReportProvider>();
+    return provider.getIncomeByMonth(year: widget.selectedYear);
+  }
+
+  List<_IncomeRowData> _buildRows(
+    int year,
+    List<IncomeByMonthResponse> data,
+  ) {
+    const monthNames = [
       "January",
       "February",
       "March",
@@ -39,6 +67,482 @@ class _IncomeDetailsTableCard extends StatelessWidget {
       "December",
     ];
 
+    final now = DateTime.now();
+    final lastCompletedMonth = year < now.year
+        ? 12
+        : year == now.year
+            ? now.month - 1
+            : 0;
+
+    final incomeMap = <int, double>{};
+    for (final item in data) {
+      incomeMap[item.month] = item.totalIncome;
+    }
+
+    return List.generate(12, (index) {
+      final monthNumber = index + 1;
+      final monthName = monthNames[index];
+
+      if (monthNumber <= lastCompletedMonth) {
+        return _IncomeRowData(
+          month: monthName,
+          premiumIncome: incomeMap[monthNumber] ?? 0,
+          isAvailable: true,
+        );
+      }
+
+      return _IncomeRowData(
+        month: monthName,
+        premiumIncome: null,
+        isAvailable: false,
+      );
+    });
+  }
+
+  double _calculateAverageMonthlyIncrease(List<_IncomeRowData> rows) {
+    final availableValues = rows
+        .where((e) => e.isAvailable && e.premiumIncome != null)
+        .map((e) => e.premiumIncome!)
+        .toList();
+
+    if (availableValues.length < 2) return 0;
+
+    double totalPercentage = 0;
+    int count = 0;
+
+    for (int i = 1; i < availableValues.length; i++) {
+      final previous = availableValues[i - 1];
+      final current = availableValues[i];
+
+      if (previous == 0) continue;
+
+      final increase = ((current - previous) / previous) * 100;
+      totalPercentage += increase;
+      count++;
+    }
+
+    if (count == 0) return 0;
+    return totalPercentage / count;
+  }
+
+  Future<List<int>> _buildIncomePdfBytes({
+    required int year,
+    required List<_IncomeRowData> rows,
+    required double profitIncreasePercentage,
+  }) async {
+    final doc = pw.Document();
+
+    final now = DateTime.now();
+    final dateFmt = DateFormat('dd.MM.yyyy HH:mm');
+
+    final darkPurple = PdfColor.fromHex("#4A148C");
+    final midPurple = PdfColor.fromHex("#9C27B0");
+    final lightPurpleBg = PdfColor.fromHex("#F3E5F5");
+    final borderColor = PdfColor.fromHex("#D9D9DE");
+    final textColor = PdfColor.fromHex("#222222");
+    final subTextColor = PdfColor.fromHex("#6F6F78");
+    final tableHeaderBg = PdfColor.fromHex("#4A148C");
+    final evenRowBg = PdfColor.fromHex("#FAFAFC");
+
+    final availableRows =
+        rows.where((e) => e.isAvailable && e.premiumIncome != null).toList();
+
+    final totalPremiumIncome = availableRows.fold<double>(
+      0,
+      (sum, item) => sum + (item.premiumIncome ?? 0),
+    );
+
+    final averagePerCompletedMonth =
+        availableRows.isEmpty ? 0 : totalPremiumIncome / availableRows.length;
+
+    _IncomeRowData? bestMonth;
+    if (availableRows.isNotEmpty) {
+      bestMonth = availableRows.reduce((a, b) {
+        final aVal = a.premiumIncome ?? 0;
+        final bVal = b.premiumIncome ?? 0;
+        return aVal >= bVal ? a : b;
+      });
+    }
+
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.fromLTRB(28, 28, 28, 28),
+        build: (context) => [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    "GrooveOn Income Report",
+                    style: pw.TextStyle(
+                      fontSize: 22,
+                      fontWeight: pw.FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    "Generated: ${dateFmt.format(now)}",
+                    style: pw.TextStyle(
+                      fontSize: 10,
+                      color: subTextColor,
+                    ),
+                  ),
+                ],
+              ),
+              pw.Container(
+                padding: const pw.EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
+                decoration: pw.BoxDecoration(
+                  color: lightPurpleBg,
+                  borderRadius: pw.BorderRadius.circular(8),
+                  border: pw.Border.all(color: midPurple, width: 1),
+                ),
+                child: pw.Text(
+                  "Year: $year",
+                  style: pw.TextStyle(
+                    fontSize: 11,
+                    fontWeight: pw.FontWeight.bold,
+                    color: darkPurple,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          pw.SizedBox(height: 18),
+          pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Expanded(
+                child: _buildPdfKpiCard(
+                  title: "Total premium income",
+                  value: "${totalPremiumIncome.toStringAsFixed(2)} KM",
+                  darkPurple: darkPurple,
+                  borderColor: borderColor,
+                  subTextColor: subTextColor,
+                ),
+              ),
+              pw.SizedBox(width: 10),
+              pw.Expanded(
+                child: _buildPdfKpiCard(
+                  title: "Best month",
+                  value: bestMonth == null
+                      ? "No data"
+                      : "${bestMonth.month} - ${bestMonth.premiumIncome!.toStringAsFixed(2)} KM",
+                  darkPurple: darkPurple,
+                  borderColor: borderColor,
+                  subTextColor: subTextColor,
+                ),
+              ),
+              pw.SizedBox(width: 10),
+              pw.Expanded(
+                child: _buildPdfKpiCard(
+                  title: "Average per completed month",
+                  value: "${averagePerCompletedMonth.toStringAsFixed(2)} KM",
+                  darkPurple: darkPurple,
+                  borderColor: borderColor,
+                  subTextColor: subTextColor,
+                ),
+              ),
+            ],
+          ),
+          pw.SizedBox(height: 22),
+          pw.Text(
+            "Income details",
+            style: pw.TextStyle(
+              fontSize: 14,
+              fontWeight: pw.FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          pw.SizedBox(height: 8),
+          pw.Table(
+            border: pw.TableBorder.all(color: borderColor, width: 0.8),
+            columnWidths: {
+              0: const pw.FlexColumnWidth(3),
+              1: const pw.FlexColumnWidth(5),
+            },
+            children: [
+              pw.TableRow(
+                decoration: pw.BoxDecoration(color: tableHeaderBg),
+                children: [
+                  _pdfHeaderCell("Month"),
+                  _pdfHeaderCell("Premium income"),
+                ],
+              ),
+              ...List.generate(rows.length, (index) {
+                final row = rows[index];
+                final isEven = index % 2 == 0;
+
+                return pw.TableRow(
+                  decoration: pw.BoxDecoration(
+                    color: isEven ? evenRowBg : PdfColors.white,
+                  ),
+                  children: [
+                    _pdfBodyCell(row.month, textColor),
+                    _pdfBodyCell(
+                      row.isAvailable && row.premiumIncome != null
+                          ? "${row.premiumIncome!.toStringAsFixed(2)} KM"
+                          : "x",
+                      textColor,
+                    ),
+                  ],
+                );
+              }),
+            ],
+          ),
+          pw.SizedBox(height: 18),
+          pw.Container(
+            width: double.infinity,
+            padding: const pw.EdgeInsets.all(14),
+            decoration: pw.BoxDecoration(
+              color: lightPurpleBg,
+              borderRadius: pw.BorderRadius.circular(10),
+              border: pw.Border.all(color: midPurple),
+            ),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  "Average profit increase per month",
+                  style: pw.TextStyle(
+                    fontSize: 12,
+                    fontWeight: pw.FontWeight.bold,
+                    color: darkPurple,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  "${profitIncreasePercentage.toStringAsFixed(2)}%",
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        footer: (context) => pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              "GrooveOn internal report",
+              style: pw.TextStyle(
+                fontSize: 10,
+                color: subTextColor,
+              ),
+            ),
+            pw.Text(
+              "Page ${context.pageNumber} / ${context.pagesCount}",
+              style: pw.TextStyle(
+                fontSize: 10,
+                color: subTextColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return doc.save();
+  }
+
+  pw.Widget _buildPdfKpiCard({
+    required String title,
+    required String value,
+    required PdfColor darkPurple,
+    required PdfColor borderColor,
+    required PdfColor subTextColor,
+  }) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(12),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.white,
+        borderRadius: pw.BorderRadius.circular(10),
+        border: pw.Border.all(color: borderColor),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            title,
+            style: pw.TextStyle(
+              fontSize: 10,
+              color: subTextColor,
+            ),
+          ),
+          pw.SizedBox(height: 8),
+          pw.Text(
+            value,
+            style: pw.TextStyle(
+              fontSize: 14,
+              fontWeight: pw.FontWeight.bold,
+              color: darkPurple,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _pdfHeaderCell(String text) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          color: PdfColors.white,
+          fontWeight: pw.FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  pw.Widget _pdfBodyCell(String text, PdfColor textColor) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          color: textColor,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _printIncomeReport({
+    required int year,
+    required List<_IncomeRowData> rows,
+    required double profitIncreasePercentage,
+  }) async {
+    final path = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save income report PDF',
+      fileName: 'GrooveOn_Income_Report_$year.pdf',
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (path == null) return;
+
+    try {
+      final bytes = await _buildIncomePdfBytes(
+        year: year,
+        rows: rows,
+        profitIncreasePercentage: profitIncreasePercentage,
+      );
+
+      final file = File(path);
+      await file.writeAsBytes(bytes, flush: true);
+      await OpenFilex.open(file.path);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Cannot create PDF: $e")),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<IncomeByMonthResponse>>(
+      future: _futureIncome,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Container(
+                  height: 610,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: IncomeScreen.borderColor),
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 18),
+              const _ProfitIncreaseCard(
+                profitIncreasePercentage: 0,
+              ),
+            ],
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: IncomeScreen.borderColor),
+            ),
+            child: Text(
+              "Greska pri ucitavanju detalja prihoda: ${snapshot.error}",
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 14,
+              ),
+            ),
+          );
+        }
+
+        final incomeData = snapshot.data ?? [];
+        final rows = _buildRows(widget.selectedYear, incomeData);
+        final profitIncrease = _calculateAverageMonthlyIncrease(rows);
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _IncomeDetailsTableCard(
+                selectedYear: widget.selectedYear,
+                rows: rows,
+                onPrint: () {
+                  _printIncomeReport(
+                    year: widget.selectedYear,
+                    rows: rows,
+                    profitIncreasePercentage: profitIncrease,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 18),
+            _ProfitIncreaseCard(
+              profitIncreasePercentage: profitIncrease,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _IncomeDetailsTableCard extends StatelessWidget {
+  final int selectedYear;
+  final List<_IncomeRowData> rows;
+  final VoidCallback onPrint;
+
+  const _IncomeDetailsTableCard({
+    required this.selectedYear,
+    required this.rows,
+    required this.onPrint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -48,40 +552,15 @@ class _IncomeDetailsTableCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Income Details",
-            style: TextStyle(
+          Text(
+            "Income Details - $selectedYear",
+            style: const TextStyle(
               fontSize: 31,
               fontWeight: FontWeight.w800,
               color: IncomeScreen.textColor,
             ),
           ),
           const SizedBox(height: 12),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const SizedBox(width: 180),
-              Row(
-                children: [
-                  const Text(
-                    "Select time interval:",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: IncomeScreen.textColor,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  _FakeDateField(label: "From"),
-                  const SizedBox(width: 8),
-                  _FakeDateField(label: "To"),
-                ],
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: IncomeScreen.borderColor),
@@ -95,32 +574,20 @@ class _IncomeDetailsTableCard extends StatelessWidget {
                     children: [
                       _TableCell(
                         text: "Month",
-                        flex: 2,
+                        flex: 3,
                         isHeader: true,
                         hasRightBorder: true,
                       ),
                       _TableCell(
                         text: "Premium account income",
-                        flex: 3,
-                        isHeader: true,
-                        hasRightBorder: true,
-                      ),
-                      _TableCell(
-                        text: "Paid promotions income",
-                        flex: 3,
-                        isHeader: true,
-                        hasRightBorder: true,
-                      ),
-                      _TableCell(
-                        text: "Paid ads income",
-                        flex: 2,
+                        flex: 5,
                         isHeader: true,
                       ),
                     ],
                   ),
                 ),
-                ...months.map(
-                  (month) => Container(
+                ...rows.map(
+                  (row) => Container(
                     decoration: const BoxDecoration(
                       border: Border(
                         top: BorderSide(color: IncomeScreen.borderColor),
@@ -129,23 +596,15 @@ class _IncomeDetailsTableCard extends StatelessWidget {
                     child: Row(
                       children: [
                         _TableCell(
-                          text: month,
-                          flex: 2,
-                          hasRightBorder: true,
-                        ),
-                        const _TableCell(
-                          text: "",
+                          text: row.month,
                           flex: 3,
                           hasRightBorder: true,
                         ),
-                        const _TableCell(
-                          text: "",
-                          flex: 3,
-                          hasRightBorder: true,
-                        ),
-                        const _TableCell(
-                          text: "",
-                          flex: 2,
+                        _TableCell(
+                          text: row.isAvailable && row.premiumIncome != null
+                              ? row.premiumIncome!.toStringAsFixed(2)
+                              : "x",
+                          flex: 5,
                         ),
                       ],
                     ),
@@ -154,16 +613,14 @@ class _IncomeDetailsTableCard extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 14),
-
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
               width: 92,
               height: 34,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: onPrint,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: IncomeScreen.darkPurple,
                   foregroundColor: Colors.white,
@@ -181,45 +638,6 @@ class _IncomeDetailsTableCard extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FakeDateField extends StatelessWidget {
-  final String label;
-
-  const _FakeDateField({
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 88,
-      height: 22,
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F9FB),
-        border: Border.all(color: IncomeScreen.borderColor),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 10,
-                color: IncomeScreen.subTextColor,
-              ),
-            ),
-          ),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            size: 14,
-            color: IncomeScreen.subTextColor,
           ),
         ],
       ),
@@ -269,7 +687,11 @@ class _TableCell extends StatelessWidget {
 }
 
 class _ProfitIncreaseCard extends StatelessWidget {
-  const _ProfitIncreaseCard();
+  final double profitIncreasePercentage;
+
+  const _ProfitIncreaseCard({
+    required this.profitIncreasePercentage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -280,10 +702,10 @@ class _ProfitIncreaseCard extends StatelessWidget {
         color: Colors.white,
         border: Border.all(color: IncomeScreen.borderColor),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Profit increase",
             style: TextStyle(
               fontSize: 15,
@@ -291,19 +713,19 @@ class _ProfitIncreaseCard extends StatelessWidget {
               color: IncomeScreen.textColor,
             ),
           ),
-          SizedBox(height: 2),
-          Text(
+          const SizedBox(height: 2),
+          const Text(
             "per month",
             style: TextStyle(
               fontSize: 11,
               color: IncomeScreen.subTextColor,
             ),
           ),
-          SizedBox(height: 26),
+          const SizedBox(height: 26),
           Center(
             child: Text(
-              "xx.xx%",
-              style: TextStyle(
+              "${profitIncreasePercentage.toStringAsFixed(2)}%",
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: IncomeScreen.textColor,
@@ -314,4 +736,16 @@ class _ProfitIncreaseCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _IncomeRowData {
+  final String month;
+  final double? premiumIncome;
+  final bool isAvailable;
+
+  _IncomeRowData({
+    required this.month,
+    required this.premiumIncome,
+    required this.isAvailable,
+  });
 }
