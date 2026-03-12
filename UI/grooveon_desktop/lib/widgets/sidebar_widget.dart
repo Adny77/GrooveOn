@@ -39,7 +39,6 @@ class _SidebarWidgetState extends State<SidebarWidget> {
 
   User? _loggedUser;
   bool _isLoadingUser = true;
-  bool _loadedOnce = false;
 
   File? _pickedImage;
   bool _isImageChanged = false;
@@ -63,17 +62,11 @@ class _SidebarWidgetState extends State<SidebarWidget> {
     _usernameController = TextEditingController();
     _phoneNumberController = TextEditingController();
     _birthDateController = TextEditingController();
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (!_loadedOnce) {
-      _loadedOnce = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _userProvider = context.read<UserProvider>();
       _loadLoggedUser();
-    }
+    });
   }
 
   @override
@@ -90,8 +83,18 @@ class _SidebarWidgetState extends State<SidebarWidget> {
   Future<void> _loadLoggedUser() async {
     try {
       if (Session.userId == null) {
-        setState(() => _isLoadingUser = false);
+        if (!mounted) return;
+        setState(() {
+          _loggedUser = null;
+          _isLoadingUser = false;
+        });
         return;
+      }
+
+      if (mounted) {
+        setState(() {
+          _isLoadingUser = true;
+        });
       }
 
       final user = await _userProvider.getById(Session.userId!);
@@ -101,7 +104,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
         _loggedUser = user;
         _isLoadingUser = false;
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoadingUser = false;
@@ -127,6 +130,37 @@ class _SidebarWidgetState extends State<SidebarWidget> {
       AppRoutes.login,
       (route) => false,
     );
+  }
+
+  String? _formatDateForApi(String value) {
+    if (value.trim().isEmpty) return null;
+
+    try {
+      final cleaned = value.replaceAll(' ', '').replaceAll('.', '');
+      final parts = cleaned.split(RegExp(r'[-/]'));
+
+      if (parts.length == 3) {
+        return DateTime.parse(
+          "${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}",
+        ).toIso8601String();
+      }
+
+      final dotParts = value
+          .replaceAll(' ', '')
+          .split('.')
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      if (dotParts.length == 3) {
+        return DateTime.parse(
+          "${dotParts[2]}-${dotParts[1].padLeft(2, '0')}-${dotParts[0].padLeft(2, '0')}",
+        ).toIso8601String();
+      }
+
+      return null;
+    } catch (_) {
+      return null;
+    }
   }
 
   Widget _datePickerField({
@@ -166,8 +200,8 @@ class _SidebarWidgetState extends State<SidebarWidget> {
         if (picked == null) return;
 
         controller.text =
-            "${picked.day.toString().padLeft(2, '0')}. "
-            "${picked.month.toString().padLeft(2, '0')}. "
+            "${picked.day.toString().padLeft(2, '0')}."
+            "${picked.month.toString().padLeft(2, '0')}."
             "${picked.year}.";
 
         onAnyChanged();
@@ -213,14 +247,14 @@ class _SidebarWidgetState extends State<SidebarWidget> {
     if (user != null) {
       _firstNameController.text = user.firstName ?? '';
       _lastNameController.text = user.lastName ?? '';
-      _emailController.text = user.email;
-      _usernameController.text = user.username;
+      _emailController.text = user.email!;
+      _usernameController.text = user.username!;
       _phoneNumberController.text = user.phoneNumber ?? '';
 
       if (user.dateOfBirth != null) {
         _birthDateController.text =
-            "${user.dateOfBirth!.day.toString().padLeft(2, '0')}. "
-            "${user.dateOfBirth!.month.toString().padLeft(2, '0')}. "
+            "${user.dateOfBirth!.day.toString().padLeft(2, '0')}."
+            "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
             "${user.dateOfBirth!.year}.";
       } else {
         _birthDateController.text = '';
@@ -236,17 +270,18 @@ class _SidebarWidgetState extends State<SidebarWidget> {
             if (_isImageChanged) return true;
             if (user == null) return false;
 
+            final originalBirthDate = user.dateOfBirth != null
+                ? "${user.dateOfBirth!.day.toString().padLeft(2, '0')}."
+                  "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
+                  "${user.dateOfBirth!.year}."
+                : "";
+
             return _firstNameController.text != (user.firstName ?? '') ||
                 _lastNameController.text != (user.lastName ?? '') ||
                 _emailController.text != user.email ||
                 _usernameController.text != user.username ||
                 _phoneNumberController.text != (user.phoneNumber ?? '') ||
-                _birthDateController.text !=
-                    (user.dateOfBirth != null
-                        ? "${user.dateOfBirth!.day.toString().padLeft(2, '0')}. "
-                          "${user.dateOfBirth!.month.toString().padLeft(2, '0')}. "
-                          "${user.dateOfBirth!.year}."
-                        : "");
+                _birthDateController.text != originalBirthDate;
           }
 
           return BaseDialog(
@@ -282,20 +317,12 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                 }
 
                 await _userProvider.update(Session.userId!, {
-                  'firstName': _firstNameController.text,
-                  'lastName': _lastNameController.text,
-                  'email': _emailController.text,
-                  'username': _usernameController.text,
-                  'phoneNumber': _phoneNumberController.text,
-                  'dateOfBirth': _birthDateController.text.isNotEmpty
-                      ? DateTime.parse(
-                          _birthDateController.text
-                              .replaceAll('.', '')
-                              .split(' ')
-                              .reversed
-                              .join('-'),
-                        ).toIso8601String()
-                      : null,
+                  'firstName': _firstNameController.text.trim(),
+                  'lastName': _lastNameController.text.trim(),
+                  'email': _emailController.text.trim(),
+                  'username': _usernameController.text.trim(),
+                  'phoneNumber': _phoneNumberController.text.trim(),
+                  'dateOfBirth': _formatDateForApi(_birthDateController.text),
                   'userImage': finalImage,
                 });
 
@@ -355,9 +382,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                                   : "${ApiConfig.apiBase}/images/users/${user.userImage!}",
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  ImageHelper.userPlaceholder(user.username),
+                                  ImageHelper.userPlaceholder(user.username!),
                             )
-                          : ImageHelper.userPlaceholder(user.username)),
+                          : ImageHelper.userPlaceholder(user.username!)),
                 ),
               ),
               const SizedBox(width: 16),
@@ -366,7 +393,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      fullName,
+                      fullName!,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -375,7 +402,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      user.email,
+                      user.email!,
                       style: const TextStyle(
                         fontSize: 14,
                         color: SidebarWidget.subTextColor,
@@ -545,7 +572,8 @@ class _SidebarWidgetState extends State<SidebarWidget> {
   }
 
   String _displayName() {
-    if (_isLoadingUser || _loggedUser == null) return "Jane Doe";
+    if (_isLoadingUser) return "Loading...";
+    if (_loggedUser == null) return "Jane Doe";
 
     final fullName =
         "${_loggedUser?.firstName ?? ''} ${_loggedUser?.lastName ?? ''}".trim();

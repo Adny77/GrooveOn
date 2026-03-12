@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/providers/auth_provider.dart';
+import 'package:grooveon_desktop/providers/report_provider.dart';
 import 'package:grooveon_desktop/providers/user_provider.dart';
 import 'package:grooveon_desktop/routes/app_routes.dart';
 import 'package:grooveon_desktop/screens/login_screen.dart';
@@ -13,6 +14,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ReportProvider()),
       ],
       child: const RentifyApp(),
     ),

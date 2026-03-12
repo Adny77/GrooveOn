@@ -8,17 +8,19 @@ part of 'user.dart';
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
   id: (json['id'] as num).toInt(),
-  firstName: json['firstName'] as String,
-  lastName: json['lastName'] as String,
-  username: json['username'] as String,
-  email: json['email'] as String,
+  firstName: json['firstName'] as String?,
+  lastName: json['lastName'] as String?,
+  username: json['username'] as String?,
+  email: json['email'] as String?,
   userImage: json['userImage'] as String?,
   dateOfBirth: json['dateOfBirth'] == null
       ? null
       : DateTime.parse(json['dateOfBirth'] as String),
   phoneNumber: json['phoneNumber'] as String?,
   isActive: json['isActive'] as bool,
-  joinDate: DateTime.parse(json['joinDate'] as String),
+  joinDate: json['joinDate'] == null
+      ? null
+      : DateTime.parse(json['joinDate'] as String),
   lastLogin: json['lastLogin'] == null
       ? null
       : DateTime.parse(json['lastLogin'] as String),
@@ -34,6 +36,6 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
   'phoneNumber': instance.phoneNumber,
   'isActive': instance.isActive,
-  'joinDate': instance.joinDate.toIso8601String(),
+  'joinDate': instance.joinDate?.toIso8601String(),
   'lastLogin': instance.lastLogin?.toIso8601String(),
 };

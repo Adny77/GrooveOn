@@ -61,6 +61,7 @@ builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();

@@ -68,7 +68,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 1,
-                    Username = "admin123",
+                    FirstName = "Marko",
+                    LastName = "Petrović",
+                    Username = "markopetrovic01",
                     Password = string.Empty,
                     PasswordHash = adminHash,
                     PasswordSalt = adminSalt,
@@ -83,7 +85,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 2,
-                    Username = "admin456",
+                    FirstName = "Nikola",
+                    LastName = "Jovanović",
+                    Username = "nikolajovanovic02",
                     Password = string.Empty,
                     PasswordHash = adminHash,
                     PasswordSalt = adminSalt,
@@ -95,11 +99,12 @@ namespace GrooveOn.Services.Database
                     JoinDate = new DateTime(2026, 3, 10),
                     LastLogin = null
                 },
-
                 new User
                 {
                     Id = 3,
-                    Username = "user1234",
+                    FirstName = "Amar",
+                    LastName = "Hadžić",
+                    Username = "amarhadzic03",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -114,7 +119,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 4,
-                    Username = "music2026",
+                    FirstName = "Lejla",
+                    LastName = "Kovačević",
+                    Username = "lejlakovacevic04",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -129,7 +136,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 5,
-                    Username = "groove789",
+                    FirstName = "Benjamin",
+                    LastName = "Mehić",
+                    Username = "benjaminmehic05",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -144,7 +153,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 6,
-                    Username = "playlist1",
+                    FirstName = "Sara",
+                    LastName = "Delić",
+                    Username = "saradelic06",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -159,7 +170,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 7,
-                    Username = "album2025",
+                    FirstName = "Adnan",
+                    LastName = "Karić",
+                    Username = "adnankaric07",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -174,7 +187,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 8,
-                    Username = "rockstar9",
+                    FirstName = "Emina",
+                    LastName = "Selimović",
+                    Username = "eminaselimovic08",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -189,7 +204,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 9,
-                    Username = "indie2024",
+                    FirstName = "Haris",
+                    LastName = "Mujić",
+                    Username = "harismujic09",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -204,7 +221,9 @@ namespace GrooveOn.Services.Database
                 new User
                 {
                     Id = 10,
-                    Username = "listener8",
+                    FirstName = "Jasmin",
+                    LastName = "Alić",
+                    Username = "jasminalic10",
                     Password = string.Empty,
                     PasswordHash = userHash,
                     PasswordSalt = userSalt,
@@ -217,6 +236,8 @@ namespace GrooveOn.Services.Database
                     LastLogin = null
                 }
             );
+
+            modelBuilder.Entity<User>().HasData(GenerateAdditionalUsers(userHash, userSalt));
 
             modelBuilder.Entity<UserRole>().HasData(
                 new UserRole { Id = 1, UserId = 1, RoleId = 1, DateAssigned = new DateTime(2026, 3, 10) },
@@ -236,7 +257,7 @@ namespace GrooveOn.Services.Database
                 new SubscriptionPlan
                 {
                     Id = 1,
-                    Name = "Free",
+                    Name = "Basic account",
                     Price = 0,
                     DurationDays = 0,
                     Description = "Osnovni plan sa preview pristupom",
@@ -245,22 +266,396 @@ namespace GrooveOn.Services.Database
                 new SubscriptionPlan
                 {
                     Id = 2,
-                    Name = "Premium",
+                    Name = "Premium account",
                     Price = 4.99f,
                     DurationDays = 30,
                     Description = "Premium plan za 30 dana",
                     IsActive = true
-                },
-                new SubscriptionPlan
-                {
-                    Id = 3,
-                    Name = "Premium Plus",
-                    Price = 9.99f,
-                    DurationDays = 30,
-                    Description = "Napredni plan za 30 dana",
-                    IsActive = true
                 }
             );
+
+            modelBuilder.Entity<Subscription>().HasData(
+                new Subscription
+                {
+                    Id = 1,
+                    UserId = 1,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 1, 5),
+                    ExpiryDate = new DateTime(2026, 2, 5),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 1, 5)
+                },
+                new Subscription
+                {
+                    Id = 2,
+                    UserId = 2,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 1, 10),
+                    ExpiryDate = new DateTime(2026, 2, 10),
+                    IsActive = true,
+                    PaymentMethod = "PayPal",
+                    PaymentAmount = 9.99f,
+                    PaymentDate = new DateTime(2026, 1, 10)
+                },
+                new Subscription
+                {
+                    Id = 3,
+                    UserId = 3,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 1, 12),
+                    ExpiryDate = new DateTime(2026, 1, 12),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 4,
+                    UserId = 4,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 1, 15),
+                    ExpiryDate = new DateTime(2026, 1, 15),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 5,
+                    UserId = 5,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 2, 2),
+                    ExpiryDate = new DateTime(2026, 3, 2),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 2, 2)
+                },
+                new Subscription
+                {
+                    Id = 6,
+                    UserId = 6,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 2, 8),
+                    ExpiryDate = new DateTime(2026, 2, 8),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 7,
+                    UserId = 7,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 2, 18),
+                    ExpiryDate = new DateTime(2026, 3, 18),
+                    IsActive = true,
+                    PaymentMethod = "PayPal",
+                    PaymentAmount = 9.99f,
+                    PaymentDate = new DateTime(2026, 2, 18)
+                },
+                new Subscription
+                {
+                    Id = 8,
+                    UserId = 8,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 3, 1),
+                    ExpiryDate = new DateTime(2026, 3, 1),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 9,
+                    UserId = 9,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 3, 9),
+                    ExpiryDate = new DateTime(2026, 4, 9),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 3, 9)
+                },
+                new Subscription
+                {
+                    Id = 10,
+                    UserId = 10,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 3, 20),
+                    ExpiryDate = new DateTime(2026, 3, 20),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 11,
+                    UserId = 3,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 4, 4),
+                    ExpiryDate = new DateTime(2026, 5, 4),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 4, 4)
+                },
+                new Subscription
+                {
+                    Id = 12,
+                    UserId = 4,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 4, 11),
+                    ExpiryDate = new DateTime(2026, 4, 11),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 13,
+                    UserId = 5,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 5, 6),
+                    ExpiryDate = new DateTime(2026, 6, 6),
+                    IsActive = true,
+                    PaymentMethod = "PayPal",
+                    PaymentAmount = 9.99f,
+                    PaymentDate = new DateTime(2026, 5, 6)
+                },
+                new Subscription
+                {
+                    Id = 14,
+                    UserId = 6,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 5, 14),
+                    ExpiryDate = new DateTime(2026, 5, 14),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 15,
+                    UserId = 7,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 6, 3),
+                    ExpiryDate = new DateTime(2026, 7, 3),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 6, 3)
+                },
+                new Subscription
+                {
+                    Id = 16,
+                    UserId = 8,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 6, 12),
+                    ExpiryDate = new DateTime(2026, 6, 12),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 17,
+                    UserId = 9,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 7, 7),
+                    ExpiryDate = new DateTime(2026, 8, 7),
+                    IsActive = true,
+                    PaymentMethod = "PayPal",
+                    PaymentAmount = 9.99f,
+                    PaymentDate = new DateTime(2026, 7, 7)
+                },
+                new Subscription
+                {
+                    Id = 18,
+                    UserId = 10,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 7, 21),
+                    ExpiryDate = new DateTime(2026, 7, 21),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 19,
+                    UserId = 1,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 8, 2),
+                    ExpiryDate = new DateTime(2026, 9, 2),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 8, 2)
+                },
+                new Subscription
+                {
+                    Id = 20,
+                    UserId = 2,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 8, 10),
+                    ExpiryDate = new DateTime(2026, 8, 10),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 21,
+                    UserId = 3,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 9, 5),
+                    ExpiryDate = new DateTime(2026, 10, 5),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 9, 5)
+                },
+                new Subscription
+                {
+                    Id = 22,
+                    UserId = 4,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 9, 15),
+                    ExpiryDate = new DateTime(2026, 9, 15),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 23,
+                    UserId = 5,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 10, 4),
+                    ExpiryDate = new DateTime(2026, 11, 4),
+                    IsActive = true,
+                    PaymentMethod = "PayPal",
+                    PaymentAmount = 9.99f,
+                    PaymentDate = new DateTime(2026, 10, 4)
+                },
+                new Subscription
+                {
+                    Id = 24,
+                    UserId = 6,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 10, 18),
+                    ExpiryDate = new DateTime(2026, 10, 18),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 25,
+                    UserId = 7,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 11, 6),
+                    ExpiryDate = new DateTime(2026, 12, 6),
+                    IsActive = true,
+                    PaymentMethod = "Card",
+                    PaymentAmount = 4.99f,
+                    PaymentDate = new DateTime(2026, 11, 6)
+                },
+                new Subscription
+                {
+                    Id = 26,
+                    UserId = 8,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 11, 16),
+                    ExpiryDate = new DateTime(2026, 11, 16),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                },
+                new Subscription
+                {
+                    Id = 27,
+                    UserId = 9,
+                    SubscriptionPlanId = 2,
+                    StartDate = new DateTime(2026, 12, 8),
+                    ExpiryDate = new DateTime(2027, 1, 8),
+                    IsActive = true,
+                    PaymentMethod = "PayPal",
+                    PaymentAmount = 9.99f,
+                    PaymentDate = new DateTime(2026, 12, 8)
+                },
+                new Subscription
+                {
+                    Id = 28,
+                    UserId = 10,
+                    SubscriptionPlanId = 1,
+                    StartDate = new DateTime(2026, 12, 20),
+                    ExpiryDate = new DateTime(2026, 12, 20),
+                    IsActive = true,
+                    PaymentMethod = null,
+                    PaymentAmount = 0,
+                    PaymentDate = null
+                }
+            );
+        }
+
+        private static List<User> GenerateAdditionalUsers(string userHash, string userSalt)
+        {
+            var random = new Random(20260311);
+            var users = new List<User>();
+
+            int startId = 11;
+            int count = 60;
+
+            for (int i = 0; i < count; i++)
+            {
+                int id = startId + i;
+
+                int year = random.Next(0, 2) == 0 ? 2025 : 2026;
+                int month = random.Next(1, 13);
+                int day = random.Next(1, DateTime.DaysInMonth(year, month) + 1);
+
+                var joinDate = new DateTime(year, month, day);
+
+                users.Add(new User
+                {
+                    Id = id,
+                    FirstName = $"User{id}",
+                    LastName = $"Test{id}",
+                    Username = $"user{id}test{id % 100}",
+                    Password = string.Empty,
+                    PasswordHash = userHash,
+                    PasswordSalt = userSalt,
+                    Email = $"user{id}@grooveon.com",
+                    UserImage = null,
+                    DateOfBirth = new DateTime(
+                        1995 + random.Next(10),
+                        random.Next(1, 13),
+                        random.Next(1, 28)
+                    ),
+                    PhoneNumber = $"061{random.Next(100000, 999999)}",
+                    IsActive = true,
+                    JoinDate = joinDate,
+                    LastLogin = null
+                });
+            }
+
+            return users;
         }
     }
 }

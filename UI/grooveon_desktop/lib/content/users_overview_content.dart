@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:grooveon_desktop/models/subscription_analytics.dart';
+import 'package:grooveon_desktop/models/user_growth_point.dart';
+import 'package:grooveon_desktop/providers/report_provider.dart';
+import 'package:provider/provider.dart';
 
-class UsersOverContent extends StatelessWidget {
+class UsersOverContent extends StatefulWidget {
   const UsersOverContent({super.key});
 
   static const Color primaryColor = Color(0xFF9C27B0);
@@ -13,9 +17,59 @@ class UsersOverContent extends StatelessWidget {
   static const Color subTextColor = Color(0xFF6F6F78);
 
   @override
+  State<UsersOverContent> createState() => _UsersOverContentState();
+}
+
+class _UsersOverContentState extends State<UsersOverContent> {
+  bool _yearMode = true;
+  int _selectedGrowthYear = 2026;
+
+  late Future<SubscriptionAnalytics> _futureAnalytics;
+  late Future<List<UserGrowthPoint>> _futureGrowth;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureAnalytics = _loadAnalytics();
+    _futureGrowth = _loadGrowth();
+  }
+
+  Future<SubscriptionAnalytics> _loadAnalytics() {
+    final provider = context.read<ReportProvider>();
+
+    return provider.getAnalytics(
+      year: 2026,
+      month: _yearMode ? null : DateTime.now().month,
+    );
+  }
+
+  Future<List<UserGrowthPoint>> _loadGrowth() {
+    final provider = context.read<ReportProvider>();
+    return provider.getUserGrowthByMonth(year: _selectedGrowthYear);
+  }
+
+  void _changeMode(bool yearMode) {
+    if (_yearMode == yearMode) return;
+
+    setState(() {
+      _yearMode = yearMode;
+      _futureAnalytics = _loadAnalytics();
+    });
+  }
+
+  void _changeGrowthYear(int year) {
+    if (_selectedGrowthYear == year) return;
+
+    setState(() {
+      _selectedGrowthYear = year;
+      _futureGrowth = _loadGrowth();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: bgColor,
+      color: UsersOverContent.bgColor,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,79 +78,205 @@ class UsersOverContent extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  _UsersAnalyticsSection(),
+                children: [
+                  FutureBuilder<SubscriptionAnalytics>(
+                    future: _futureAnalytics,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container(
+                          height: 320,
+                          decoration: BoxDecoration(
+                            color: UsersOverContent.cardColor,
+                            border: Border.all(
+                              color: UsersOverContent.borderColor,
+                            ),
+                          ),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: UsersOverContent.cardColor,
+                            border: Border.all(
+                              color: UsersOverContent.borderColor,
+                            ),
+                          ),
+                          child: Text(
+                            "Greška pri učitavanju podataka: ${snapshot.error}",
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      }
+
+                      final data = snapshot.data!;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "New Users",
+                            style: TextStyle(
+                              fontSize: 31,
+                              fontWeight: FontWeight.w800,
+                              color: UsersOverContent.textColor,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: UsersOverContent.cardColor,
+                              border: Border.all(
+                                color: UsersOverContent.borderColor,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => _changeMode(true),
+                                        child: _UsersSwitchHeader(
+                                          title: "Year",
+                                          active: _yearMode,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => _changeMode(false),
+                                        child: _UsersSwitchHeader(
+                                          title: "Month",
+                                          active: !_yearMode,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(18),
+                                  child: _UsersDonutSection(data: data),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "User growth overview",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: UsersOverContent.textColor,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: UsersOverContent.borderColor,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: DropdownButton<int>(
+                          value: _selectedGrowthYear,
+                          underline: const SizedBox(),
+                          borderRadius: BorderRadius.circular(12),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 2025,
+                              child: Text("2025"),
+                            ),
+                            DropdownMenuItem(
+                              value: 2026,
+                              child: Text("2026"),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+                            _changeGrowthYear(value);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  FutureBuilder<List<UserGrowthPoint>>(
+                    future: _futureGrowth,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container(
+                          height: 210,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: UsersOverContent.borderColor,
+                            ),
+                          ),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: UsersOverContent.borderColor,
+                            ),
+                          ),
+                          child: Text(
+                            "Greška pri učitavanju rasta korisnika: ${snapshot.error}",
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      }
+
+                      final growthData = snapshot.data ?? [];
+
+                      return _UserGrowthOverviewCard(
+                        data: growthData,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 18),
-          const _AverageUseTimeCard(),
+          FutureBuilder<List<UserGrowthPoint>>(
+            future: _futureGrowth,
+            builder: (context, snapshot) {
+              final growthData = snapshot.data ?? const <UserGrowthPoint>[];
+              return _NewUsersAverageCard(data: growthData);
+            },
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _UsersAnalyticsSection extends StatelessWidget {
-  const _UsersAnalyticsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "New Users",
-          style: TextStyle(
-            fontSize: 31,
-            fontWeight: FontWeight.w800,
-            color: UsersOverContent.textColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: UsersOverContent.cardColor,
-            border: Border.all(color: UsersOverContent.borderColor),
-          ),
-          child: Column(
-            children: const [
-              Row(
-                children: [
-                  Expanded(
-                    child: _UsersSwitchHeader(
-                      title: "Year",
-                      active: true,
-                    ),
-                  ),
-                  Expanded(
-                    child: _UsersSwitchHeader(
-                      title: "Month",
-                      active: false,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.all(18),
-                child: _UsersDonutSection(),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 18),
-        const Text(
-          "Use time overview",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: UsersOverContent.textColor,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const _UseTimeOverviewCard(),
-      ],
     );
   }
 }
@@ -137,8 +317,9 @@ class _UsersSwitchHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color:
-                      active ? UsersOverContent.primaryColor : UsersOverContent.textColor,
+                  color: active
+                      ? UsersOverContent.primaryColor
+                      : UsersOverContent.textColor,
                 ),
               ),
             ),
@@ -150,7 +331,11 @@ class _UsersSwitchHeader extends StatelessWidget {
 }
 
 class _UsersDonutSection extends StatelessWidget {
-  const _UsersDonutSection();
+  final SubscriptionAnalytics data;
+
+  const _UsersDonutSection({
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -158,20 +343,29 @@ class _UsersDonutSection extends StatelessWidget {
       height: 240,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Expanded(
             flex: 2,
-            child: _UsersLegend(),
+            child: _UsersLegend(
+              basicCount: data.basicCount,
+              premiumCount: data.premiumCount,
+            ),
           ),
           Expanded(
             flex: 4,
             child: Center(
-              child: _DonutPlaceholder(),
+              child: _DonutChart(
+                basicPercentage: data.basicPercentage,
+                premiumPercentage: data.premiumPercentage,
+              ),
             ),
           ),
           Expanded(
             flex: 2,
-            child: _DonutPercentages(),
+            child: _DonutPercentages(
+              basicPercentage: data.basicPercentage,
+              premiumPercentage: data.premiumPercentage,
+            ),
           ),
         ],
       ),
@@ -180,7 +374,13 @@ class _UsersDonutSection extends StatelessWidget {
 }
 
 class _UsersLegend extends StatelessWidget {
-  const _UsersLegend();
+  final int basicCount;
+  final int premiumCount;
+
+  const _UsersLegend({
+    required this.basicCount,
+    required this.premiumCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -188,15 +388,15 @@ class _UsersLegend extends StatelessWidget {
       padding: const EdgeInsets.only(top: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _LegendItem(
             color: UsersOverContent.darkPurple,
-            title: "Basic Accounts",
+            title: "Basic Accounts ($basicCount)",
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _LegendItem(
             color: UsersOverContent.lightPurple,
-            title: "Premium Accounts",
+            title: "Premium Accounts ($premiumCount)",
           ),
         ],
       ),
@@ -226,8 +426,150 @@ class _LegendItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: UsersOverContent.textColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DonutChart extends StatelessWidget {
+  final double basicPercentage;
+  final double premiumPercentage;
+
+  const _DonutChart({
+    required this.basicPercentage,
+    required this.premiumPercentage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 210,
+      height: 210,
+      child: CustomPaint(
+        painter: _DonutPainter(
+          basicPercentage: basicPercentage,
+          premiumPercentage: premiumPercentage,
+        ),
+      ),
+    );
+  }
+}
+
+class _DonutPainter extends CustomPainter {
+  final double basicPercentage;
+  final double premiumPercentage;
+
+  _DonutPainter({
+    required this.basicPercentage,
+    required this.premiumPercentage,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const strokeWidth = 48.0;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - 18;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    final backgroundPaint = Paint()
+      ..color = const Color(0xFFE9E9EE)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.butt;
+
+    final basicPaint = Paint()
+      ..color = UsersOverContent.darkPurple
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.butt;
+
+    final premiumPaint = Paint()
+      ..color = UsersOverContent.lightPurple
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.butt;
+
+    canvas.drawArc(rect, -1.5708, 6.28318, false, backgroundPaint);
+
+    final basicSweep = 6.28318 * (basicPercentage / 100);
+    final premiumSweep = 6.28318 * (premiumPercentage / 100);
+
+    double startAngle = -1.5708;
+
+    if (basicSweep > 0) {
+      canvas.drawArc(rect, startAngle, basicSweep, false, basicPaint);
+      startAngle += basicSweep;
+    }
+
+    if (premiumSweep > 0) {
+      canvas.drawArc(rect, startAngle, premiumSweep, false, premiumPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonutPainter oldDelegate) {
+    return oldDelegate.basicPercentage != basicPercentage ||
+        oldDelegate.premiumPercentage != premiumPercentage;
+  }
+}
+
+class _DonutPercentages extends StatelessWidget {
+  final double basicPercentage;
+  final double premiumPercentage;
+
+  const _DonutPercentages({
+    required this.basicPercentage,
+    required this.premiumPercentage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 48),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _PercentageLabel(
+            value: "${basicPercentage.toStringAsFixed(2)}%",
+          ),
+          const SizedBox(height: 54),
+          _PercentageLabel(
+            value: "${premiumPercentage.toStringAsFixed(2)}%",
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PercentageLabel extends StatelessWidget {
+  final String value;
+
+  const _PercentageLabel({
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 22,
+          height: 1,
+          color: UsersOverContent.subTextColor,
+        ),
+        const SizedBox(width: 6),
         Text(
-          title,
+          value,
           style: const TextStyle(
             fontSize: 12,
             color: UsersOverContent.textColor,
@@ -238,157 +580,53 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-class _DonutPlaceholder extends StatelessWidget {
-  const _DonutPlaceholder();
+class _NewUsersAverageCard extends StatelessWidget {
+  final List<UserGrowthPoint> data;
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 210,
-      height: 210,
-      child: CustomPaint(
-        painter: _DonutPainter(),
-      ),
-    );
-  }
-}
-
-class _DonutPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final strokeWidth = 48.0;
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width / 2) - 18;
-
-    final rect = Rect.fromCircle(center: center, radius: radius);
-
-    final paint1 = Paint()
-      ..color = UsersOverContent.darkPurple
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
-
-    final paint2 = Paint()
-      ..color = UsersOverContent.lightPurple
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
-
-    canvas.drawArc(
-      rect,
-      -1.2,
-      5.62,
-      false,
-      paint1,
-    );
-
-    canvas.drawArc(
-      rect,
-      4.42,
-      0.66,
-      false,
-      paint2,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _DonutPercentages extends StatelessWidget {
-  const _DonutPercentages();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 48),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _PercentageLabel(
-            value: "10.56%",
-            topMargin: 0,
-          ),
-          const SizedBox(height: 54),
-          _PercentageLabel(
-            value: "89.44%",
-            topMargin: 0,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PercentageLabel extends StatelessWidget {
-  final String value;
-  final double topMargin;
-
-  const _PercentageLabel({
-    required this.value,
-    required this.topMargin,
+  const _NewUsersAverageCard({
+    required this.data,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: topMargin),
-      child: Row(
-        children: [
-          Container(
-            width: 22,
-            height: 1,
-            color: UsersOverContent.subTextColor,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 12,
-              color: UsersOverContent.textColor,
-            ),
-          ),
-        ],
-      ),
-    );
+  double _averagePerMonth() {
+    if (data.isEmpty) return 0;
+    final total = data.fold<int>(0, (sum, item) => sum + item.count);
+    return total / data.length;
   }
-}
-
-class _AverageUseTimeCard extends StatelessWidget {
-  const _AverageUseTimeCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150,
+      width: 170,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: UsersOverContent.borderColor),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Average use time",
+          const Text(
+            "Average new users",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: UsersOverContent.textColor,
             ),
           ),
-          SizedBox(height: 2),
-          Text(
-            "per day",
+          const SizedBox(height: 2),
+          const Text(
+            "per month",
             style: TextStyle(
               fontSize: 12,
               color: UsersOverContent.subTextColor,
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Center(
             child: Text(
-              "2.5hr",
-              style: TextStyle(
-                fontSize: 18,
+              _averagePerMonth().toStringAsFixed(1),
+              style: const TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: UsersOverContent.textColor,
               ),
@@ -400,28 +638,132 @@ class _AverageUseTimeCard extends StatelessWidget {
   }
 }
 
-class _UseTimeOverviewCard extends StatelessWidget {
-  const _UseTimeOverviewCard();
+class _UserGrowthOverviewCard extends StatefulWidget {
+  final List<UserGrowthPoint> data;
+
+  const _UserGrowthOverviewCard({
+    required this.data,
+  });
+
+  @override
+  State<_UserGrowthOverviewCard> createState() => _UserGrowthOverviewCardState();
+}
+
+class _UserGrowthOverviewCardState extends State<_UserGrowthOverviewCard> {
+  int? _hoveredIndex;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 210,
+      height: 230,
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: UsersOverContent.borderColor),
       ),
-      child: CustomPaint(
-        painter: _UseTimePainter(),
-        size: const Size(double.infinity, 180),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final chartSize = Size(constraints.maxWidth, 180);
+
+          return MouseRegion(
+            onHover: (event) {
+              final index = _findClosestIndex(
+                localPosition: event.localPosition,
+                size: chartSize,
+                data: widget.data,
+              );
+
+              if (_hoveredIndex != index) {
+                setState(() {
+                  _hoveredIndex = index;
+                });
+              }
+            },
+            onExit: (_) {
+              if (_hoveredIndex != null) {
+                setState(() {
+                  _hoveredIndex = null;
+                });
+              }
+            },
+            child: CustomPaint(
+              size: chartSize,
+              painter: _UserGrowthPainter(
+                widget.data,
+                hoveredIndex: _hoveredIndex,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
+
+  int? _findClosestIndex({
+    required Offset localPosition,
+    required Size size,
+    required List<UserGrowthPoint> data,
+  }) {
+    if (data.isEmpty) return null;
+
+    const leftPadding = 38.0;
+    const rightPadding = 12.0;
+    const topPadding = 18.0;
+    const bottomPadding = 34.0;
+
+    final chartWidth = size.width - leftPadding - rightPadding;
+    final chartHeight = size.height - topPadding - bottomPadding;
+
+    if (chartWidth <= 0 || chartHeight <= 0) return null;
+
+    final values = data.map((e) => e.count.toDouble()).toList();
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
+    final upperBound = _niceUpperBound(maxValue);
+
+    final points = List.generate(data.length, (index) {
+      final x = data.length == 1
+          ? leftPadding + (chartWidth / 2)
+          : leftPadding + (index * chartWidth / (data.length - 1));
+
+      final normalized = values[index] / upperBound;
+      final y = topPadding + chartHeight - (normalized * chartHeight);
+
+      return Offset(x, y);
+    });
+
+    int? closestIndex;
+    double closestDistance = double.infinity;
+
+    for (int i = 0; i < points.length; i++) {
+      final distance = (points[i] - localPosition).distance;
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = i;
+      }
+    }
+
+    return closestDistance <= 18 ? closestIndex : null;
+  }
+
+  double _niceUpperBound(double maxValue) {
+    if (maxValue <= 5) return 5;
+    if (maxValue <= 10) return 10;
+    if (maxValue <= 20) return 20;
+    if (maxValue <= 50) return 50;
+    return (maxValue / 10).ceil() * 10.0;
+  }
 }
 
-class _UseTimePainter extends CustomPainter {
+class _UserGrowthPainter extends CustomPainter {
+  final List<UserGrowthPoint> data;
+  final int? hoveredIndex;
+
+  _UserGrowthPainter(
+    this.data, {
+    this.hoveredIndex,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
@@ -430,17 +772,23 @@ class _UseTimePainter extends CustomPainter {
 
     final linePaint = Paint()
       ..color = UsersOverContent.lightPurple
-      ..strokeWidth = 2
+      ..strokeWidth = 2.2
       ..style = PaintingStyle.stroke;
 
     final fillPaint = Paint()
-      ..color = UsersOverContent.lightPurple.withOpacity(0.18)
+      ..color = UsersOverContent.lightPurple.withOpacity(0.15)
       ..style = PaintingStyle.fill;
 
-    const leftPadding = 20.0;
-    const rightPadding = 20.0;
-    const topPadding = 20.0;
-    const bottomPadding = 20.0;
+    final labelStyle = const TextStyle(
+      color: UsersOverContent.subTextColor,
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+    );
+
+    const leftPadding = 38.0;
+    const rightPadding = 12.0;
+    const topPadding = 18.0;
+    const bottomPadding = 34.0;
 
     final chartWidth = size.width - leftPadding - rightPadding;
     final chartHeight = size.height - topPadding - bottomPadding;
@@ -454,18 +802,36 @@ class _UseTimePainter extends CustomPainter {
       );
     }
 
-    final values = <double>[
-      58, 42, 66, 53, 58, 51, 45,
-      39, 57, 55, 59, 56, 44, 66,
-      52, 64,
-    ];
+    if (data.isEmpty) return;
 
-    final minValue = 30.0;
-    final maxValue = 80.0;
+    final values = data.map((e) => e.count.toDouble()).toList();
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
+    final upperBound = _niceUpperBound(maxValue);
 
-    final points = List.generate(values.length, (index) {
-      final x = leftPadding + (index * chartWidth / (values.length - 1));
-      final normalized = (values[index] - minValue) / (maxValue - minValue);
+    for (int i = 0; i < 5; i++) {
+      final y = topPadding + (i * chartHeight / 4);
+      final value = ((4 - i) * upperBound / 4).round();
+
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: value.toString(),
+          style: labelStyle,
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      textPainter.paint(
+        canvas,
+        Offset(leftPadding - textPainter.width - 8, y - textPainter.height / 2),
+      );
+    }
+
+    final points = List.generate(data.length, (index) {
+      final x = data.length == 1
+          ? leftPadding + (chartWidth / 2)
+          : leftPadding + (index * chartWidth / (data.length - 1));
+
+      final normalized = values[index] / upperBound;
       final y = topPadding + chartHeight - (normalized * chartHeight);
       return Offset(x, y);
     });
@@ -482,8 +848,115 @@ class _UseTimePainter extends CustomPainter {
 
     canvas.drawPath(fillPath, fillPaint);
     canvas.drawPath(path, linePaint);
+
+    for (int i = 0; i < points.length; i++) {
+      final isHovered = hoveredIndex == i;
+
+      if (isHovered) {
+        canvas.drawCircle(
+          points[i],
+          8,
+          Paint()..color = UsersOverContent.primaryColor.withOpacity(0.18),
+        );
+      }
+
+      canvas.drawCircle(
+        points[i],
+        isHovered ? 4.5 : 3,
+        Paint()..color = UsersOverContent.primaryColor,
+      );
+
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: data[i].label,
+          style: labelStyle,
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      textPainter.paint(
+        canvas,
+        Offset(
+          points[i].dx - textPainter.width / 2,
+          size.height - bottomPadding + 8,
+        ),
+      );
+    }
+
+    if (hoveredIndex != null &&
+        hoveredIndex! >= 0 &&
+        hoveredIndex! < data.length) {
+      _drawTooltip(
+        canvas,
+        point: points[hoveredIndex!],
+        label: "${data[hoveredIndex!].count}",
+        size: size,
+      );
+    }
+  }
+
+  void _drawTooltip(
+    Canvas canvas, {
+    required Offset point,
+    required String label,
+    required Size size,
+  }) {
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    const horizontalPadding = 10.0;
+    const verticalPadding = 6.0;
+
+    final tooltipWidth = textPainter.width + horizontalPadding * 2;
+    final tooltipHeight = textPainter.height + verticalPadding * 2;
+
+    double dx = point.dx - tooltipWidth / 2;
+    double dy = point.dy - tooltipHeight - 12;
+
+    if (dx < 0) dx = 0;
+    if (dx + tooltipWidth > size.width) {
+      dx = size.width - tooltipWidth;
+    }
+    if (dy < 0) {
+      dy = point.dy + 12;
+    }
+
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(dx, dy, tooltipWidth, tooltipHeight),
+      const Radius.circular(8),
+    );
+
+    canvas.drawRRect(
+      rect,
+      Paint()..color = const Color(0xFF2A2A2A),
+    );
+
+    textPainter.paint(
+      canvas,
+      Offset(dx + horizontalPadding, dy + verticalPadding),
+    );
+  }
+
+  double _niceUpperBound(double maxValue) {
+    if (maxValue <= 5) return 5;
+    if (maxValue <= 10) return 10;
+    if (maxValue <= 20) return 20;
+    if (maxValue <= 50) return 50;
+    return (maxValue / 10).ceil() * 10.0;
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _UserGrowthPainter oldDelegate) {
+    return oldDelegate.data != data ||
+        oldDelegate.hoveredIndex != hoveredIndex;
+  }
 }
