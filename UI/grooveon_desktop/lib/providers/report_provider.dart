@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
-import 'package:grooveon_desktop/models/income_by_month_response.dart';
-import 'package:grooveon_desktop/models/subscription_analytics.dart';
-import 'package:grooveon_desktop/models/user_growth_point.dart';
+import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
+import 'package:grooveon_desktop/models/response/subscription_analytics.dart';
+import 'package:grooveon_desktop/models/response/user_growth_point.dart';
 import 'package:grooveon_desktop/utils/session.dart';
 import 'package:http/http.dart' as http;
 

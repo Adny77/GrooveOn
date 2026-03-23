@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:grooveon_desktop/models/income_by_month_response.dart';
+import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
 import 'package:grooveon_desktop/providers/report_provider.dart';
 import 'package:grooveon_desktop/screens/income_screen.dart';
 import 'package:intl/intl.dart';

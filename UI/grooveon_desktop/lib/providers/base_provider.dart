@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
-import 'package:grooveon_desktop/models/search_result.dart';
+import 'package:grooveon_desktop/models/response/search_result.dart';
 import 'package:http/http.dart' as http;
 import '../utils/session.dart';
 

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
 import 'package:http/http.dart' as http;
-import '../models/login_request.dart';
-import '../models/login_response.dart';
+import '../models/request/login_request.dart';
+import '../models/response/login_response.dart';
 import '../utils/session.dart';
 
 class AuthProvider with ChangeNotifier {

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:grooveon_desktop/models/search_result.dart';
+import 'package:grooveon_desktop/models/response/search_result.dart';
 
 typedef PagedFetcher<T> = Future<SearchResult<T>> Function({
   required int page,

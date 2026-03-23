@@ -12,7 +12,7 @@ import 'package:grooveon_desktop/utils/session.dart';
 import 'package:grooveon_desktop/widgets/sidebar_item_widget.dart';
 import 'package:provider/provider.dart';
 
-import '../models/user.dart';
+import '../models/response/user.dart';
 
 class SidebarWidget extends StatefulWidget {
   final int selectedIndex;

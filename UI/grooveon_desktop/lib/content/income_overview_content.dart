@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grooveon_desktop/models/income_by_month_response.dart';
+import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
 import 'package:grooveon_desktop/providers/report_provider.dart';
 import 'package:provider/provider.dart';
 

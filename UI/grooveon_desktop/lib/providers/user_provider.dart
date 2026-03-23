@@ -1,4 +1,4 @@
-import 'package:grooveon_desktop/models/user.dart';
+import 'package:grooveon_desktop/models/response/user.dart';
 import 'package:grooveon_desktop/providers/base_provider.dart';
 
 class UserProvider extends BaseProvider<User> {
