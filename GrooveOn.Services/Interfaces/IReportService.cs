@@ -1,3 +1,4 @@
+using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 
 namespace GrooveOn.Services.Interfaces
@@ -7,5 +8,7 @@ namespace GrooveOn.Services.Interfaces
         SubscriptionAnalyticsResponse GetSubscriptionAnalytics(int year, int? month = null);
         List<UserGrowthPointResponse> GetUserGrowthByMonth(int year);
         List<IncomeByMonthResponse> GetIncomeByMonth(int year);
+
+        MusicOverviewResponse GetMusicOverview(MusicOverviewRequest request);
     }
 }

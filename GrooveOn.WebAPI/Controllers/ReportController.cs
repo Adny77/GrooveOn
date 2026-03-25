@@ -1,3 +1,4 @@
+using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -23,17 +24,23 @@ namespace GrooveOn.API.Controllers
         }
 
         [HttpGet("user-growth-by-month")]
-        public ActionResult<List<UserGrowthPointResponse>> GetUserGrowthByMonth(
-        [FromQuery] int year)
+        public ActionResult<List<UserGrowthPointResponse>> GetUserGrowthByMonth([FromQuery] int year)
         {
             var result = _reportService.GetUserGrowthByMonth(year);
             return Ok(result);
         }
 
         [HttpGet("income-by-month")]
-        public ActionResult<List<IncomeByMonthResponse>> GetIncomeByMonth(int year)
+        public ActionResult<List<IncomeByMonthResponse>> GetIncomeByMonth([FromQuery] int year)
         {
             return Ok(_reportService.GetIncomeByMonth(year));
+        }
+
+        [HttpGet("music-overview")]
+        public ActionResult<MusicOverviewResponse> GetMusicOverview([FromQuery] MusicOverviewRequest request)
+        {
+            var result = _reportService.GetMusicOverview(request);
+            return Ok(result);
         }
     }
 }

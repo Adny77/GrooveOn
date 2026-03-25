@@ -70,7 +70,7 @@ namespace GrooveOn.Services.Services
             _mapper.Map(request, entity);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public virtual async Task<bool> DeleteAsync(int id)
         {
             var entity = await _context.Set<TEntity>().FindAsync(id);
             if (entity == null)

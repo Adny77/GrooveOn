@@ -26,12 +26,7 @@ namespace GrooveOn.Services.Database
 
         public Album? Album { get; set; }
 
-        [ForeignKey(nameof(GenreId))]
-        public int? GenreId { get; set; }
-
-        public Genre? Genre { get; set; }
-
-        public int DurationSeconds { get; set; }
+        public int? DurationSeconds { get; set; }
 
         public string? PreviewUrl { get; set; }
 
@@ -49,6 +44,6 @@ namespace GrooveOn.Services.Database
 
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 
-        public ICollection<ListeningHistory> ListeningHistories { get; set; } = new List<ListeningHistory>();
+        public ICollection<PlayHistory> ListeningHistories { get; set; } = new List<PlayHistory>();
     }
 }

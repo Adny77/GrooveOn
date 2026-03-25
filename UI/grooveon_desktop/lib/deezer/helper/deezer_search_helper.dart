@@ -7,6 +7,8 @@ import 'package:grooveon_desktop/deezer/provider/deezer_provider.dart';
 class DeezerMusicHelper extends ChangeNotifier {
   final DeezerProvider _provider = DeezerProvider();
 
+  DeezerProvider get provider => _provider;
+
   List<DeezerTrack> songResults = [];
   List<DeezerAlbum> albumResults = [];
 
@@ -25,29 +27,29 @@ class DeezerMusicHelper extends ChangeNotifier {
   String? currentAlbumQuery;
 
   Future<void> loadInitialTopTracks() async {
-    isLoadingSongs = true;
-    songError = null;
+  isLoadingSongs = true;
+  songError = null;
+  notifyListeners();
+
+  try {
+    final result = await _provider.searchTracksWithFullAlbums(
+      query: "top",
+      limit: 5,
+      index: 0,
+    );
+
+    songResults = result.data;
+    songNextUrl = result.next;
+  } catch (e) {
+    songError = e.toString();
+  } finally {
+    isLoadingSongs = false;
     notifyListeners();
-
-    try {
-      final result = await _provider.getTopTracks(
-        limit: 5,
-        index: 0,
-      );
-
-      songResults = result.data;
-      songNextUrl = result.next;
-    } catch (e) {
-      songError = e.toString();
-    } finally {
-      isLoadingSongs = false;
-      notifyListeners();
-    }
   }
+}
 
   Future<void> searchSongs(String query) async {
     final trimmed = query.trim();
-
     currentSongQuery = trimmed;
 
     if (trimmed.isEmpty) {
@@ -60,7 +62,7 @@ class DeezerMusicHelper extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _provider.searchTracks(
+      final result = await _provider.searchTracksWithFullAlbums(
         query: trimmed,
         limit: 5,
         index: 0,
@@ -83,7 +85,9 @@ class DeezerMusicHelper extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _provider.getTracksFromNextUrl(songNextUrl!);
+      final result = await _provider.getTracksFromNextUrlWithFullAlbums(
+        songNextUrl!,
+      );
 
       songResults = [...songResults, ...result.data];
       songNextUrl = result.next;
@@ -97,7 +101,6 @@ class DeezerMusicHelper extends ChangeNotifier {
 
   Future<void> searchAlbums(String query) async {
     final trimmed = query.trim();
-
     currentAlbumQuery = trimmed;
 
     if (trimmed.isEmpty) {
@@ -180,24 +183,24 @@ class DeezerMusicHelper extends ChangeNotifier {
   }
 
   Future<void> loadInitialAlbums() async {
-  isLoadingAlbums = true;
-  albumError = null;
-  notifyListeners();
-
-  try {
-    final result = await _provider.searchAlbums(
-      query: 'top',
-      limit: 5,
-      index: 0,
-    );
-
-    albumResults = result.data;
-    albumNextUrl = result.next;
-  } catch (e) {
-    albumError = e.toString();
-  } finally {
-    isLoadingAlbums = false;
+    isLoadingAlbums = true;
+    albumError = null;
     notifyListeners();
+
+    try {
+      final result = await _provider.searchAlbums(
+        query: 'top',
+        limit: 5,
+        index: 0,
+      );
+
+      albumResults = result.data;
+      albumNextUrl = result.next;
+    } catch (e) {
+      albumError = e.toString();
+    } finally {
+      isLoadingAlbums = false;
+      notifyListeners();
+    }
   }
-}
 }

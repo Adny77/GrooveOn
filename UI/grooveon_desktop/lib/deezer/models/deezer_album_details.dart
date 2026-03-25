@@ -1,4 +1,6 @@
+import 'package:grooveon_desktop/deezer/models/deezer_album.dart';
 import 'package:grooveon_desktop/deezer/models/deezer_artist.dart';
+import 'package:grooveon_desktop/deezer/models/deezer_genre_response.dart';
 import 'package:grooveon_desktop/deezer/models/deezer_track.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -27,6 +29,9 @@ class DeezerAlbumDetails {
 
   @JsonKey(name: 'genre_id')
   final int? genreId;
+
+  @JsonKey(fromJson: _genresFromJson, defaultValue: [])
+  final List<DeezerGenreResponse> genres;
 
   final String? label;
 
@@ -58,6 +63,7 @@ class DeezerAlbumDetails {
     this.coverBig,
     this.coverXl,
     this.genreId,
+    this.genres = const [],
     this.label,
     this.nbTracks,
     this.duration,
@@ -73,6 +79,31 @@ class DeezerAlbumDetails {
       _$DeezerAlbumDetailsFromJson(json);
 
   Map<String, dynamic> toJson() => _$DeezerAlbumDetailsToJson(this);
+
+  static List<DeezerGenreResponse> _genresFromJson(dynamic json) {
+    if (json == null) return [];
+
+    final data = json['data'] as List<dynamic>? ?? [];
+
+    return data
+        .map((e) => DeezerGenreResponse.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  DeezerAlbum toAlbum() {
+    return DeezerAlbum(
+      id: id,
+      title: title,
+      cover: cover,
+      coverSmall: coverSmall,
+      coverMedium: coverMedium,
+      coverBig: coverBig,
+      coverXl: coverXl,
+      releaseDate: releaseDate,
+      artist: artist,
+      genres: genres,
+    );
+  }
 }
 
 @JsonSerializable()

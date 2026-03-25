@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
 import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
+import 'package:grooveon_desktop/models/response/music_overview_response.dart';
 import 'package:grooveon_desktop/models/response/subscription_analytics.dart';
 import 'package:grooveon_desktop/models/response/user_growth_point.dart';
 import 'package:grooveon_desktop/utils/session.dart';
@@ -33,6 +34,50 @@ class ReportProvider with ChangeNotifier {
     return SubscriptionAnalytics.fromJson(jsonDecode(response.body));
   }
 
+  Future<MusicOverviewResponse> getMusicOverview({
+    required String mode,
+    required int userId,
+    required int year,
+    int? month,
+    int take = 4,
+  }) async {
+    final query = <String, dynamic>{
+      "mode": mode,
+      "userId": userId,
+      "year": year,
+      "take": take,
+    };
+
+    if (month != null) {
+      query["month"] = month;
+    }
+
+    final uri = Uri.parse("${ApiConfig.apiBase}/api/Report/music-overview")
+        .replace(
+          queryParameters: query.map(
+            (key, value) => MapEntry(key, value.toString()),
+          ),
+        );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${Session.token}",
+      },
+    );
+
+    if (response.statusCode == 401) {
+      throw Exception("Unauthorized");
+    }
+
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw Exception("API Error: ${response.statusCode} → ${response.body}");
+    }
+
+    return MusicOverviewResponse.fromJson(jsonDecode(response.body));
+  }
+
   Future<List<UserGrowthPoint>> getUserGrowthByMonth({
     required int year,
   }) async {
@@ -56,29 +101,24 @@ class ReportProvider with ChangeNotifier {
   }
 
   Future<List<IncomeByMonthResponse>> getIncomeByMonth({
-  required int year,
-}) async {
-  final url =
-      "${ApiConfig.apiBase}/api/Report/income-by-month?year=$year";
+    required int year,
+  }) async {
+    final url = "${ApiConfig.apiBase}/api/Report/income-by-month?year=$year";
 
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer ${Session.token}",
-    },
-  );
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${Session.token}",
+      },
+    );
 
-  if (response.statusCode < 200 || response.statusCode > 299) {
-    throw Exception("Greška pri učitavanju income podataka.");
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw Exception("Greška pri učitavanju income podataka.");
+    }
+
+    final data = jsonDecode(response.body) as List;
+
+    return data.map((e) => IncomeByMonthResponse.fromJson(e)).toList();
   }
-
-  final data = jsonDecode(response.body) as List;
-
-  return data
-      .map((e) => IncomeByMonthResponse.fromJson(e))
-      .toList();
-}
-
-  
 }

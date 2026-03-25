@@ -6,7 +6,7 @@ using GrooveOn.Model.SearchObjects;
 namespace GrooveOn.Services.Interfaces
 {
     public interface IAlbumService
-    : ICRUDService<AlbumResponse, BaseSearchObject, AlbumUpsertRequest, AlbumUpsertRequest>
+    : ICRUDService<AlbumResponse, AlbumSearchObject, AlbumUpsertRequest, AlbumUpsertRequest>
 {
     Task<AlbumPreviewResponse> PreviewDeezerAlbumAsync(AlbumUpsertRequest request);
     Task<AlbumSaveResponse> SaveDeezerAlbumAsync(AlbumUpsertRequest request);

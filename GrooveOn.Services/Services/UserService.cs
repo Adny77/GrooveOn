@@ -25,7 +25,26 @@ namespace GrooveOn.Services.Services
         public UserService(GrooveOnDbContext context, IMapper mapper, IConfiguration configuration) : base(context, mapper)
         {
             _configuration = configuration;
-           // _rabbitConnection = rabbitConnection;
+            // _rabbitConnection = rabbitConnection;
+        }
+
+        protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject? search = null)
+        {
+            query = base.ApplyFilter(query, search);
+
+            if (!string.IsNullOrWhiteSpace(search?.FTS))
+            {
+                var fts = search.FTS.ToLower();
+
+                query = query.Where(x =>
+                    x.Username.ToLower().Contains(fts) ||
+                    x.Email.ToLower().Contains(fts) ||
+                    (x.FirstName != null && x.FirstName.ToLower().Contains(fts)) ||
+                    (x.LastName != null && x.LastName.ToLower().Contains(fts))
+                );
+            }
+
+            return query;
         }
 
 

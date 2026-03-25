@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/deezer/helper/deezer_search_helper.dart';
 import 'package:grooveon_desktop/deezer/models/deezer_album.dart';
+import 'package:grooveon_desktop/deezer/models/deezer_album_details.dart';
 import 'package:grooveon_desktop/deezer/models/deezer_track.dart';
 import 'package:grooveon_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:grooveon_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_desktop/models/request/album_upsert_request.dart';
+import 'package:grooveon_desktop/models/request/genre_upsert_request.dart';
 import 'package:grooveon_desktop/models/request/song_bulk_insert_request.dart';
 import 'package:grooveon_desktop/models/request/song_duplicate_check_request.dart';
 import 'package:grooveon_desktop/models/request/song_upsert_request.dart';
@@ -14,8 +16,6 @@ import 'package:grooveon_desktop/models/response/song_bulk_insert_response.dart'
 import 'package:grooveon_desktop/models/response/song_duplicate_check_response.dart';
 import 'package:grooveon_desktop/providers/album_provider.dart';
 import 'package:grooveon_desktop/providers/song_provider.dart';
-
-
 import 'package:grooveon_desktop/screens/music_screen.dart';
 
 enum AddMusicMode {
@@ -35,7 +35,6 @@ class _MusicAddContentState extends State<MusicAddContent> {
 
   late final DeezerMusicHelper _deezerHelper;
   final SongProvider _songProvider = SongProvider();
-
   final AlbumProvider _albumProvider = AlbumProvider();
 
   final TextEditingController _songSearchController = TextEditingController();
@@ -77,7 +76,56 @@ class _MusicAddContentState extends State<MusicAddContent> {
     await _deezerHelper.searchAlbums(_albumSearchController.text);
   }
 
-  void _addSongToSelection(DeezerTrack track) {
+  List<GenreUpsertRequest> _mapAlbumGenresToUpsert(List<dynamic> rawGenres) {
+    final seen = <String>{};
+    final result = <GenreUpsertRequest>[];
+
+    for (final item in rawGenres) {
+      String externalGenreId = '';
+      String name = '';
+
+      try {
+        externalGenreId = (item.id ?? '').toString().trim();
+      } catch (_) {}
+
+      try {
+        name = (item.name ?? '').toString().trim();
+      } catch (_) {}
+
+      if (externalGenreId.isEmpty || name.isEmpty) continue;
+      if (!seen.add(externalGenreId)) continue;
+
+      result.add(
+        GenreUpsertRequest(
+          externalGenreId: externalGenreId,
+          source: "Deezer",
+          name: name,
+        ),
+      );
+    }
+
+    return result;
+  }
+
+  Future<DeezerAlbum?> _resolveFullAlbumForTrack(DeezerTrack track) async {
+    final currentAlbum = track.album;
+
+    if (currentAlbum == null) return null;
+
+    if (currentAlbum.genres.isNotEmpty) {
+      return currentAlbum;
+    }
+
+    final details = await _deezerHelper.getAlbumDetails(currentAlbum.id);
+
+    if (details == null) {
+      return currentAlbum;
+    }
+
+    return details.toAlbum();
+  }
+
+  Future<void> _addSongToSelection(DeezerTrack track) async {
     final exists = _selectedSongs.any((x) => x.id == track.id);
 
     if (exists) {
@@ -89,21 +137,49 @@ class _MusicAddContentState extends State<MusicAddContent> {
       return;
     }
 
-    setState(() {
-      _selectedSongs.add(
-        _SongPreviewModel(
-          id: track.id,
-          externalTrackId: track.id.toString(),
-          title: track.title,
-          artist: track.artist?.name ?? 'Unknown artist',
-          duration: _formatDuration(track.duration),
-          durationSeconds: track.duration ?? 0,
-          coverUrl: track.album?.coverMedium ?? track.album?.coverBig,
-          previewUrl: track.preview,
-          albumTitle: track.album?.title,
+    try {
+      final resolvedAlbum = await _resolveFullAlbumForTrack(track);
+      final trackGenres = _mapAlbumGenresToUpsert(resolvedAlbum?.genres ?? []);
+
+      if (!mounted) return;
+
+      setState(() {
+        _selectedSongs.add(
+          _SongPreviewModel(
+            id: track.id,
+            externalTrackId: track.id.toString(),
+            externalArtistId: track.artist?.id.toString(),
+            externalAlbumId: resolvedAlbum?.id.toString(),
+            title: track.title,
+            artistName: track.artist?.name ?? 'Unknown artist',
+            artistPicture:
+                track.artist?.pictureMedium ??
+                track.artist?.pictureBig ??
+                track.artist?.picture,
+            duration: _formatDuration(track.duration),
+            durationSeconds: track.duration ?? 0,
+            coverUrl:
+                resolvedAlbum?.coverMedium ??
+                resolvedAlbum?.coverBig ??
+                resolvedAlbum?.cover,
+            previewUrl: track.preview,
+            albumTitle: resolvedAlbum?.title ?? track.album?.title,
+            releaseDate: resolvedAlbum?.releaseDate != null
+                ? DateTime.tryParse(resolvedAlbum!.releaseDate!)
+                : null,
+            genres: trackGenres,
+          ),
+        );
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error while preparing song: $e"),
         ),
       );
-    });
+    }
   }
 
   void _removeSongFromSelection(int id) {
@@ -121,18 +197,58 @@ class _MusicAddContentState extends State<MusicAddContent> {
   SongUpsertRequest _mapToSongUpsertRequest(_SongPreviewModel song) {
     return SongUpsertRequest(
       externalTrackId: song.externalTrackId,
+      externalArtistId: song.externalArtistId,
+      externalAlbumId: song.externalAlbumId,
       source: "Deezer",
       title: song.title,
-      artistName: song.artist,
+      artistName: song.artistName,
+      artistPicture: song.artistPicture,
       albumTitle: song.albumTitle,
       durationSeconds: song.durationSeconds,
       previewUrl: song.previewUrl,
       coverUrl: song.coverUrl,
-      releaseDate: null,
+      releaseDate: song.releaseDate,
+      genres: song.genres,
     );
   }
 
-  AlbumUpsertRequest _mapAlbumDetailsToRequest(dynamic details) {
+  Future<AlbumUpsertRequest> _mapAlbumDetailsToRequest(
+    DeezerAlbumDetails details,
+  ) async {
+    final albumGenres = _mapAlbumGenresToUpsert(details.genres);
+    final tracks = <SongUpsertRequest>[];
+
+    for (final track in details.tracks.data) {
+      tracks.add(
+        SongUpsertRequest(
+          externalTrackId: track.id.toString(),
+          externalArtistId:
+              track.artist?.id.toString() ?? details.artist?.id.toString(),
+          externalAlbumId: details.id.toString(),
+          source: "Deezer",
+          title: track.title,
+          artistName:
+              track.artist?.name ?? details.artist?.name ?? 'Unknown artist',
+          artistPicture:
+              track.artist?.pictureMedium ??
+              track.artist?.pictureBig ??
+              track.artist?.picture ??
+              details.artist?.pictureMedium ??
+              details.artist?.pictureBig ??
+              details.artist?.picture,
+          albumTitle: details.title,
+          durationSeconds: track.duration ?? 0,
+          previewUrl: track.preview,
+          coverUrl:
+              details.coverMedium ?? details.coverBig ?? details.cover,
+          releaseDate: details.releaseDate != null
+              ? DateTime.tryParse(details.releaseDate!)
+              : null,
+          genres: albumGenres,
+        ),
+      );
+    }
+
     return AlbumUpsertRequest(
       externalAlbumId: details.id.toString(),
       externalArtistId: details.artist?.id.toString(),
@@ -144,24 +260,8 @@ class _MusicAddContentState extends State<MusicAddContent> {
       releaseDate: details.releaseDate != null
           ? DateTime.tryParse(details.releaseDate!)
           : null,
-      tracks: details.tracks.data.map<SongUpsertRequest>((track) {
-        return SongUpsertRequest(
-          externalTrackId: track.id.toString(),
-          source: "Deezer",
-          title: track.title,
-          artistName: track.artist?.name ?? details.artist?.name ?? 'Unknown artist',
-          albumTitle: details.title,
-          durationSeconds: track.duration ?? 0,
-          previewUrl: track.preview,
-          coverUrl: track.album?.coverMedium ??
-              track.album?.coverBig ??
-              details.coverMedium ??
-              details.coverBig,
-          releaseDate: details.releaseDate != null
-              ? DateTime.tryParse(details.releaseDate!)
-              : null,
-        );
-      }).toList(),
+      tracks: tracks,
+      genres: albumGenres,
     );
   }
 
@@ -175,7 +275,8 @@ class _MusicAddContentState extends State<MusicAddContent> {
     try {
       final duplicateResponse = await _songProvider.checkDuplicates(
         SongDuplicateCheckRequest(
-          externalTrackIds: _selectedSongs.map((e) => e.externalTrackId).toList(),
+          externalTrackIds:
+              _selectedSongs.map((e) => e.externalTrackId).toList(),
         ),
       );
 
@@ -219,9 +320,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "${result.savedCount} song(s) successfully saved.",
-          ),
+          content: Text("${result.savedCount} song(s) successfully saved."),
         ),
       );
     } catch (e) {
@@ -364,9 +463,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "${result.savedCount} new song(s) successfully saved.",
-          ),
+          content: Text("${result.savedCount} new song(s) successfully saved."),
         ),
       );
     } catch (e) {
@@ -402,7 +499,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
         return;
       }
 
-      final request = _mapAlbumDetailsToRequest(details);
+      final request = await _mapAlbumDetailsToRequest(details);
       final preview = await _albumProvider.previewDeezerAlbum(request);
 
       if (!mounted) return;
@@ -490,7 +587,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
-                            track.alreadyExists ? "Already exists" : "Will be added",
+                            track.alreadyExists
+                                ? "Already exists"
+                                : "Will be added",
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -651,10 +750,17 @@ class _MusicAddContentState extends State<MusicAddContent> {
       children: [
         Expanded(
           flex: 6,
-          child: _Panel(
+          child: _PanelWithAction(
             title: "Add songs",
             subtitle:
                 "Search Deezer songs and prepare a list of songs you want to save.",
+            action: _RefreshIconButton(
+  isLoading: _deezerHelper.isLoadingSongs,
+  onPressed: () async {
+    _songSearchController.clear(); 
+    await _deezerHelper.loadInitialTopTracks();
+  },
+),
             child: Column(
               children: [
                 Row(
@@ -713,7 +819,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
         const SizedBox(width: 18),
         Expanded(
           flex: 4,
-          child: _Panel(
+          child: _PanelWithAction(
             title: "Selected songs",
             subtitle:
                 "Songs that will be saved after confirmation. Review the final list here.",
@@ -734,7 +840,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
                             final song = _selectedSongs[index];
                             return _SelectedSongTile(
                               title: song.title,
-                              artist: song.artist,
+                              artist: song.artistName,
                               duration: song.duration,
                               coverUrl: song.coverUrl,
                               onRemove: () => _removeSongFromSelection(song.id),
@@ -825,17 +931,24 @@ class _MusicAddContentState extends State<MusicAddContent> {
           album: track.album?.title ?? 'Unknown album',
           duration: _formatDuration(track.duration),
           coverUrl: track.album?.coverMedium ?? track.album?.coverBig,
-          onAdd: () => _addSongToSelection(track),
+          onAdd: () async => await _addSongToSelection(track),
         );
       },
     );
   }
 
   Widget _buildAlbumLayout() {
-    return _Panel(
+    return _PanelWithAction(
       title: "Add albums",
       subtitle:
           "Browse suggested albums or search Deezer albums. Clicking Add should open a preview dialog with album tracks.",
+      action: _RefreshIconButton(
+  isLoading: _deezerHelper.isLoadingAlbums,
+  onPressed: () async {
+    _albumSearchController.clear(); 
+    await _deezerHelper.loadInitialAlbums();
+  },
+),
       child: Column(
         children: [
           Row(
@@ -1021,15 +1134,17 @@ class _ModeButton extends StatelessWidget {
   }
 }
 
-class _Panel extends StatelessWidget {
+class _PanelWithAction extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget child;
+  final Widget? action;
 
-  const _Panel({
+  const _PanelWithAction({
     required this.title,
     required this.subtitle,
     required this.child,
+    this.action,
   });
 
   @override
@@ -1045,22 +1160,38 @@ class _Panel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              color: MusicScreen.textColor,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 13,
-              height: 1.5,
-              color: MusicScreen.subTextColor,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: MusicScreen.textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        height: 1.5,
+                        color: MusicScreen.subTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (action != null) ...[
+                const SizedBox(width: 12),
+                action!,
+              ],
+            ],
           ),
           const SizedBox(height: 18),
           Expanded(child: child),
@@ -1592,26 +1723,76 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+class _RefreshIconButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final bool isLoading;
+
+  const _RefreshIconButton({
+    required this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 42,
+      height: 42,
+      child: OutlinedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          side: const BorderSide(color: MusicScreen.borderColor),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.white,
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(
+                Icons.refresh_rounded,
+                size: 18,
+                color: MusicScreen.textColor,
+              ),
+      ),
+    );
+  }
+}
+
 class _SongPreviewModel {
   final int id;
   final String externalTrackId;
+  final String? externalArtistId;
+  final String? externalAlbumId;
   final String title;
-  final String artist;
+  final String artistName;
+  final String? artistPicture;
   final String duration;
   final int durationSeconds;
   final String? coverUrl;
   final String? previewUrl;
   final String? albumTitle;
+  final DateTime? releaseDate;
+  final List<GenreUpsertRequest> genres;
 
   _SongPreviewModel({
     required this.id,
     required this.externalTrackId,
+    this.externalArtistId,
+    this.externalAlbumId,
     required this.title,
-    required this.artist,
+    required this.artistName,
+    this.artistPicture,
     required this.duration,
     required this.durationSeconds,
     this.coverUrl,
     this.previewUrl,
     this.albumTitle,
+    this.releaseDate,
+    this.genres = const [],
   });
 }

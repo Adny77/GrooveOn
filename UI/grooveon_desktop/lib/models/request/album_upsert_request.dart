@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:grooveon_desktop/models/request/song_upsert_request.dart';
+import 'package:grooveon_desktop/models/request/genre_upsert_request.dart';
 
 part 'album_upsert_request.g.dart';
 
@@ -13,6 +14,9 @@ class AlbumUpsertRequest {
   final String? coverUrl;
   final String? description;
   final DateTime? releaseDate;
+
+  final List<GenreUpsertRequest> genres; 
+
   final List<SongUpsertRequest> tracks;
 
   AlbumUpsertRequest({
@@ -24,6 +28,7 @@ class AlbumUpsertRequest {
     this.coverUrl,
     this.description,
     this.releaseDate,
+    this.genres = const [],
     required this.tracks,
   });
 

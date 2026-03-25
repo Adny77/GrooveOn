@@ -18,6 +18,13 @@ AlbumUpsertRequest _$AlbumUpsertRequestFromJson(Map<String, dynamic> json) =>
       releaseDate: json['releaseDate'] == null
           ? null
           : DateTime.parse(json['releaseDate'] as String),
+      genres:
+          (json['genres'] as List<dynamic>?)
+              ?.map(
+                (e) => GenreUpsertRequest.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
       tracks: (json['tracks'] as List<dynamic>)
           .map((e) => SongUpsertRequest.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -33,5 +40,6 @@ Map<String, dynamic> _$AlbumUpsertRequestToJson(AlbumUpsertRequest instance) =>
       'coverUrl': instance.coverUrl,
       'description': instance.description,
       'releaseDate': instance.releaseDate?.toIso8601String(),
+      'genres': instance.genres.map((e) => e.toJson()).toList(),
       'tracks': instance.tracks.map((e) => e.toJson()).toList(),
     };

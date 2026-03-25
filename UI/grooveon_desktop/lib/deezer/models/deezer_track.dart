@@ -44,4 +44,32 @@ class DeezerTrack {
       _$DeezerTrackFromJson(json);
 
   Map<String, dynamic> toJson() => _$DeezerTrackToJson(this);
+
+  DeezerTrack copyWith({
+  int? id,
+  String? title,
+  String? titleShort,
+  String? titleVersion,
+  String? link,
+  int? duration,
+  int? rank,
+  bool? explicitLyrics,
+  String? preview,
+  DeezerArtist? artist,
+  DeezerAlbum? album,
+}) {
+  return DeezerTrack(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    titleShort: titleShort ?? this.titleShort,
+    titleVersion: titleVersion ?? this.titleVersion,
+    link: link ?? this.link,
+    duration: duration ?? this.duration,
+    rank: rank ?? this.rank,
+    explicitLyrics: explicitLyrics ?? this.explicitLyrics,
+    preview: preview ?? this.preview,
+    artist: artist ?? this.artist,
+    album: album ?? this.album,
+  );
+}
 }

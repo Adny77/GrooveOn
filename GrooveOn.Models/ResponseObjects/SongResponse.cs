@@ -15,9 +15,6 @@ namespace GrooveOn.Model.Responses
         public int? AlbumId { get; set; }
         public string? AlbumTitle { get; set; }
 
-        public int? GenreId { get; set; }
-        public string? GenreName { get; set; }
-
         public int DurationSeconds { get; set; }
         public string? PreviewUrl { get; set; }
         public string? CoverUrl { get; set; }

@@ -15,10 +15,7 @@ namespace GrooveOn.Services.Database
 
         public string Name { get; set; } = string.Empty;
 
-        public string? Description { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        public ICollection<Song> Songs { get; set; } = new List<Song>();
+        public ICollection<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();        
     }
 }

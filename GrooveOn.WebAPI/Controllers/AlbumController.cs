@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GrooveOn.API.Controllers
 {
     public class AlbumController
-        : BaseCRUDController<AlbumResponse, BaseSearchObject, AlbumUpsertRequest, AlbumUpsertRequest>
+        : BaseCRUDController<AlbumResponse, AlbumSearchObject, AlbumUpsertRequest, AlbumUpsertRequest>
     {
         private readonly IAlbumService _albumService;
 

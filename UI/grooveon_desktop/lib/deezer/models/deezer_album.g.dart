@@ -18,6 +18,9 @@ DeezerAlbum _$DeezerAlbumFromJson(Map<String, dynamic> json) => DeezerAlbum(
   artist: json['artist'] == null
       ? null
       : DeezerArtist.fromJson(json['artist'] as Map<String, dynamic>),
+  genres: json['genres'] == null
+      ? []
+      : DeezerAlbum._genresFromJson(json['genres']),
 );
 
 Map<String, dynamic> _$DeezerAlbumToJson(DeezerAlbum instance) =>
@@ -31,4 +34,5 @@ Map<String, dynamic> _$DeezerAlbumToJson(DeezerAlbum instance) =>
       'cover_xl': instance.coverXl,
       'release_date': instance.releaseDate,
       'artist': instance.artist,
+      'genres': instance.genres,
     };

@@ -19,6 +19,9 @@ DeezerAlbumDetails _$DeezerAlbumDetailsFromJson(Map<String, dynamic> json) =>
       coverBig: json['cover_big'] as String?,
       coverXl: json['cover_xl'] as String?,
       genreId: (json['genre_id'] as num?)?.toInt(),
+      genres: json['genres'] == null
+          ? []
+          : DeezerAlbumDetails._genresFromJson(json['genres']),
       label: json['label'] as String?,
       nbTracks: (json['nb_tracks'] as num?)?.toInt(),
       duration: (json['duration'] as num?)?.toInt(),
@@ -47,6 +50,7 @@ Map<String, dynamic> _$DeezerAlbumDetailsToJson(DeezerAlbumDetails instance) =>
       'cover_big': instance.coverBig,
       'cover_xl': instance.coverXl,
       'genre_id': instance.genreId,
+      'genres': instance.genres,
       'label': instance.label,
       'nb_tracks': instance.nbTracks,
       'duration': instance.duration,

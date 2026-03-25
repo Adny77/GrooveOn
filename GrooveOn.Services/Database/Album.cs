@@ -18,7 +18,6 @@ namespace GrooveOn.Services.Database
 
         [ForeignKey(nameof(ArtistId))]
         public int ArtistId { get; set; }
-
         public Artist? Artist { get; set; }
 
         public DateTime? ReleaseDate { get; set; }
@@ -28,6 +27,7 @@ namespace GrooveOn.Services.Database
         public string? Description { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<AlbumGenre> AlbumGenres { get; set; } = new List<AlbumGenre>();
 
         public ICollection<Song> Songs { get; set; } = new List<Song>();
     }
