@@ -20,13 +20,13 @@ void main() {
         ChangeNotifierProvider(create: (_) => SongProvider()),
         ChangeNotifierProvider(create: (_) => AlbumProvider()),
       ],
-      child: const RentifyApp(),
+      child: const GrooveOnApp(),
     ),
   );
 }
 
-class RentifyApp extends StatelessWidget {
-  const RentifyApp({super.key});
+class GrooveOnApp extends StatelessWidget {
+  const GrooveOnApp({super.key});
 
   @override
   Widget build(BuildContext context) {

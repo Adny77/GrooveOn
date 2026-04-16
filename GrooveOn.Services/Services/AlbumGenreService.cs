@@ -1,3 +1,4 @@
+using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.Requests;
 using GrooveOn.Model.Responses;
 using GrooveOn.Model.SearchObjects;
@@ -12,14 +13,13 @@ namespace GrooveOn.Services.Services
         : BaseCRUDService<AlbumGenreResponse, AlbumGenreSearchObject, AlbumGenre, AlbumGenreUpsertRequest, AlbumGenreUpsertRequest>,
           IAlbumGenreService
     {
-        private readonly GrooveOnDbContext _context;
-        private readonly IMapper _mapper;
 
-        public AlbumGenreService(GrooveOnDbContext context, IMapper mapper)
+        private readonly IGenreService _genreService;
+
+        public AlbumGenreService(GrooveOnDbContext context, IMapper mapper, IGenreService genreService)
             : base(context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            _genreService = genreService;
         }
 
         protected override IQueryable<AlbumGenre> AddInclude(IQueryable<AlbumGenre> query, AlbumGenreSearchObject? search = null)
@@ -68,6 +68,43 @@ namespace GrooveOn.Services.Services
             await base.BeforeUpdate(entity, update);
         }
 
+        public async Task DeleteByAlbumIdAsync(int albumId, int? albumIdToIgnore = null)
+        {
+            var query = _context.AlbumGenres
+                .Where(x => x.AlbumId == albumId);
+
+            if (albumIdToIgnore.HasValue)
+                query = query.Where(x => x.AlbumId != albumIdToIgnore.Value);
+
+            var albumGenres = await query.ToListAsync();
+
+            if (albumGenres.Any())
+                _context.AlbumGenres.RemoveRange(albumGenres);
+        }
+
+        public async Task SaveAlbumGenresAsync(int albumId, List<GenreUpsertRequest> genres)
+        {
+            if (genres == null || !genres.Any())
+                return;
+
+            foreach (var item in genres
+                .Where(x => !string.IsNullOrWhiteSpace(x.ExternalGenreId) && !string.IsNullOrWhiteSpace(x.Name))
+                .GroupBy(x => x.ExternalGenreId)
+                .Select(g => g.First()))
+            {
+
+                var genre = await _genreService.GetByExternalGenreAsync(item.ExternalGenreId, item.Source);
+
+                if (genre == null)
+                {
+                    await _genreService.CreateAsync(item);
+                }
+                else if (string.IsNullOrWhiteSpace(genre.Name))
+                {
+                    await _genreService.UpdateAsync(genre.Id, item);
+                }
+            }
+        }
         private async Task ValidateDuplicateAsync(int albumId, int genreId, int? ignoreId)
         {
             var query = _context.AlbumGenres
@@ -82,7 +119,7 @@ namespace GrooveOn.Services.Services
 
             if (exists)
             {
-                throw new Exception("Veza između albuma i žanra već postoji.");
+                throw new InvalidOperationException("The relationship between the album and genre already exists.");
             }
         }
     }

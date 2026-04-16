@@ -1,6 +1,7 @@
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -169,10 +170,10 @@ namespace GrooveOn.Services.Services
         private void ValidateMusicOverviewRequest(MusicOverviewRequest request)
         {
             if (request == null)
-                throw new Exception("Zahtjev ne može biti null.");
+                throw new UserException("Request is null");
 
             if (request.Year <= 0)
-                throw new Exception("Year je obavezan.");
+                throw new UserException("Year is required");
 
             if (request.Take <= 0)
                 request.Take = 4;
@@ -180,18 +181,18 @@ namespace GrooveOn.Services.Services
             var mode = request.Mode?.Trim().ToLower();
 
             if (string.IsNullOrWhiteSpace(mode))
-                throw new Exception("Mode je obavezan.");
+                throw new UserException("Mode is required");
 
             if (mode != "year" && mode != "month")
-                throw new Exception("Mode mora biti 'year' ili 'month'.");
+                throw new UserException("Mode needs to be 'year' or 'month'");
 
             if (mode == "month")
             {
                 if (!request.Month.HasValue)
-                    throw new Exception("Month je obavezan kada je mode = 'month'.");
+                    throw new InvalidOperationException("Month value is required when the mode is 'month'");
 
                 if (request.Month.Value < 1 || request.Month.Value > 12)
-                    throw new Exception("Month mora biti između 1 i 12.");
+                    throw new UserException("Month needs to be between 1 and 12.");
             }
             else
             {

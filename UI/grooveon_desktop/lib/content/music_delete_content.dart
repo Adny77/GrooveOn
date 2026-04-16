@@ -2,177 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_desktop/helper/univerzal_pagging_helper.dart';
-import 'package:grooveon_desktop/models/response/search_result.dart';
-import 'package:grooveon_desktop/providers/base_provider.dart';
+import 'package:grooveon_desktop/models/response/album_response.dart';
+import 'package:grooveon_desktop/models/response/song_response.dart';
+import 'package:grooveon_desktop/providers/album_provider.dart';
+import 'package:grooveon_desktop/providers/song_provider.dart';
 import 'package:grooveon_desktop/screens/music_screen.dart';
 
 enum DeleteMusicMode { song, album }
-
-class SongDeleteVm {
-  final int id;
-  final String title;
-  final String artistName;
-  final String? albumTitle;
-  final int durationSeconds;
-  final String? coverUrl;
-  final bool? isActive;
-
-  SongDeleteVm({
-    required this.id,
-    required this.title,
-    required this.artistName,
-    this.albumTitle,
-    required this.durationSeconds,
-    this.coverUrl,
-    this.isActive,
-  });
-
-  factory SongDeleteVm.fromJson(Map<String, dynamic> json) {
-    final artist = json['artist'];
-    final album = json['album'];
-
-    return SongDeleteVm(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      title: (json['title'] ?? '').toString(),
-      artistName:
-          (json['artistName'] ??
-                  artist?['name'] ??
-                  artist?['title'] ??
-                  'Unknown artist')
-              .toString(),
-      albumTitle: (json['albumTitle'] ?? album?['title'])?.toString(),
-      durationSeconds:
-          (json['durationSeconds'] as num?)?.toInt() ??
-          (json['duration'] as num?)?.toInt() ??
-          0,
-      coverUrl:
-          (json['coverUrl'] ??
-                  json['imageUrl'] ??
-                  album?['coverUrl'] ??
-                  album?['coverMedium'] ??
-                  album?['coverBig'])
-              ?.toString(),
-      isActive: json['isActive'] as bool?,
-    );
-  }
-}
-
-class AlbumDeleteVm {
-  final int id;
-  final String title;
-  final String artistName;
-  final int trackCount;
-  final String? coverUrl;
-  final String? year;
-
-  AlbumDeleteVm({
-    required this.id,
-    required this.title,
-    required this.artistName,
-    required this.trackCount,
-    this.coverUrl,
-    this.year,
-  });
-
-  factory AlbumDeleteVm.fromJson(Map<String, dynamic> json) {
-    final artist = json['artist'];
-
-    String? releaseDate = json['releaseDate']?.toString();
-    String? year;
-
-    if (releaseDate != null && releaseDate.isNotEmpty) {
-      year = releaseDate.length >= 4
-          ? releaseDate.substring(0, 4)
-          : releaseDate;
-    }
-
-    return AlbumDeleteVm(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      title: (json['title'] ?? '').toString(),
-      artistName:
-          (json['artistName'] ??
-                  artist?['name'] ??
-                  artist?['title'] ??
-                  'Unknown artist')
-              .toString(),
-      trackCount:
-          (json['trackCount'] as num?)?.toInt() ??
-          (json['songsCount'] as num?)?.toInt() ??
-          (json['numberOfTracks'] as num?)?.toInt() ??
-          0,
-      coverUrl:
-          (json['coverUrl'] ??
-                  json['imageUrl'] ??
-                  json['coverMedium'] ??
-                  json['coverBig'])
-              ?.toString(),
-      year: year,
-    );
-  }
-}
-
-class SongDeleteProvider extends BaseProvider<SongDeleteVm> {
-  SongDeleteProvider() : super("Song");
-
-  @override
-  SongDeleteVm fromJson(data) {
-    return SongDeleteVm.fromJson(Map<String, dynamic>.from(data));
-  }
-
-  Future<SearchResult<SongDeleteVm>> getPaged({
-    required int page,
-    required int pageSize,
-    String? filter,
-    bool includeTotalCount = true,
-  }) async {
-    final Map<String, dynamic> filterMap = {
-      "page": page,
-      "pageSize": pageSize,
-      "includeArtist": true,
-      "includeAlbum": true,
-      "includeTotalCount": includeTotalCount,
-    };
-
-    if (filter != null && filter.trim().isNotEmpty) {
-      filterMap["FTS"] = filter.trim();
-    }
-
-    return await get(
-      filter: filterMap,
-    );
-  }
-}
-
-class AlbumDeleteProvider extends BaseProvider<AlbumDeleteVm> {
-  AlbumDeleteProvider() : super("Album");
-
-  @override
-  AlbumDeleteVm fromJson(data) {
-    return AlbumDeleteVm.fromJson(Map<String, dynamic>.from(data));
-  }
-
-  Future<SearchResult<AlbumDeleteVm>> getPaged({
-    required int page,
-    required int pageSize,
-    String? filter,
-    bool includeTotalCount = true,
-  }) async {
-    final Map<String, dynamic> filterMap = {
-      "page": page,
-      "pageSize": pageSize,
-      "includeArtist": true,
-      "includeTotalCount": includeTotalCount,
-    };
-
-    if (filter != null && filter.trim().isNotEmpty) {
-      filterMap["FTS"] = filter.trim();
-    }
-
-    return await get(
-      filter: filterMap,
-    );
-  }
-}
 
 class MusicDeleteContent extends StatefulWidget {
   const MusicDeleteContent({super.key});
@@ -187,13 +23,13 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
   final TextEditingController _songSearchController = TextEditingController();
   final TextEditingController _albumSearchController = TextEditingController();
 
-  late final SongDeleteProvider _songProvider;
-  late final AlbumDeleteProvider _albumProvider;
+  late final SongProvider _songProvider;
+  late final AlbumProvider _albumProvider;
 
-  late final UniversalPagingProvider<SongDeleteVm> _songPaging;
-  late final UniversalPagingProvider<AlbumDeleteVm> _albumPaging;
+  late final UniversalPagingProvider<SongResponse> _songPaging;
+  late final UniversalPagingProvider<AlbumResponse> _albumPaging;
 
-  final List<SongDeleteVm> _selectedSongs = [];
+  final List<SongResponse> _selectedSongs = [];
 
   bool _isDeletingSongs = false;
   int? _deletingAlbumId;
@@ -202,43 +38,41 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
   void initState() {
     super.initState();
 
-    _songProvider = SongDeleteProvider();
-    _albumProvider = AlbumDeleteProvider();
+    _songProvider = SongProvider();
+    _albumProvider = AlbumProvider();
 
-    _songPaging = UniversalPagingProvider<SongDeleteVm>(
+    _songPaging = UniversalPagingProvider<SongResponse>(
       pageSize: 5,
-      fetcher:
-          ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            bool includeTotalCount = true,
-          }) {
-            return _songProvider.getPaged(
-              page: page,
-              pageSize: pageSize,
-              filter: filter,
-              includeTotalCount: includeTotalCount,
-            );
-          },
+      fetcher: ({
+        required int page,
+        required int pageSize,
+        String? filter,
+        bool includeTotalCount = true,
+      }) {
+        return _songProvider.getPaged(
+          page: page,
+          pageSize: pageSize,
+          filter: filter,
+          includeTotalCount: includeTotalCount,
+        );
+      },
     );
 
-    _albumPaging = UniversalPagingProvider<AlbumDeleteVm>(
+    _albumPaging = UniversalPagingProvider<AlbumResponse>(
       pageSize: 5,
-      fetcher:
-          ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            bool includeTotalCount = true,
-          }) {
-            return _albumProvider.getPaged(
-              page: page,
-              pageSize: pageSize,
-              filter: filter,
-              includeTotalCount: includeTotalCount,
-            );
-          },
+      fetcher: ({
+        required int page,
+        required int pageSize,
+        String? filter,
+        bool includeTotalCount = true,
+      }) {
+        return _albumProvider.getPaged(
+          page: page,
+          pageSize: pageSize,
+          filter: filter,
+          includeTotalCount: includeTotalCount,
+        );
+      },
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -247,7 +81,10 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
   }
 
   Future<void> _loadInitialData() async {
-    await Future.wait([_songPaging.loadPage(), _albumPaging.loadPage()]);
+    await Future.wait([
+      _songPaging.loadPage(),
+      _albumPaging.loadPage(),
+    ]);
   }
 
   @override
@@ -267,7 +104,7 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     await _albumPaging.search(_albumSearchController.text.trim());
   }
 
-  void _addSongToSelection(SongDeleteVm song) {
+  void _addSongToSelection(SongResponse song) {
     final exists = _selectedSongs.any((x) => x.id == song.id);
     if (exists) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -311,10 +148,10 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     });
 
     try {
-      final songsToDelete = List<SongDeleteVm>.from(_selectedSongs);
+      final songsToDelete = List<SongResponse>.from(_selectedSongs);
 
       for (final song in songsToDelete) {
-        await _songProvider.delete(song.id);
+        await _songProvider.delete(song.id!);
       }
 
       if (!mounted) return;
@@ -337,9 +174,9 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error while deleting songs: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error while deleting songs: $e")),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -349,7 +186,7 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     }
   }
 
-  Future<void> _deleteAlbum(AlbumDeleteVm album) async {
+  Future<void> _deleteAlbum(AlbumResponse album) async {
     if (_deletingAlbumId != null) return;
 
     final confirmed = await ConfirmDialogs.yesNoConfirmation(
@@ -365,7 +202,7 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     });
 
     try {
-      await _albumProvider.delete(album.id);
+      await _albumProvider.delete(album.id!);
 
       if (!mounted) return;
 
@@ -381,9 +218,9 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error while deleting album: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error while deleting album: $e")),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -400,6 +237,35 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     final remainingSeconds = seconds % 60;
 
     return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  String _resolveAlbumArtistName(AlbumResponse album) {
+    final dynamic a = album;
+    return (a.artistName ?? a.artist?.name ?? 'Unknown artist').toString();
+  }
+
+  int _resolveAlbumTrackCount(AlbumResponse album) {
+    final dynamic a = album;
+    return (a.songCount as int?) ??
+        (a.numberOfTracks as int?) ??
+        0;
+  }
+
+  String? _resolveAlbumYear(AlbumResponse album) {
+    final dynamic a = album;
+    final releaseDate = a.releaseDate?.toString();
+
+    if (releaseDate == null || releaseDate.isEmpty) return null;
+    return releaseDate.length >= 4 ? releaseDate.substring(0, 4) : releaseDate;
+  }
+
+  String? _resolveAlbumCoverUrl(AlbumResponse album) {
+    final dynamic a = album;
+    return (a.coverUrl ??
+            a.imageUrl ??
+            a.coverMedium ??
+            a.coverBig)
+        ?.toString();
   }
 
   @override
@@ -440,154 +306,152 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
   }
 
   Widget _buildSongLayout() {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        flex: 6,
-        child: AnimatedBuilder(
-          animation: _songPaging,
-          builder: (context, _) => _PanelWithAction(
-            title: "Delete songs",
-            subtitle:
-                "Search songs from your system and add them to the delete list.",
-            action: _RefreshIconButton(
-  isLoading: _songPaging.isLoading,
-  onPressed: () async {
-    _songSearchController.clear();
-    _clearSelectedSongs();
-    await _songPaging.loadPage(pageNumber: 0, filter: " ");
-  },
-),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 6,
+          child: AnimatedBuilder(
+            animation: _songPaging,
+            builder: (context, _) => _PanelWithAction(
+              title: "Delete songs",
+              subtitle:
+                  "Search songs from your system and add them to the delete list.",
+              action: _RefreshIconButton(
+                isLoading: _songPaging.isLoading,
+                onPressed: () async {
+                  _songSearchController.clear();
+                  _clearSelectedSongs();
+                  await _songPaging.loadPage(pageNumber: 0, filter: " ");
+                },
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _SearchBox(
+                          controller: _songSearchController,
+                          hintText: "Search song or artist...",
+                          onSubmitted: (_) => _searchSongs(),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        height: 46,
+                        child: ElevatedButton.icon(
+                          onPressed: _songPaging.isLoading ? null : _searchSongs,
+                          icon: const Icon(Icons.search_rounded, size: 18),
+                          label: const Text("Search"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: MusicScreen.primaryColor,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Expanded(
+                    child: _buildSongResults(),
+                  ),
+                  const SizedBox(height: 16),
+                  _PagingControls(
+                    page: _songPaging.page,
+                    hasNextPage: _songPaging.hasNextPage,
+                    hasPreviousPage: _songPaging.hasPreviousPage,
+                    totalCount: _songPaging.totalCount,
+                    pageSize: _songPaging.pageSize,
+                    isLoading: _songPaging.isLoading,
+                    onPrevious: _songPaging.previousPage,
+                    onNext: _songPaging.nextPage,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 18),
+        Expanded(
+          flex: 4,
+          child: _PanelWithAction(
+            title: "Selected songs",
+            subtitle: "Songs that will be deleted after confirmation.",
             child: Column(
               children: [
+                Expanded(
+                  child: _selectedSongs.isEmpty
+                      ? const _EmptyState(
+                          title: "No songs selected",
+                          subtitle: "Select songs from the left side.",
+                        )
+                      : ListView.separated(
+                          itemCount: _selectedSongs.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final song = _selectedSongs[index];
+                            return _SelectedSongTile(
+                              title: song.title ?? '',
+                              artist: song.artistName ?? 'Unknown artist',
+                              duration: _formatDuration(song.durationSeconds),
+                              coverUrl: song.coverUrl,
+                              onRemove: () => _removeSongFromSelection(song.id!),
+                            );
+                          },
+                        ),
+                ),
+                const SizedBox(height: 18),
                 Row(
                   children: [
                     Expanded(
-                      child: _SearchBox(
-                        controller: _songSearchController,
-                        hintText: "Search song or artist...",
-                        onSubmitted: (_) => _searchSongs(),
+                      child: OutlinedButton(
+                        onPressed:
+                            _selectedSongs.isEmpty ? null : _clearSelectedSongs,
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(46),
+                          side: const BorderSide(
+                            color: MusicScreen.borderColor,
+                          ),
+                        ),
+                        child: const Text("Clear list"),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    SizedBox(
-                      height: 46,
-                      child: ElevatedButton.icon(
-                        onPressed: _songPaging.isLoading ? null : _searchSongs,
-                        icon: const Icon(Icons.search_rounded, size: 18),
-                        label: const Text("Search"),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed:
+                            (_selectedSongs.isEmpty || _isDeletingSongs)
+                                ? null
+                                : _deleteSelectedSongs,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: MusicScreen.primaryColor,
+                          backgroundColor: const Color(0xFFE14D43),
                           foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(46),
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
                         ),
+                        child: _isDeletingSongs
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text("Delete songs"),
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 18),
-                Expanded(
-                  child: _buildSongResults(),
-                ),
-                const SizedBox(height: 16),
-                _PagingControls(
-                  page: _songPaging.page,
-                  hasNextPage: _songPaging.hasNextPage,
-                  hasPreviousPage: _songPaging.hasPreviousPage,
-                  totalCount: _songPaging.totalCount,
-                  pageSize: _songPaging.pageSize,
-                  isLoading: _songPaging.isLoading,
-                  onPrevious: _songPaging.previousPage,
-                  onNext: _songPaging.nextPage,
                 ),
               ],
             ),
           ),
         ),
-      ),
-      const SizedBox(width: 18),
-      Expanded(
-        flex: 4,
-        child: _PanelWithAction(
-          title: "Selected songs",
-          subtitle: "Songs that will be deleted after confirmation.",
-          child: Column(
-            children: [
-              Expanded(
-                child: _selectedSongs.isEmpty
-                    ? const _EmptyState(
-                        title: "No songs selected",
-                        subtitle: "Select songs from the left side.",
-                      )
-                    : ListView.separated(
-                        itemCount: _selectedSongs.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final song = _selectedSongs[index];
-                          return _SelectedSongTile(
-                            title: song.title,
-                            artist: song.artistName,
-                            duration: _formatDuration(song.durationSeconds),
-                            coverUrl: song.coverUrl,
-                            onRemove: () =>
-                                _removeSongFromSelection(song.id),
-                          );
-                        },
-                      ),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _selectedSongs.isEmpty
-                          ? null
-                          : _clearSelectedSongs,
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(46),
-                        side: const BorderSide(
-                          color: MusicScreen.borderColor,
-                        ),
-                      ),
-                      child: const Text("Clear list"),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: (_selectedSongs.isEmpty || _isDeletingSongs)
-                          ? null
-                          : _deleteSelectedSongs,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFE14D43),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(46),
-                        elevation: 0,
-                      ),
-                      child: _isDeletingSongs
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text("Delete songs"),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
   Widget _buildSongResults() {
     if (_songPaging.isLoading && _songPaging.items.isEmpty) {
@@ -609,8 +473,8 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
         final isSelected = _selectedSongs.any((x) => x.id == song.id);
 
         return _SongDeleteCard(
-          title: song.title,
-          artist: song.artistName,
+          title: song.title ?? '',
+          artist: song.artistName ?? 'Unknown artist',
           album: song.albumTitle ?? 'Unknown album',
           duration: _formatDuration(song.durationSeconds),
           coverUrl: song.coverUrl,
@@ -627,12 +491,12 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
       subtitle:
           "Browse albums from your system and delete them directly from the list.",
       action: _RefreshIconButton(
-  isLoading: _albumPaging.isLoading,
-  onPressed: () async {
-    _albumSearchController.clear();
-    await _albumPaging.loadPage(pageNumber: 0, filter: " ");
-  },
-),
+        isLoading: _albumPaging.isLoading,
+        onPressed: () async {
+          _albumSearchController.clear();
+          await _albumPaging.loadPage(pageNumber: 0, filter: " ");
+        },
+      ),
       child: Column(
         children: [
           Row(
@@ -704,15 +568,14 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final album = _albumPaging.items[index];
+        final trackCount = _resolveAlbumTrackCount(album);
 
         return _AlbumDeleteCard(
-          title: album.title,
-          artist: album.artistName,
-          trackCountLabel: album.trackCount > 0
-              ? "${album.trackCount} tracks"
-              : "Album",
-          year: album.year ?? '-',
-          coverUrl: album.coverUrl,
+          title: album.title ?? '',
+          artist: _resolveAlbumArtistName(album),
+          trackCountLabel: trackCount > 0 ? "$trackCount tracks" : "Album",
+          year: _resolveAlbumYear(album) ?? '-',
+          coverUrl: _resolveAlbumCoverUrl(album),
           isLoading: _deletingAlbumId == album.id,
           onDelete: () => _deleteAlbum(album),
         );
@@ -720,10 +583,6 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     );
   }
 }
-
-/// ---------------------------------------------------------------------------
-/// UI HELPERS
-/// ---------------------------------------------------------------------------
 
 class _ModeSwitcher extends StatelessWidget {
   final DeleteMusicMode selectedMode;
@@ -1394,7 +1253,10 @@ class _CoverImage extends StatelessWidget {
         color: MusicScreen.primaryLight,
         borderRadius: BorderRadius.circular(12),
         image: hasImage
-            ? DecorationImage(image: NetworkImage(imageUrl!), fit: BoxFit.cover)
+            ? DecorationImage(
+                image: NetworkImage(imageUrl!),
+                fit: BoxFit.cover,
+              )
             : null,
       ),
       child: hasImage

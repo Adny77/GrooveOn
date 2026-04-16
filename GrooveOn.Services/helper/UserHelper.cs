@@ -1,5 +1,6 @@
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -81,7 +82,7 @@ namespace GrooveOn.Services.Helpers
             else if (request.IsUser == true) roleId = await GetRoleIdAsync("Korisnik", _context);
 
             if (roleId == null)
-                throw new InvalidOperationException("Nijedna validna rola nije označena.");
+                throw new NotFoundException("Valid role not found");
 
             entity.UserRoles.Add(new UserRole
             {

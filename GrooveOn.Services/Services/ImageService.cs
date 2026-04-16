@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 using GrooveOn.Services.Interfaces;
+using GrooveOn.Services.Exceptions;
 
 namespace GrooveOn.Services
 {
@@ -28,16 +29,16 @@ namespace GrooveOn.Services
             CancellationToken ct = default)
         {
             if (file == null || file.Length == 0)
-                throw new ArgumentException("Fajl nije poslan ili je prazan.");
+                throw new NotFoundException("File not found");
 
             if (file.Length > MaxBytes)
-                throw new ArgumentException("Slika je prevelika (max 10MB).");
+                throw new NotFoundException("Image to big to process");
 
             var folder = NormalizeFolder(nameOfTheFolder);
 
             var ext = Path.GetExtension(file.FileName);
             if (string.IsNullOrWhiteSpace(ext) || !AllowedExtensions.Contains(ext))
-                throw new ArgumentException("Nedozvoljen format slike. Dozvoljeno: jpg, jpeg, png, webp.");
+                throw new InvalidOperationException("Image format invalid, Valid formats: jpg, jpeg, png, webp.");
 
             var safeFileName = MakeSafeFileName(desiredFileName);
             if (string.IsNullOrWhiteSpace(safeFileName))

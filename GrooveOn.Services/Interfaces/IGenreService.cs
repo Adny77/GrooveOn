@@ -6,6 +6,8 @@ namespace GrooveOn.Services.Interfaces
 {
     public interface IGenreService : ICRUDService<GenreResponse, GenreSearchObject, GenreUpsertRequest, GenreUpsertRequest>
     {
-        Task<GenreResponse?> GetByExternalGenreAsync(string externalGenreId, string source);
+        public Task<GenreResponse?> GetByExternalGenreAsync(string externalGenreId, string source);
+
+        public Task DeleteUnusedGenresAsync(List<int> genreIds, int? albumIdToIgnore = null);
     }
 }

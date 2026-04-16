@@ -43,6 +43,33 @@ namespace GrooveOn.Services.Services
             return entity == null ? null : _mapper.Map<GenreResponse>(entity);
         }
 
+        public async Task DeleteUnusedGenresAsync(List<int> genreIds, int? albumIdToIgnore = null)
+        {
+            if (genreIds == null || !genreIds.Any())
+                return;
+
+            var distinctGenreIds = genreIds.Distinct().ToList();
+
+            foreach (var genreId in distinctGenreIds)
+            {
+                var query = _context.AlbumGenres
+                    .Where(x => x.GenreId == genreId);
+
+                if (albumIdToIgnore.HasValue)
+                    query = query.Where(x => x.AlbumId != albumIdToIgnore.Value);
+
+                var genreStillUsed = await query.AnyAsync();
+
+                if (!genreStillUsed)
+                {
+                    var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == genreId);
+                    if (genre != null)
+                        _context.Genres.Remove(genre);
+                }
+            }
+        }
+
+
         protected override async Task BeforeInsert(Genre entity, GenreUpsertRequest insert)
         {
             var exists = await _context.Genres.AnyAsync(x =>
@@ -50,7 +77,7 @@ namespace GrooveOn.Services.Services
                 x.Source == insert.Source);
 
             if (exists)
-                throw new Exception("Genre sa ovim external ID već postoji.");
+                throw new InvalidOperationException("Genre already exists");
 
             entity.CreatedAt = DateTime.UtcNow;
 

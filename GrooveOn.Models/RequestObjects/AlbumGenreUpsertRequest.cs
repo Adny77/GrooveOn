@@ -1,3 +1,5 @@
+using System.Dynamic;
+
 namespace GrooveOn.Model.Requests
 {
     public class AlbumGenreUpsertRequest

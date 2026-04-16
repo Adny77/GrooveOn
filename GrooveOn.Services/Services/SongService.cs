@@ -3,6 +3,7 @@ using GrooveOn.Model.Requests;
 using GrooveOn.Model.Responses;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -13,19 +14,27 @@ namespace GrooveOn.Services.Services
         : BaseCRUDService<SongResponse, SongSearchObject, Song, SongUpsertRequest, SongUpsertRequest>,
           ISongService
     {
-        private readonly GrooveOnDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly IMusicResolveService _musicResolveService;
+        private readonly IAlbumGenreService _albumGenreService;
+        private readonly IPlayHistoryService _playHistoryService;
+        private readonly IArtistService _artistService;
         private readonly IGenreService _genreService;
 
         public SongService(
             GrooveOnDbContext context,
             IMapper mapper,
-            IGenreService genreService)
+            IMusicResolveService musicResolveService,
+            IAlbumGenreService albumGenreService,
+            IGenreService genreService,
+            IPlayHistoryService playHistoryService,
+            IArtistService arstisService)
             : base(context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            _musicResolveService = musicResolveService;
+            _albumGenreService = albumGenreService;
             _genreService = genreService;
+            _artistService = arstisService;
+            _playHistoryService = playHistoryService;
         }
 
         protected override IQueryable<Song> ApplyFilter(IQueryable<Song> query, SongSearchObject? search = null)
@@ -155,12 +164,28 @@ namespace GrooveOn.Services.Services
 
             foreach (var item in toInsert)
             {
-                var artist = await ResolveArtistAsync(item);
-                var album = await ResolveAlbumAsync(item, artist);
+                var artist = await _musicResolveService.ResolveArtistAsync(new ResolveArtistRequest
+                {
+                    ExternalArtistId = item.ExternalArtistId,
+                    ArtistName = item.ArtistName,
+                    Source = item.Source,
+                    ArtistPicture = item.ArtistPicture
+                });
+
+                var album = await _musicResolveService.ResolveAlbumAsync(new ResolveAlbumRequest
+                {
+                    ExternalAlbumId = item.ExternalAlbumId,
+                    Title = item.AlbumTitle ?? item.Title,
+                    Source = item.Source,
+                    CoverUrl = item.CoverUrl,
+                    ReleaseDate = item.ReleaseDate,
+                    AllowNull = true,
+                    IncludeDetails = false
+                }, artist);
 
                 if (album != null && item.Genres.Any())
                 {
-                    await SaveAlbumGenresAsync(album.Id, item.Genres);
+                    await _albumGenreService.SaveAlbumGenresAsync(album.Id, item.Genres);
                 }
 
                 var entity = new Song
@@ -175,14 +200,15 @@ namespace GrooveOn.Services.Services
                     CoverUrl = item.CoverUrl,
                     ReleaseDate = item.ReleaseDate,
                     LastSyncedAt = DateTime.UtcNow,
-                    IsActive = true
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.Songs.Add(entity);
-                await _context.SaveChangesAsync();
-
                 savedSongIds.Add(entity.Id);
             }
+
+            await _context.SaveChangesAsync();
 
             return new SongBulkInsertResponse
             {
@@ -191,170 +217,31 @@ namespace GrooveOn.Services.Services
             };
         }
 
-        private async Task<Artist> ResolveArtistAsync(SongUpsertRequest item)
-        {
-            Artist? artist = null;
-
-            if (!string.IsNullOrWhiteSpace(item.ExternalArtistId))
-            {
-                artist = await _context.Artists
-                    .FirstOrDefaultAsync(x => x.ExternalArtistId == item.ExternalArtistId);
-            }
-
-            if (artist == null && !string.IsNullOrWhiteSpace(item.ArtistName))
-            {
-                artist = await _context.Artists
-                    .FirstOrDefaultAsync(x => x.Name == item.ArtistName);
-            }
-
-            if (artist == null)
-            {
-                artist = new Artist
-                {
-                    ExternalArtistId = item.ExternalArtistId,
-                    Source = string.IsNullOrWhiteSpace(item.Source) ? "Deezer" : item.Source,
-                    Name = item.ArtistName,
-                    Picture = item.ArtistPicture
-                };
-
-                _context.Artists.Add(artist);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                var changed = false;
-
-                if (string.IsNullOrWhiteSpace(artist.ExternalArtistId) && !string.IsNullOrWhiteSpace(item.ExternalArtistId))
-                {
-                    artist.ExternalArtistId = item.ExternalArtistId;
-                    changed = true;
-                }
-
-                if (string.IsNullOrWhiteSpace(artist.Picture) && !string.IsNullOrWhiteSpace(item.ArtistPicture))
-                {
-                    artist.Picture = item.ArtistPicture;
-                    changed = true;
-                }
-
-                if (string.IsNullOrWhiteSpace(artist.Source) && !string.IsNullOrWhiteSpace(item.Source))
-                {
-                    artist.Source = item.Source;
-                    changed = true;
-                }
-
-                if (changed)
-                {
-                    await _context.SaveChangesAsync();
-                }
-            }
-
-            return artist;
-        }
-
-        private async Task<Album?> ResolveAlbumAsync(SongUpsertRequest item, Artist artist)
-        {
-            if (string.IsNullOrWhiteSpace(item.AlbumTitle) && string.IsNullOrWhiteSpace(item.ExternalAlbumId))
-            {
-                return null;
-            }
-
-            Album? album = null;
-
-            if (!string.IsNullOrWhiteSpace(item.ExternalAlbumId))
-            {
-                album = await _context.Albums
-                    .FirstOrDefaultAsync(x => x.ExternalAlbumId == item.ExternalAlbumId);
-            }
-
-            if (album == null && !string.IsNullOrWhiteSpace(item.AlbumTitle))
-            {
-                album = await _context.Albums
-                    .FirstOrDefaultAsync(x => x.Title == item.AlbumTitle && x.ArtistId == artist.Id);
-            }
-
-            if (album == null)
-            {
-                album = new Album
-                {
-                    ExternalAlbumId = item.ExternalAlbumId,
-                    Source = string.IsNullOrWhiteSpace(item.Source) ? "Deezer" : item.Source,
-                    Title = item.AlbumTitle ?? item.Title,
-                    ArtistId = artist.Id,
-                    CoverUrl = item.CoverUrl,
-                    ReleaseDate = item.ReleaseDate
-                };
-
-                _context.Albums.Add(album);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                var changed = false;
-
-                if (string.IsNullOrWhiteSpace(album.ExternalAlbumId) && !string.IsNullOrWhiteSpace(item.ExternalAlbumId))
-                {
-                    album.ExternalAlbumId = item.ExternalAlbumId;
-                    changed = true;
-                }
-
-                if (string.IsNullOrWhiteSpace(album.Source) && !string.IsNullOrWhiteSpace(item.Source))
-                {
-                    album.Source = item.Source;
-                    changed = true;
-                }
-
-                if (string.IsNullOrWhiteSpace(album.CoverUrl) && !string.IsNullOrWhiteSpace(item.CoverUrl))
-                {
-                    album.CoverUrl = item.CoverUrl;
-                    changed = true;
-                }
-
-                if (!album.ReleaseDate.HasValue && item.ReleaseDate.HasValue)
-                {
-                    album.ReleaseDate = item.ReleaseDate;
-                    changed = true;
-                }
-
-                if (changed)
-                {
-                    await _context.SaveChangesAsync();
-                }
-            }
-
-            return album;
-        }
-
         public override async Task<bool> DeleteAsync(int id)
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-
             var song = await _context.Songs
                 .Include(x => x.Album)
-                    .ThenInclude(a => a.AlbumGenres)
-                .Include(x => x.Artist)
+                    .ThenInclude(x => x.AlbumGenres)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (song == null)
-                throw new InvalidOperationException("Pjesma nije pronađena.");
+                throw new NotFoundException("Song not found");
 
             var albumId = song.AlbumId;
             var artistId = song.ArtistId;
 
-            var playHistories = await _context.PlayHistories
-                .Where(x => x.SongId == song.Id)
-                .ToListAsync();
-
-            if (playHistories.Any())
-                _context.PlayHistories.RemoveRange(playHistories);
+            await _playHistoryService.DeleteBySongIdsAsync(new List<int> { song.Id });
 
             _context.Songs.Remove(song);
-            await _context.SaveChangesAsync();
 
             if (albumId.HasValue)
             {
-                var albumSongsCount = await _context.Songs.CountAsync(x => x.AlbumId == albumId.Value);
+                var albumSongIdsToIgnore = new List<int> { song.Id };
 
-                if (albumSongsCount == 0)
+                var albumStillHasSongs = await _context.Songs
+                    .AnyAsync(x => x.AlbumId == albumId.Value && x.Id != song.Id);
+
+                if (!albumStillHasSongs)
                 {
                     var album = await _context.Albums
                         .Include(x => x.AlbumGenres)
@@ -362,92 +249,26 @@ namespace GrooveOn.Services.Services
 
                     if (album != null)
                     {
-                        var genreIds = album.AlbumGenres.Select(x => x.GenreId).Distinct().ToList();
+                        var genreIds = album.AlbumGenres
+                            .Select(x => x.GenreId)
+                            .Distinct()
+                            .ToList();
 
-                        if (album.AlbumGenres.Any())
-                            _context.AlbumGenres.RemoveRange(album.AlbumGenres);
-
+                        await _albumGenreService.DeleteByAlbumIdAsync(album.Id);
                         _context.Albums.Remove(album);
-                        await _context.SaveChangesAsync();
 
-                        foreach (var genreId in genreIds)
-                        {
-                            var genreStillUsed = await _context.AlbumGenres
-                                .AnyAsync(x => x.GenreId == genreId);
-
-                            if (!genreStillUsed)
-                            {
-                                var genre = await _context.Genres.FirstOrDefaultAsync(x => x.Id == genreId);
-                                if (genre != null)
-                                    _context.Genres.Remove(genre);
-                            }
-                        }
-
-                        await _context.SaveChangesAsync();
+                        await _genreService.DeleteUnusedGenresAsync(genreIds, albumIdToIgnore: album.Id);
                     }
                 }
             }
 
-            var artistStillHasSongs = await _context.Songs.AnyAsync(x => x.ArtistId == artistId);
-            if (!artistStillHasSongs)
-            {
-                var artist = await _context.Artists.FirstOrDefaultAsync(x => x.Id == artistId);
-                if (artist != null)
-                {
-                    _context.Artists.Remove(artist);
-                    await _context.SaveChangesAsync();
-                }
-            }
+            await _artistService.DeleteUnusedArtistsAsync(
+                new List<int> { artistId },
+                songIdsToIgnore: new List<int> { song.Id });
 
-            await transaction.CommitAsync();
+            await _context.SaveChangesAsync();
+
             return true;
-        }
-
-        private async Task SaveAlbumGenresAsync(int albumId, List<GenreUpsertRequest> genres)
-        {
-            if (genres == null || !genres.Any())
-                return;
-
-            foreach (var item in genres
-                .Where(x => !string.IsNullOrWhiteSpace(x.ExternalGenreId) && !string.IsNullOrWhiteSpace(x.Name))
-                .GroupBy(x => x.ExternalGenreId)
-                .Select(g => g.First()))
-            {
-                var genre = await _context.Genres
-                    .FirstOrDefaultAsync(x => x.ExternalGenreId == item.ExternalGenreId);
-
-                if (genre == null)
-                {
-                    genre = new Genre
-                    {
-                        ExternalGenreId = item.ExternalGenreId,
-                        Source = string.IsNullOrWhiteSpace(item.Source) ? "Deezer" : item.Source,
-                        Name = item.Name
-                    };
-
-                    _context.Genres.Add(genre);
-                    await _context.SaveChangesAsync();
-                }
-                else if (string.IsNullOrWhiteSpace(genre.Name))
-                {
-                    genre.Name = item.Name;
-                    await _context.SaveChangesAsync();
-                }
-
-                var exists = await _context.AlbumGenres
-                    .AnyAsync(x => x.AlbumId == albumId && x.GenreId == genre.Id);
-
-                if (!exists)
-                {
-                    _context.AlbumGenres.Add(new AlbumGenre
-                    {
-                        AlbumId = albumId,
-                        GenreId = genre.Id
-                    });
-
-                    await _context.SaveChangesAsync();
-                }
-            }
         }
     }
 }

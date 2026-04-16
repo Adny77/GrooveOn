@@ -86,7 +86,7 @@ namespace GrooveOn.Services.Services
                 x.Username == entity.Username || x.Email == entity.Email);
 
             if (exists)
-                throw new InvalidOperationException("Korisnik sa istim username/email već postoji.");
+                throw new InvalidOperationException("User with the same username/email already exists");
 
             await UserHelper.AssignRoleByFlagsAsync(entity, request, _context);
         }
@@ -97,7 +97,7 @@ namespace GrooveOn.Services.Services
                 x.Id != entity.Id && (x.Username == request.Username || x.Email == request.Email));
 
             if (exists)
-                throw new InvalidOperationException("Korisnik sa istim username/email već postoji.");
+                throw new InvalidOperationException("User with the same username/email already exists");
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -108,10 +108,10 @@ namespace GrooveOn.Services.Services
                 .FirstOrDefaultAsync(x => x.Username == request.Username);
 
             if (user == null || !user.IsActive)
-                throw new UnauthorizedAccessException("Pogrešan username ili password.");
+                throw new UnauthorizedAccessException("Invalid username or password");
 
             if (!UserHelper.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
-                throw new UnauthorizedAccessException("Pogrešan username ili password.");
+                throw new UnauthorizedAccessException("Invalid username or password");
 
             var token = UserHelper.CreateJwt(user, _configuration);
 

@@ -2,6 +2,7 @@ using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -62,11 +63,11 @@ namespace GrooveOn.Services.Services
         {
             var question = await _context.Questions.FirstOrDefaultAsync(x => x.Id == request.QuestionId);
             if (question == null)
-                throw new Exception("Question not found.");
+                throw new NotFoundException("Question not found.");
 
             var admin = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.AdminId);
             if (admin == null)
-                throw new Exception("Admin not found.");
+                throw new NotFoundException("Admin not found.");
 
             entity.CreatedAt = DateTime.UtcNow;
 
@@ -81,7 +82,7 @@ namespace GrooveOn.Services.Services
         {
             var question = await _context.Questions.FirstOrDefaultAsync(x => x.Id == entity.QuestionId);
             if (question == null)
-                throw new Exception("Question not found.");
+                throw new NotFoundException("Question not found.");
 
             question.Answer = request.Message;
             question.AnsweredAt = DateTime.UtcNow;

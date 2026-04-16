@@ -1,10 +1,12 @@
 using DotNetEnv;
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
 using GrooveOn.Services.Services;
 using GrooveOn.WebAPI.Authentication;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -60,20 +62,64 @@ TypeAdapterConfig.GlobalSettings.Default
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
 
-builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IAlbumGenreService, AlbumGenreService>(); 
+builder.Services.AddScoped<IArtistService, ArtistService>();
+builder.Services.AddScoped<IPlayHistoryService, PlayHistoryService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
-
+builder.Services.AddScoped<IMusicResolveService, MusicResolveService>(); 
 
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+
+        var error = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        switch (error)
+        {
+            case UserException ex:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case ForbiddenException ex:
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case InvalidOperationException ex:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case NotFoundException ex:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            default:
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    message = "Došlo je do neočekivane greške."
+                });
+                break;
+        }
+    });
+});
 
 if (app.Environment.IsDevelopment())
 {
