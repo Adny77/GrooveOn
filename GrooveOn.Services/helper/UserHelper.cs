@@ -1,10 +1,10 @@
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Services.Database;
 using GrooveOn.Services.Exceptions;
+using Konscious.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,75 +14,42 @@ namespace GrooveOn.Services.Helpers
 {
     public static class UserHelper
     {
-        public static void CreatePasswordHash(string password, out string hashBase64, out string saltBase64)
+        public static string CreatePasswordHash(string password)
         {
-            using var hmac = new HMACSHA512();
-            var salt = hmac.Key;
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Password is required.", nameof(password));
 
-            hashBase64 = Convert.ToBase64String(hash);
-            saltBase64 = Convert.ToBase64String(salt);
-        }
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
-        public static bool VerifyPassword(string password, string storedHashBase64, string storedSaltBase64)
-        {
-            if (string.IsNullOrWhiteSpace(storedHashBase64) || string.IsNullOrWhiteSpace(storedSaltBase64))
-                return false;
+            using var argon2 = new Argon2id(passwordBytes);
+            argon2.Salt = salt;
+            argon2.Iterations = 4;
+            argon2.MemorySize = 65536;
+            argon2.DegreeOfParallelism = 4;
 
-            var salt = Convert.FromBase64String(storedSaltBase64);
-            var storedHash = Convert.FromBase64String(storedHashBase64);
+            byte[] hash = argon2.GetBytes(32);
 
-            using var hmac = new HMACSHA512(salt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-            return CryptographicOperations.FixedTimeEquals(computedHash, storedHash);
-        }
-
-        public static string CreateJwt(User user, IConfiguration configuration)
-        {
-            var jwtKey = configuration["Jwt:Key"]!;
-            var jwtIssuer = configuration["Jwt:Issuer"]!;
-        
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username)
-            };
-        
-            // Dodavanje role iz UserRoles tabele
-            foreach (var userRole in user.UserRoles)
-            {
-                if (!string.IsNullOrEmpty(userRole.Role?.Name))
-                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Name));
-            }
-        
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-        
-            var token = new JwtSecurityToken(
-                issuer: jwtIssuer,
-                audience: jwtIssuer,
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
-                signingCredentials: creds
+            return string.Join('.',
+                Convert.ToBase64String(salt),
+                argon2.Iterations,
+                argon2.MemorySize,
+                argon2.DegreeOfParallelism,
+                Convert.ToBase64String(hash)
             );
-        
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
-
-        public static async Task AssignRoleByFlagsAsync(User entity, UserInsertRequest request, GrooveOnDbContext _context)
+        public static async Task AssignRoleByFlagsAsync(User entity, UserInsertRequest request, GrooveOnDbContext context)
         {
             int? roleId = null;
 
-            if (request.IsAdmin == true) roleId = await GetRoleIdAsync("Admin", _context);
-            else if (request.IsTrener == true) roleId = await GetRoleIdAsync("Trener", _context);
-            else if (request.IsRadnik == true) roleId = await GetRoleIdAsync("Radnik", _context);
-            else if (request.IsUser == true) roleId = await GetRoleIdAsync("Korisnik", _context);
+            if (request.IsAdmin == true)
+                roleId = await GetRoleIdAsync("Admin", context);
+            else
+                roleId = await GetRoleIdAsync("Korisnik", context);
 
             if (roleId == null)
-                throw new NotFoundException("Valid role not found");
+                throw new NotFoundException("Valid role not found.");
 
             entity.UserRoles.Add(new UserRole
             {
@@ -91,12 +58,81 @@ namespace GrooveOn.Services.Helpers
             });
         }
 
+        public static bool VerifyPassword(string password, string storedHash)
+        {
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(storedHash))
+                return false;
+
+            var parts = storedHash.Split('.');
+            if (parts.Length != 5)
+                return false;
+
+            byte[] salt = Convert.FromBase64String(parts[0]);
+            int iterations = int.Parse(parts[1]);
+            int memorySize = int.Parse(parts[2]);
+            int degreeOfParallelism = int.Parse(parts[3]);
+            byte[] expectedHash = Convert.FromBase64String(parts[4]);
+
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+            using var argon2 = new Argon2id(passwordBytes);
+            argon2.Salt = salt;
+            argon2.Iterations = iterations;
+            argon2.MemorySize = memorySize;
+            argon2.DegreeOfParallelism = degreeOfParallelism;
+
+            byte[] computedHash = argon2.GetBytes(expectedHash.Length);
+
+            return CryptographicOperations.FixedTimeEquals(computedHash, expectedHash);
+        }
+
+        public static string CreateJwt(User user, IConfiguration configuration)
+        {
+            var jwtKey = configuration["JWT_SECRET"];
+            var jwtIssuer = configuration["JWT_ISSUER"];
+            var jwtAudience = configuration["JWT_AUDIENCE"];
+
+            if (string.IsNullOrWhiteSpace(jwtKey))
+                throw new InvalidOperationException("JWT_SECRET nije konfigurisan.");
+
+            if (string.IsNullOrWhiteSpace(jwtIssuer))
+                throw new InvalidOperationException("JWT_ISSUER nije konfigurisan.");
+
+            if (string.IsNullOrWhiteSpace(jwtAudience))
+                throw new InvalidOperationException("JWT_AUDIENCE nije konfigurisan.");
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            foreach (var userRole in user.UserRoles)
+            {
+                if (!string.IsNullOrWhiteSpace(userRole.Role?.Name))
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, userRole.Role!.Name));
+                }
+            }
+
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: jwtIssuer,
+                audience: jwtAudience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         private static async Task<int?> GetRoleIdAsync(string roleName, GrooveOnDbContext context)
         {
             var role = await context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
             return role?.Id;
         }
-
-
     }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grooveon_desktop/dialogs/forgot_password_dialog.dart';
 import 'package:grooveon_desktop/screens/base_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -100,6 +101,14 @@ class _LoginScreenState extends State<LoginScreen> {
         _loading = false;
       });
     }
+  }
+
+  Future<void> _openForgotPasswordDialog() async {
+    await showDialog(
+      context: context,
+      barrierDismissible: ! _loading,
+      builder: (_) => const ForgotPasswordDialog(),
+    );
   }
 
   InputDecoration _inputDecoration({
@@ -275,7 +284,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     onFieldSubmitted: (_) => _login(),
                   ),
-                  const SizedBox(height: 22),
+
+                  const SizedBox(height: 8),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _loading ? null : _openForgotPasswordDialog,
+                      style: TextButton.styleFrom(
+                        foregroundColor: LoginScreen.primaryColor,
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: const Text(
+                        "Forgot password?",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
 
                   SizedBox(
                     width: double.infinity,

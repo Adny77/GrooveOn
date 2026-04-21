@@ -1,4 +1,6 @@
 using DotNetEnv;
+using GrooveOn.MailingService.Configuration;
+using GrooveOn.Services;
 using GrooveOn.Services.Database;
 using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
@@ -9,24 +11,54 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 
 Env.Load(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration["CONNECTION_STRING"];
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("CONNECTION_STRING nije pronađen u .env fajlu.");
+}
+
 builder.Services.AddDbContext<GrooveOnDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        connectionString,
         b => b.MigrationsAssembly("GrooveOn.Services")
     ));
 
+builder.Services.Configure<AppConfig>(options =>
+{
+    options.ResetPasswordQueue = "email.reset-password";
+});
+
+builder.Services.AddSingleton<IConnection>(sp =>
+{
+    var factory = new ConnectionFactory
+    {
+        HostName = builder.Configuration["RABBITMQ_HOST"] ?? "localhost",
+        Port = int.TryParse(builder.Configuration["RABBITMQ_PORT"], out var port) ? port : 5672,
+        UserName = builder.Configuration["RABBITMQ_USERNAME"] ?? "guest",
+        Password = builder.Configuration["RABBITMQ_PASSWORD"] ?? "guest",
+        VirtualHost = builder.Configuration["RABBITMQ_VIRTUALHOST"] ?? "/"
+    };
+
+    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "GrooveOn API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "GrooveOn API",
+        Version = "v1"
+    });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -67,13 +99,13 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
-builder.Services.AddScoped<IAlbumGenreService, AlbumGenreService>(); 
+builder.Services.AddScoped<IAlbumGenreService, AlbumGenreService>();
 builder.Services.AddScoped<IArtistService, ArtistService>();
 builder.Services.AddScoped<IPlayHistoryService, PlayHistoryService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
-builder.Services.AddScoped<IMusicResolveService, MusicResolveService>(); 
-
+builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IMusicResolveService, MusicResolveService>();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
@@ -125,7 +157,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapOpenApi();
 }
 
 using (var scope = app.Services.CreateScope())
@@ -140,3 +171,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task WriteError(HttpContext context, int statusCode, string message)
+{
+    context.Response.StatusCode = statusCode;
+    await context.Response.WriteAsJsonAsync(new
+    {
+        message
+    });
+}

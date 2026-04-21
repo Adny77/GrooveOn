@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
 import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
 import 'package:grooveon_desktop/models/response/music_overview_response.dart';
+import 'package:grooveon_desktop/models/response/new_users_summary.dart';
 import 'package:grooveon_desktop/models/response/subscription_analytics.dart';
 import 'package:grooveon_desktop/models/response/user_growth_point.dart';
 import 'package:grooveon_desktop/utils/session.dart';
@@ -32,6 +33,40 @@ class ReportProvider with ChangeNotifier {
     }
 
     return SubscriptionAnalytics.fromJson(jsonDecode(response.body));
+  }
+
+  Future<SubscriptionAnalytics> getNewUsersSubscriptionAnalytics({
+    required int year,
+    int? month,
+  }) async {
+    final queryParams = <String, String>{'year': year.toString()};
+
+    if (month != null) {
+      queryParams['month'] = month.toString();
+    }
+
+    final uri = Uri.parse(
+      '${ApiConfig.apiBase}/api/Report/new-users-subscription-analytics',
+    ).replace(queryParameters: queryParams);
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${Session.token}",
+      },
+    );
+
+    if (response.statusCode == 401) {
+      throw Exception("Unauthorized");
+    }
+
+    if (response.statusCode < 200 || response.statusCode > 299) {
+      throw Exception("API Error: ${response.statusCode} → ${response.body}");
+    }
+
+    final data = jsonDecode(response.body);
+    return SubscriptionAnalytics.fromJson(data);
   }
 
   Future<MusicOverviewResponse> getMusicOverview({

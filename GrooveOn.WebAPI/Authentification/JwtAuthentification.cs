@@ -11,14 +11,18 @@ namespace GrooveOn.WebAPI.Authentication
     {
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtKey = configuration["Jwt:Key"];
-            var jwtIssuer = configuration["Jwt:Issuer"];
+            var jwtKey = configuration["JWT_SECRET"];
+            var jwtIssuer = configuration["JWT_ISSUER"];
+            var jwtAudience = configuration["JWT_AUDIENCE"];
 
             if (string.IsNullOrWhiteSpace(jwtKey))
-                throw new InvalidOperationException("Jwt:Key is not configured.");
+                throw new InvalidOperationException("JWT_SECRET nije konfigurisan.");
 
             if (string.IsNullOrWhiteSpace(jwtIssuer))
-                throw new InvalidOperationException("Jwt:Issuer is not configured.");
+                throw new InvalidOperationException("JWT_ISSUER nije konfigurisan.");
+
+            if (string.IsNullOrWhiteSpace(jwtAudience))
+                throw new InvalidOperationException("JWT_AUDIENCE nije konfigurisan.");
 
             services.AddAuthentication(options =>
             {
@@ -35,15 +39,13 @@ namespace GrooveOn.WebAPI.Authentication
                     ValidateIssuerSigningKey = true,
 
                     ValidIssuer = jwtIssuer,
-                    ValidAudience = jwtIssuer, 
+                    ValidAudience = jwtAudience,
 
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtKey)
                     )
                 };
             });
-
-            services.AddAuthorization();
 
             return services;
         }

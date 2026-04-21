@@ -50,6 +50,11 @@ namespace GrooveOn.Services.Services
         {
             query = base.ApplyFilter(query, search);
 
+            if (search.ArtistId.HasValue)
+            {
+                query = query.Where(x => x.Artist.Id == search.ArtistId);
+            }
+
             if (!string.IsNullOrWhiteSpace(search?.FTS))
             {
                 var fts = search.FTS.Trim().ToLower();
@@ -61,6 +66,13 @@ namespace GrooveOn.Services.Services
             }
 
             return query;
+        }
+
+        protected override AlbumResponse MapToResponse(Album entity)
+        {
+            var response = _mapper.Map<AlbumResponse>(entity);
+            response.SongCount = entity.Songs?.Count ?? 0;
+            return response;
         }
 
         public async Task<AlbumPreviewResponse> PreviewDeezerAlbumAsync(AlbumUpsertRequest request)

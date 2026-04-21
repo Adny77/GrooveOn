@@ -16,8 +16,6 @@ namespace GrooveOn.Services.Database
 
         public string? PasswordHash { get; set; }
 
-        public string? PasswordSalt { get; set; }
-
         public string Email { get; set; } = string.Empty;
 
         public string? UserImage { get; set; }

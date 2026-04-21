@@ -5,27 +5,37 @@ using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using GrooveOn.Model.ResponseObject;
 using GrooveOn.Services.Helpers;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 using System.Text;
-// using RabbitMQ.Client;
-// using GrooveOn.EmailConsumer.Messages;
+using GrooveOn.MailingService.Messages;
+using RabbitMQ.Client;
+using GrooveOn.Services.Exceptions;
+using GrooveOn.MailingService.Configuration;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
 namespace GrooveOn.Services.Services
 {
     public class UserService : BaseCRUDService<UserResponse, UserSearchObject, User, UserInsertRequest, UserUpdateRequest>, IUserService
     {
-        IConfiguration _configuration;
-        //private readonly IConnection _rabbitConnection;
-        public UserService(GrooveOnDbContext context, IMapper mapper, IConfiguration configuration) : base(context, mapper)
+        private readonly IConfiguration _configuration;
+        private readonly IConnection _rabbitConnection;
+        private readonly AppConfig _appConfig;
+
+        public UserService(
+            GrooveOnDbContext context,
+            IMapper mapper,
+            IConfiguration configuration,
+            IConnection rabbitConnection,
+            IOptions<AppConfig> appConfig
+        ) : base(context, mapper)
         {
             _configuration = configuration;
-            // _rabbitConnection = rabbitConnection;
+            _rabbitConnection = rabbitConnection;
+            _appConfig = appConfig.Value;
         }
 
         protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject? search = null)
@@ -47,17 +57,13 @@ namespace GrooveOn.Services.Services
             return query;
         }
 
-
-
         protected override User MapInsertToEntity(User entity, UserInsertRequest request)
         {
             _mapper.Map(request, entity);
 
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
-                UserHelper.CreatePasswordHash(request.Password, out var hash, out var salt);
-                entity.PasswordHash = hash;
-                entity.PasswordSalt = salt;
+                entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
 
             entity.JoinDate = DateTime.UtcNow;
@@ -66,17 +72,15 @@ namespace GrooveOn.Services.Services
 
         protected override void MapUpdateToEntity(User entity, UserUpdateRequest request)
         {
-            var JoinDate = entity.JoinDate;
+            var joinDate = entity.JoinDate;
 
             _mapper.Map(request, entity);
 
-            entity.JoinDate = JoinDate;
+            entity.JoinDate = joinDate;
 
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
-                UserHelper.CreatePasswordHash(request.Password, out var hash, out var salt);
-                entity.PasswordHash = hash;
-                entity.PasswordSalt = salt;
+                entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
         }
 
@@ -110,7 +114,7 @@ namespace GrooveOn.Services.Services
             if (user == null || !user.IsActive)
                 throw new UnauthorizedAccessException("Invalid username or password");
 
-            if (!UserHelper.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
+            if (!UserHelper.VerifyPassword(request.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid username or password");
 
             var token = UserHelper.CreateJwt(user, _configuration);
@@ -131,62 +135,72 @@ namespace GrooveOn.Services.Services
             return response;
         }
 
-        // public async Task ForgotPasswordAsync(string email)
-        // {
-        //     var user = await _context.Users
-        //         .FirstOrDefaultAsync(x => x.Email == email);
+        public async Task ForgotPasswordAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new UserException("Email je obavezan.");
 
-        //     if (user == null)
-        //         throw new Exception("Email nije povezan ni sa jednim nalogom.");
+            var normalizedEmail = email.Trim();
 
-        //     var newPassword = GenerateRandomPassword();
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.Email == normalizedEmail);
 
-        //     UserHelper.CreatePasswordHash(newPassword, out string hash, out string salt);
+            if (user == null)
+                throw new UserException("Email nije povezan ni sa jednim nalogom.");
 
-        //     user.PasswordHash = hash;
-        //     user.PasswordSalt = salt;
+            var newPassword = GenerateRandomPassword();
 
-        //     await _context.SaveChangesAsync();
+            user.PasswordHash = UserHelper.CreatePasswordHash(newPassword);
 
-        //     var channel = await _rabbitConnection.CreateChannelAsync();
+            await _context.SaveChangesAsync();
 
-        //     await channel.QueueDeclareAsync(
-        //         queue: "email.reset-password",
-        //         durable: true,
-        //         exclusive: false,
-        //         autoDelete: false,
-        //         arguments: null
-        //     );
+            await using var channel = await _rabbitConnection.CreateChannelAsync();
 
-        //     var message = new ResetPasswordEmailMessage
-        //     {
-        //         To = user.Email!,
-        //         UserName = user.FirstName ?? user.Username ?? "Korisnik",
-        //         NewPassword = newPassword
-        //     };
+            string queueName = _appConfig.ResetPasswordQueue;
 
-        //     var body = Encoding.UTF8.GetBytes(
-        //         JsonSerializer.Serialize(message)
-        //     );
+            await channel.QueueDeclareAsync(
+                queue: queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null
+            );
 
-        //     await channel.BasicPublishAsync(
-        //         exchange: "",
-        //         routingKey: "email.reset-password",
-        //         body: body
-        //     );
-        // }
+            var message = new ResetPasswordEmailMessage
+            {
+                To = user.Email!,
+                Name = user.FirstName ?? "Korisnik",
+                UserName = user.Username,
+                NewPassword = newPassword
+            };
+
+            var body = Encoding.UTF8.GetBytes(
+                JsonSerializer.Serialize(message)
+            );
+
+            await channel.BasicPublishAsync(
+                exchange: "",
+                routingKey: queueName,
+                body: body
+            );
+        }
 
         private string GenerateRandomPassword(int length = 10)
         {
             const string chars =
                 "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@$?";
 
-            var random = new Random();
-            return new string(
-                Enumerable.Repeat(chars, length)
-                    .Select(s => s[random.Next(s.Length)])
-                    .ToArray()
-            );
+            var bytes = new byte[length];
+            RandomNumberGenerator.Fill(bytes);
+
+            var result = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = chars[bytes[i] % chars.Length];
+            }
+
+            return new string(result);
         }
     }
 }

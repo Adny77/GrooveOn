@@ -16,6 +16,146 @@ namespace GrooveOn.Services.Services
             _context = context;
         }
 
+        public SubscriptionAnalyticsResponse GetNewUsersSubscriptionAnalytics(int year, int? month)
+        {
+            if (year <= 0)
+                throw new UserException("Year is required.");
+
+            if (month.HasValue && (month.Value < 1 || month.Value > 12))
+                throw new UserException("Month must be between 1 and 12.");
+
+            var newUsersQuery = _context.Users.Where(x => x.JoinDate.Year == year);
+
+            if (month.HasValue)
+            {
+                newUsersQuery = newUsersQuery.Where(x => x.JoinDate.Month == month.Value);
+            }
+
+            var newUserIds = newUsersQuery
+                .Select(x => x.Id)
+                .ToList();
+
+            var query = _context.Subscriptions
+                .Where(x => newUserIds.Contains(x.UserId));
+
+            var basicCount = query.Count(x => x.SubscriptionPlanId == 1);
+            var premiumCount = query.Count(x => x.SubscriptionPlanId == 2 || x.SubscriptionPlanId == 3);
+
+            var total = basicCount + premiumCount;
+
+            double basicPercentage = total == 0 ? 0 : (double)basicCount / total * 100;
+            double premiumPercentage = total == 0 ? 0 : (double)premiumCount / total * 100;
+
+            return new SubscriptionAnalyticsResponse
+            {
+                BasicCount = basicCount,
+                PremiumCount = premiumCount,
+                BasicPercentage = Math.Round(basicPercentage, 2),
+                PremiumPercentage = Math.Round(premiumPercentage, 2),
+                TotalCount = total,
+                PeriodLabel = month.HasValue
+                    ? $"{month.Value:D2}/{year}"
+                    : year.ToString()
+            };
+        }
+
+        public MobileHomeResponse GetMobileHome(int takeTracks = 4, int takeArtists = 8)
+        {
+            // TOP TRACKS
+            var topTracks = _context.PlayHistories
+                .GroupBy(ph => ph.SongId)
+                .Select(g => new
+                {
+                    SongId = g.Key,
+                    PlayCount = g.Count()
+                })
+                .OrderByDescending(x => x.PlayCount)
+                .Take(10) // uzimamo 10 za izbor "pjesme dana"
+                .ToList();
+
+            var songIds = topTracks.Select(x => x.SongId).ToList();
+
+            var songs = _context.Songs
+                .Where(s => songIds.Contains(s.Id))
+                .ToList();
+
+            var topTracksResponse = topTracks
+                .Take(takeTracks)
+                .Select(x =>
+                {
+                    var song = songs.FirstOrDefault(s => s.Id == x.SongId);
+
+                    return new MusicStatItemResponse
+                    {
+                        Id = song!.Id,
+                        Title = song.Title,
+                        ImageUrl = song.CoverUrl,
+                        PlayCount = x.PlayCount
+                    };
+                })
+                .ToList();
+
+            // SONG OF THE DAY (random iz top 10)
+            MusicStatItemResponse? songOfTheDay = null;
+
+            if (topTracks.Any())
+            {
+                var random = new Random();
+                var picked = topTracks[random.Next(topTracks.Count)];
+
+                var song = songs.First(s => s.Id == picked.SongId);
+
+                songOfTheDay = new MusicStatItemResponse
+                {
+                    Id = song.Id,
+                    Title = song.Title,
+                    ImageUrl = song.CoverUrl,
+                    PlayCount = picked.PlayCount
+                };
+            }
+
+            // TOP ARTISTS
+            var topArtists = _context.PlayHistories
+                .Where(ph => ph.Song != null)
+                .GroupBy(ph => ph.Song!.ArtistId)
+                .Select(g => new
+                {
+                    ArtistId = g.Key,
+                    PlayCount = g.Count()
+                })
+                .OrderByDescending(x => x.PlayCount)
+                .Take(takeArtists)
+                .ToList();
+
+            var artistIds = topArtists.Select(x => x.ArtistId).ToList();
+
+            var artists = _context.Artists
+                .Where(a => artistIds.Contains(a.Id))
+                .ToList();
+
+            var topArtistsResponse = topArtists
+                .Select(x =>
+                {
+                    var artist = artists.First(a => a.Id == x.ArtistId);
+
+                    return new MusicStatItemResponse
+                    {
+                        Id = artist.Id,
+                        Title = artist.Name,
+                        ImageUrl = artist.Picture,
+                        PlayCount = x.PlayCount
+                    };
+                })
+                .ToList();
+
+            return new MobileHomeResponse
+            {
+                SongOfTheDay = songOfTheDay,
+                TopTracks = topTracksResponse,
+                TopArtists = topArtistsResponse
+            };
+        }
+
         public SubscriptionAnalyticsResponse GetSubscriptionAnalytics(int year, int? month = null)
         {
             var query = _context.Subscriptions.AsQueryable();

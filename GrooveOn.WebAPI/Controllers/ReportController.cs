@@ -42,5 +42,19 @@ namespace GrooveOn.API.Controllers
             var result = _reportService.GetMusicOverview(request);
             return Ok(result);
         }
+
+        [HttpGet("new-users-subscription-analytics")]
+        public SubscriptionAnalyticsResponse GetNewUsersSubscriptionAnalytics([FromQuery] int year, [FromQuery] int? month)
+        {
+            return _reportService.GetNewUsersSubscriptionAnalytics(year, month);
+        }
+
+        [HttpGet("mobile-home")]
+        public ActionResult<MobileHomeResponse> GetMobileHome(
+        [FromQuery] int takeTracks = 4,
+        [FromQuery] int takeArtists = 8)
+        {
+            return Ok(_reportService.GetMobileHome(takeTracks, takeArtists));
+        }
     }
 }

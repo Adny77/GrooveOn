@@ -21,7 +21,7 @@ namespace GrooveOn.Services.Database
 
         public DateTime StartDate { get; set; }
 
-        public DateTime ExpiryDate { get; set; }
+        public DateTime? ExpiryDate { get; set; }
 
         public bool IsActive { get; set; } = true;
 
