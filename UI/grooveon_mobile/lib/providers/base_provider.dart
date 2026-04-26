@@ -4,7 +4,7 @@ import 'package:grooveon_mobile/config/api_config.dart';
 import 'package:grooveon_mobile/helper/http_helper.dart';
 import 'package:grooveon_mobile/models/search_results.dart';
 import 'package:http/http.dart' as http;
-import '../utils/session.dart';
+import '../utils/Session.dart';
 
 abstract class BaseProvider<T> with ChangeNotifier {
   final String endpoint;

@@ -93,8 +93,8 @@ TypeAdapterConfig.GlobalSettings.Default
 
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
-
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
@@ -105,8 +105,10 @@ builder.Services.AddScoped<IPlayHistoryService, PlayHistoryService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IMusicSearchEngineService, MusicSearchEngineService>();
 builder.Services.AddScoped<IMusicResolveService, MusicResolveService>();
-
+builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddScoped<IPlaylistSongService, PlaylistSongService>();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
 
@@ -159,11 +161,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<GrooveOnDbContext>();
-    db.Database.Migrate();
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<GrooveOnDbContext>();
+//     db.Database.Migrate();
+// }
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

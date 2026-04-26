@@ -5,33 +5,25 @@ part 'player_response.g.dart';
 @JsonSerializable()
 class PlayerResponse {
   final int id;
-
-  final int userId;
-  final String? username;
-
   final int songId;
-  final String? songTitle;
-  final String? songCoverUrl;
-  final String? previewUrl;
-
-  final int currentSeconds;
-  final bool isPlaying;
-  final bool isVisible;
-
-  final DateTime updatedAt;
+  final String title;
+  final String artistName;
+  final int duration;
+  final String coverUrl;
+  final String externalTrackId;
+  final bool hasPrevious;
+  final bool hasNext;
 
   PlayerResponse({
     required this.id,
-    required this.userId,
-    this.username,
     required this.songId,
-    this.songTitle,
-    this.songCoverUrl,
-    this.previewUrl,
-    required this.currentSeconds,
-    required this.isPlaying,
-    required this.isVisible,
-    required this.updatedAt,
+    required this.title,
+    required this.artistName,
+    required this.duration,
+    required this.coverUrl,
+    required this.externalTrackId,
+    required this.hasPrevious,
+    required this.hasNext,
   });
 
   factory PlayerResponse.fromJson(Map<String, dynamic> json) =>

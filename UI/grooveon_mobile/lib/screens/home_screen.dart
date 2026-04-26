@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/models/music_stat_item_response.dart';
 import 'package:grooveon_mobile/screens/artist_info_screen.dart';
+import 'package:grooveon_mobile/screens/search_apperance_screen.dart';
+import 'package:grooveon_mobile/widgets/mini_player_bar.dart';
 import '../models/mobile_home_response.dart';
 import '../providers/report_provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool showBottomNav;
+
+  const HomeScreen({
+    super.key,
+    this.showBottomNav = true,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -34,6 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
     await _homeFuture;
   }
 
+  void _openSearch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const SearchScreen(),
+      ),
+    );
+  }
+
   void _openArtistInfo(MusicStatItemResponse artist) {
     Navigator.push(
       context,
@@ -53,57 +69,64 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: pageBg,
-      body: SafeArea(
-        child: FutureBuilder<MobileHomeResponse>(
-          future: _homeFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return _loadingState();
-            }
+      body: Stack(
+  children: [
+    SafeArea(
+      child: FutureBuilder<MobileHomeResponse>(
+        future: _homeFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _loadingState();
+          }
 
-            if (snapshot.hasError) {
-              return _errorState(snapshot.error.toString());
-            }
+          if (snapshot.hasError) {
+            return _errorState(snapshot.error.toString());
+          }
 
-            final data = snapshot.data ?? MobileHomeResponse();
-            final songOfTheDay = data.songOfTheDay;
-            final topArtists = data.topArtists;
-            final topTracks = data.topTracks;
+          final data = snapshot.data ?? MobileHomeResponse();
+          final songOfTheDay = data.songOfTheDay;
+          final topArtists = data.topArtists;
+          final topTracks = data.topTracks;
 
-            return RefreshIndicator(
-              onRefresh: _reload,
-              child: Column(
-                children: [
-                  _header(),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _banner(songOfTheDay),
-                          const SizedBox(height: 20),
-                          _sectionTitle("Top Artists"),
-                          const SizedBox(height: 10),
-                          _artists(topArtists),
-                          const SizedBox(height: 20),
-                          _sectionTitle("Top Tracks"),
-                          const SizedBox(height: 10),
-                          _topTracks(topTracks),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
+          return RefreshIndicator(
+            onRefresh: _reload,
+            child: Column(
+              children: [
+                _header(),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 100), // 🔥 BITNO
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _banner(songOfTheDay),
+                        const SizedBox(height: 20),
+                        _sectionTitle("Top Artists"),
+                        const SizedBox(height: 10),
+                        _artists(topArtists),
+                        const SizedBox(height: 20),
+                        _sectionTitle("Top Tracks"),
+                        const SizedBox(height: 10),
+                        _topTracks(topTracks),
+                        const SizedBox(height: 24),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
-      bottomNavigationBar: _bottomNav(),
+    ),
+
+    // 🔥 MINI PLAYER (uvijek na dnu)
+    const MiniPlayerBar(),
+  ],
+),
+      bottomNavigationBar: widget.showBottomNav ? _bottomNav() : null,
     );
   }
 
@@ -183,23 +206,34 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  hintText: "Search...",
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(22),
+              onTap: _openSearch,
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: const Row(
+                  children: [
+                    Icon(Icons.search, color: Colors.black54),
+                    SizedBox(width: 10),
+                    Text(
+                      "Search...",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

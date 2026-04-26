@@ -2,22 +2,16 @@ using System;
 
 namespace GrooveOn.Model.ResponseObjects
 {
-    public class PlayerResponse
-    {
-        public int Id { get; set; }
-
-        public int UserId { get; set; }
-        public string? Username { get; set; }
-
-        public int SongId { get; set; }
-        public string? SongTitle { get; set; }
-        public string? SongCoverUrl { get; set; }
-        public string? PreviewUrl { get; set; }
-
-        public int CurrentSeconds { get; set; }
-        public bool IsPlaying { get; set; }
-        public bool IsVisible { get; set; }
-
-        public DateTime UpdatedAt { get; set; }
-    }
+   public class PlayerResponse
+{
+    public int Id { get; set; }
+    public int SongId { get; set; }
+    public string Title { get; set; }
+    public String ArtistName {get; set;}
+    public int Duration {get; set;}
+    public string CoverUrl { get; set; }
+    public string ExternalTrackId { get; set; }
+    public bool HasPrevious { get; set; }
+    public bool HasNext { get; set; }
+}
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/providers/album_provider.dart';
 import 'package:grooveon_mobile/providers/auth_provider.dart';
+import 'package:grooveon_mobile/providers/music_search_provider.dart';
 import 'package:grooveon_mobile/providers/player_provider.dart';
 import 'package:grooveon_mobile/providers/song_provider.dart';
 import 'package:grooveon_mobile/providers/user_provider.dart';
@@ -19,6 +20,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => PlayerProvider()),
         ChangeNotifierProvider(create: (_) => SongProvider()),
         ChangeNotifierProvider(create: (_) => AlbumProvider()),
+        ChangeNotifierProvider(create: (_) => MusicSearchProvider()),
 
       ],
       child: const GrooveOnApp(),

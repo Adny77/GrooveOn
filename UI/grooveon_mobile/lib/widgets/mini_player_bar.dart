@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../providers/player_provider.dart';
 
 class MiniPlayerBar extends StatelessWidget {
@@ -17,174 +16,250 @@ class MiniPlayerBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<PlayerProvider>(
       builder: (context, player, child) {
-        if (!player.isVisible || !player.hasSong) {
-          return const SizedBox.shrink();
-        }
+        if (!player.hasSong) return const SizedBox.shrink();
+
+        final song = player.currentSong;
 
         return SafeArea(
           top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-            child: Material(
-              elevation: 10,
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(18),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: bg,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: border),
-                  boxShadow: [
-                    BoxShadow(
-                      color: groovePurple.withOpacity(0.08),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    LinearProgressIndicator(
-                      value: player.progress,
-                      minHeight: 3,
-                      backgroundColor: Colors.transparent,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(groovePurple),
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(18),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+              child: Material(
+                elevation: 12,
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(22),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  decoration: BoxDecoration(
+                    color: bg,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: border),
+                    boxShadow: [
+                      BoxShadow(
+                        color: groovePurple.withOpacity(0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                      child: Row(
-                        children: [
-                          // COVER
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1ECF7),
-                              borderRadius: BorderRadius.circular(12),
-                              image: player.currentCover != null &&
-                                      player.currentCover!.trim().isNotEmpty
-                                  ? DecorationImage(
-                                      image: NetworkImage(player.currentCover!),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        /// PROGRESS BAR
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTapDown: (details) {
+                            if (player.duration.inMilliseconds <= 0) return;
+
+                            final box =
+                                context.findRenderObject() as RenderBox;
+                            final percent =
+                                (details.localPosition.dx / box.size.width)
+                                    .clamp(0.0, 1.0);
+
+                            final newPosition = Duration(
+                              milliseconds:
+                                  (player.duration.inMilliseconds * percent)
+                                      .round(),
+                            );
+
+                            player.seek(newPosition);
+                          },
+                          child: LinearProgressIndicator(
+                            value: player.progress,
+                            minHeight: 4,
+                            backgroundColor: Colors.grey.shade300,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              groovePurple,
                             ),
-                            child: player.currentCover == null ||
-                                    player.currentCover!.trim().isEmpty
-                                ? const Icon(
-                                    Icons.music_note_rounded,
-                                    color: groovePurple,
-                                  )
-                                : null,
                           ),
+                        ),
 
-                          const SizedBox(width: 12),
-
-                          // TITLE + ARTIST
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        /// PLAYER CONTENT
+                        SizedBox(
+                          height: 72,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
                               children: [
-                                Text(
-                                  player.currentTitle,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: textPrimary,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w800,
+                                /// COVER
+                                Container(
+                                  width: 46,
+                                  height: 46,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF1ECF7),
+                                    borderRadius: BorderRadius.circular(14),
+                                    image: song?.coverUrl != null &&
+                                            song!.coverUrl!.trim().isNotEmpty
+                                        ? DecorationImage(
+                                            image:
+                                                NetworkImage(song.coverUrl!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: song?.coverUrl == null ||
+                                          song!.coverUrl!.trim().isEmpty
+                                      ? const Icon(
+                                          Icons.music_note_rounded,
+                                          color: groovePurple,
+                                          size: 22,
+                                        )
+                                      : null,
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                /// TITLE + TIME
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        song?.title ?? "",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: textPrimary,
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        song?.artistName ?? "GrooveOn",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: textSecondary,
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        "${player.formatDuration(player.position)} / ${player.formatDuration(player.duration)}",
+                                        style: const TextStyle(
+                                          color: textSecondary,
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  player.currentArtist,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: textSecondary,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+
+                                /// PREVIOUS
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(
+                                    minWidth: 34,
+                                    minHeight: 34,
+                                  ),
+                                  onPressed: player.hasPrevious
+                                      ? () => player.playPrevious()
+                                      : null,
+                                  icon: Icon(
+                                    Icons.skip_previous_rounded,
+                                    color: player.hasPrevious
+                                        ? groovePurpleDark
+                                        : textSecondary.withOpacity(0.35),
+                                    size: 26,
                                   ),
                                 ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  "${player.formatDuration(player.position)} / ${player.formatDuration(player.duration)}",
-                                  style: const TextStyle(
-                                    color: textSecondary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+
+                                /// PLAY / PAUSE
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(
+                                    minWidth: 38,
+                                    minHeight: 38,
+                                  ),
+                                  onPressed: player.isLoading
+                                      ? null
+                                      : () {
+                                          if (player.isCompleted) {
+                                            player.repeatCurrentSong();
+                                          } else {
+                                            player.togglePlayPause();
+                                          }
+                                        },
+                                  icon: player.isLoading
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: groovePurple,
+                                          ),
+                                        )
+                                      : Icon(
+                                          player.isCompleted
+                                              ? Icons.repeat_rounded
+                                              : player.isPlaying
+                                                  ? Icons
+                                                      .pause_circle_filled_rounded
+                                                  : Icons
+                                                      .play_circle_fill_rounded,
+                                          color: groovePurpleDark,
+                                          size: player.isCompleted ? 28 : 31,
+                                        ),
+                                ),
+
+                                /// NEXT
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(
+                                    minWidth: 34,
+                                    minHeight: 34,
+                                  ),
+                                  onPressed: player.hasNext
+                                      ? () => player.playNext()
+                                      : null,
+                                  icon: Icon(
+                                    Icons.skip_next_rounded,
+                                    color: player.hasNext
+                                        ? groovePurpleDark
+                                        : textSecondary.withOpacity(0.35),
+                                    size: 26,
+                                  ),
+                                ),
+
+                                /// ❌ CLOSE PLAYER
+                                IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(
+                                    minWidth: 34,
+                                    minHeight: 34,
+                                  ),
+                                  onPressed: () {
+                                    player.stopPlayer();
+                                  },
+                                  icon: const Icon(
+                                    Icons.close_rounded,
+                                    color: Colors.redAccent,
+                                    size: 22,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-
-                          const SizedBox(width: 6),
-
-                          // // ⏮️ PREVIOUS
-                          // IconButton(
-                          //   onPressed: player.isLoading
-                          //       ? null
-                          //       : () => player.playPrevious(),
-                          //   icon: const Icon(
-                          //     Icons.skip_previous_rounded,
-                          //     color: groovePurpleDark,
-                          //     size: 30,
-                          //   ),
-                          // ),
-
-                          // ▶️ / ⏸️ PLAY PAUSE
-                          IconButton(
-                            onPressed: player.isLoading
-                                ? null
-                                : () => player.togglePlayPause(),
-                            icon: player.isLoading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: groovePurple,
-                                    ),
-                                  )
-                                : Icon(
-                                    player.isPlaying
-                                        ? Icons.pause_circle_filled_rounded
-                                        : Icons.play_circle_fill_rounded,
-                                    color: groovePurpleDark,
-                                    size: 34,
-                                  ),
-                          ),
-
-                          // ⏭️ NEXT
-                          // IconButton(
-                          //   onPressed: player.isLoading
-                          //       ? null
-                          //       : () => player.playNext(),
-                          //   icon: const Icon(
-                          //     Icons.skip_next_rounded,
-                          //     color: groovePurpleDark,
-                          //     size: 30,
-                          //   ),
-                          // ),
-
-                          // ❌ CLOSE
-                          IconButton(
-                            onPressed: () => player.closePlayer(),
-                            icon: const Icon(
-                              Icons.close_rounded,
-                              color: textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

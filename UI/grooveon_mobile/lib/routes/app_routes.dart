@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/screens/home_screen.dart';
 import 'package:grooveon_mobile/screens/login_screen.dart';
+import 'package:grooveon_mobile/screens/navigation_screen.dart';
 import 'package:grooveon_mobile/screens/register_screen.dart';
 
 class AppRoutes {
   static const String home = '/home';
   static const String login = '/login';
   static const String register = '/register';
+  static const String navigation = '/navigation';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case navigation:
+        return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
       case home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 

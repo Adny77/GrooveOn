@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:grooveon_mobile/helper/univerzal_pagging_helper.dart';
 import 'package:grooveon_mobile/models/album_response.dart';
 import 'package:grooveon_mobile/models/song_response.dart';
@@ -7,6 +8,7 @@ import 'package:grooveon_mobile/providers/song_provider.dart';
 import 'package:grooveon_mobile/providers/player_provider.dart';
 import 'package:grooveon_mobile/widgets/swipe_widget.dart';
 import 'package:grooveon_mobile/widgets/mini_player_bar.dart';
+import 'package:grooveon_mobile/utils/Session.dart';
 
 class UniversalAlbumPreviewScreen extends StatefulWidget {
   final AlbumResponse album;
@@ -25,7 +27,6 @@ class _UniversalAlbumPreviewScreenState
     extends State<UniversalAlbumPreviewScreen> {
   static const Color groovePurple = Color(0xFF9C27B0);
   static const Color groovePurpleDark = Color(0xFF4A148C);
-  static const Color groovePurpleSoft = Color(0xFFB64FC8);
 
   static const Color bg = Color(0xFFF8F6FB);
   static const Color card = Color(0xFFFFFFFF);
@@ -109,6 +110,48 @@ class _UniversalAlbumPreviewScreenState
     });
   }
 
+  Future<void> _playSong(SongResponse song) async {
+    try {
+      final userId = Session.userId;
+
+      if (userId == null) {
+        throw Exception("Korisnik nije prijavljen.");
+      }
+
+      await context.read<PlayerProvider>().playSongWithPurpose(
+            request: {
+              "userId": userId,
+              "songId": song.id,
+              "purpose": "AlbumList",
+              "artistId": widget.album.artistId,
+            },
+          );
+    } catch (e) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Preview trenutno nije dostupan za ovu pjesmu."),
+        ),
+      );
+    }
+  }
+
+  Future<void> _startAlbumFromFirstSong() async {
+    final items = _songsPaging.items;
+
+    if (items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Album nema pjesama."),
+        ),
+      );
+      return;
+    }
+
+    await _playSong(items.first);
+  }
+
   @override
   void dispose() {
     _songsPaging.dispose();
@@ -167,10 +210,8 @@ class _UniversalAlbumPreviewScreenState
                                           child: Row(
                                             children: [
                                               _circleIconButton(
-                                                icon:
-                                                    Icons.arrow_back_ios_new_rounded,
-                                                onTap: () =>
-                                                    Navigator.pop(context),
+                                                icon: Icons.arrow_back_ios_new_rounded,
+                                                onTap: () => Navigator.pop(context),
                                               ),
                                             ],
                                           ),
@@ -194,8 +235,8 @@ class _UniversalAlbumPreviewScreenState
                                                   vertical: 6,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withOpacity(0.18),
+                                                  color:
+                                                      Colors.white.withOpacity(0.18),
                                                   borderRadius:
                                                       BorderRadius.circular(30),
                                                   border: Border.all(
@@ -234,8 +275,7 @@ class _UniversalAlbumPreviewScreenState
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
-                                              if (widget.album.description !=
-                                                      null &&
+                                              if (widget.album.description != null &&
                                                   widget.album.description!
                                                       .trim()
                                                       .isNotEmpty) ...[
@@ -243,8 +283,7 @@ class _UniversalAlbumPreviewScreenState
                                                 Text(
                                                   widget.album.description!,
                                                   maxLines: 3,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                                  overflow: TextOverflow.ellipsis,
                                                   style: const TextStyle(
                                                     color: Colors.white70,
                                                     fontSize: 13,
@@ -329,7 +368,8 @@ class _UniversalAlbumPreviewScreenState
   }
 
   Widget _heroImage() {
-    if (widget.album.coverUrl != null && widget.album.coverUrl!.trim().isNotEmpty) {
+    if (widget.album.coverUrl != null &&
+        widget.album.coverUrl!.trim().isNotEmpty) {
       return Image.network(
         widget.album.coverUrl!,
         fit: BoxFit.cover,
@@ -419,24 +459,28 @@ class _UniversalAlbumPreviewScreenState
                 ),
         ),
         const Spacer(),
-        Container(
-          width: 62,
-          height: 62,
-          decoration: const BoxDecoration(
-            color: groovePurple,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Color(0x559C27B0),
-                blurRadius: 18,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.play_arrow_rounded,
-            color: Colors.white,
-            size: 34,
+        InkWell(
+          onTap: _startAlbumFromFirstSong,
+          borderRadius: BorderRadius.circular(31),
+          child: Container(
+            width: 62,
+            height: 62,
+            decoration: const BoxDecoration(
+              color: groovePurple,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x559C27B0),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.play_arrow_rounded,
+              color: Colors.white,
+              size: 34,
+            ),
           ),
         ),
       ],
@@ -446,19 +490,7 @@ class _UniversalAlbumPreviewScreenState
   Widget _buildSongRow(SongResponse song, int number) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () async {
-        try {
-          await context.read<PlayerProvider>().playSong(song);
-        } catch (_) {
-          if (!context.mounted) return;
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Preview trenutno nije dostupan za ovu pjesmu."),
-            ),
-          );
-        }
-      },
+      onTap: () => _playSong(song),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(

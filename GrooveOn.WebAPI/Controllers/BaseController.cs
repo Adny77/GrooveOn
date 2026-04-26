@@ -10,7 +10,7 @@ using GrooveOn.Model.SearchObjects;
 namespace GrooveOn.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [Authorize]
     public class BaseController<T, TSearch> : ControllerBase where T : class where TSearch : BaseSearchObject, new()
     {

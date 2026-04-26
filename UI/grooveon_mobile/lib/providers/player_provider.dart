@@ -1,297 +1,369 @@
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:grooveon_mobile/deezer/provider/deezer_track_provider.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:http/http.dart' as http;
 
-import '../models/player_response.dart';
-import '../models/song_response.dart';
-import '../utils/session.dart';
-import 'base_provider.dart';
+import 'package:grooveon_mobile/config/api_config.dart';
+import 'package:grooveon_mobile/helper/http_helper.dart';
+import 'package:grooveon_mobile/deezer/provider/deezer_track_provider.dart';
+import 'package:grooveon_mobile/models/player_song.dart';
+import 'package:grooveon_mobile/models/player_response.dart';
 
-class PlayerProvider extends BaseProvider<PlayerResponse> {
-  PlayerProvider() : super("Player") {
-    _bindPlayerStreams();
-  }
-
+class PlayerProvider with ChangeNotifier {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  SongResponse? _currentSong;
-  PlayerResponse? _playerState;
-  String? _currentPreviewUrl;
+  PlayerSong? _currentSong;
+  Map<String, dynamic>? _currentRequest;
 
-  bool _isVisible = false;
-  bool _isLoading = false;
   bool _isPlaying = false;
+  bool _isLoading = false;
+  bool _isCompleted = false;
+  bool _isChangingSong = false;
+
+  bool _hasNext = false;
+  bool _hasPrevious = false;
 
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
 
-  StreamSubscription<Duration>? _positionSub;
-  StreamSubscription<Duration?>? _durationSub;
-  StreamSubscription<PlayerState>? _playerStateSub;
+  Timer? _repeatTimer;
 
-  SongResponse? get currentSong => _currentSong;
-  PlayerResponse? get playerState => _playerState;
-
-  bool get isVisible => _isVisible;
-  bool get isLoading => _isLoading;
   bool get isPlaying => _isPlaying;
+  bool get isLoading => _isLoading;
+  bool get isCompleted => _isCompleted;
+
   bool get hasSong => _currentSong != null;
+  PlayerSong? get currentSong => _currentSong;
+
+  bool get hasNext => _hasNext;
+  bool get hasPrevious => _hasPrevious;
 
   Duration get position => _position;
   Duration get duration => _duration;
 
-  String get currentTitle => _currentSong?.title ?? "";
-  String get currentArtist => _currentSong?.artistName ?? "";
-  String? get currentCover => _currentSong?.coverUrl;
-  String? get currentPreviewUrl => _currentPreviewUrl;
-
-  bool get canGoNext => false;
-  bool get canGoPrevious => false;
-
   double get progress {
-    if (_duration.inMilliseconds <= 0) return 0;
-    return (_position.inMilliseconds / _duration.inMilliseconds).clamp(0.0, 1.0);
+    if (_duration.inMilliseconds <= 0) return 0.0;
+    return (_position.inMilliseconds / _duration.inMilliseconds)
+        .clamp(0.0, 1.0);
   }
 
-  void _bindPlayerStreams() {
-    _positionSub = _audioPlayer.positionStream.listen((value) {
+  PlayerProvider() {
+    _audioPlayer.positionStream.listen((value) {
       _position = value;
       notifyListeners();
     });
 
-    _durationSub = _audioPlayer.durationStream.listen((value) {
+    _audioPlayer.durationStream.listen((value) {
       _duration = value ?? Duration.zero;
       notifyListeners();
-    });
 
-    _playerStateSub = _audioPlayer.playerStateStream.listen((state) async {
-      _isPlaying = state.playing;
-
-      if (state.processingState == ProcessingState.completed) {
-        _position = Duration.zero;
-        _isPlaying = false;
-        await _syncWithBackend();
+      if (_audioPlayer.playing && !_isCompleted) {
+        _startRepeatTimerFromCurrentPosition();
       }
-
-      notifyListeners();
     });
-  }
 
-  Future<void> playSong(SongResponse song) async {
-    if (song.externalTrackId == null || song.externalTrackId!.trim().isEmpty) {
-      throw Exception("Pjesma nema externalTrackId.");
-    }
-
-    try {
-      _isLoading = true;
-      _isVisible = true;
-      notifyListeners();
-
-      final isSameSong = _currentSong?.id == song.id;
-
-      if (isSameSong) {
-        if (_audioPlayer.playing) {
-          await _audioPlayer.pause();
-        } else {
-          final shouldRestart =
-              _duration.inMilliseconds > 0 &&
-              _position.inMilliseconds >= _duration.inMilliseconds;
-
-          if (shouldRestart) {
-            await _audioPlayer.seek(Duration.zero);
-          }
-
-          await _audioPlayer.play();
-        }
-
-        await _syncWithBackend();
+    _audioPlayer.playerStateStream.listen((state) {
+      if (_isChangingSong) {
+        _isPlaying = state.playing;
+        notifyListeners();
         return;
       }
 
-      final freshPreviewUrl = await DeezerTrackProvider.getPreviewUrl(
-        song.externalTrackId!,
-      );
-
-      if (freshPreviewUrl == null || freshPreviewUrl.trim().isEmpty) {
-        throw Exception("Preview nije dostupan za ovu pjesmu.");
+      if (state.processingState == ProcessingState.completed) {
+        _markCompleted();
+        return;
       }
 
-      await _audioPlayer.stop();
+      if (_isCompleted) {
+        _isPlaying = false;
+        notifyListeners();
+        return;
+      }
 
-      _position = Duration.zero;
-      _duration = Duration.zero;
-      _currentSong = song;
-      _currentPreviewUrl = freshPreviewUrl;
+      _isPlaying = state.playing;
+      notifyListeners();
+    });
+  }
 
-      await _audioPlayer.setUrl(freshPreviewUrl);
-      await _audioPlayer.play();
+  Future<void> playSongWithPurpose({
+    required Map<String, dynamic> request,
+  }) async {
+    try {
+      _repeatTimer?.cancel();
+      _isLoading = true;
+      _isCompleted = false;
+      notifyListeners();
 
-      await _syncWithBackend();
-    } catch (e) {
-      debugPrint("PLAYER ERROR: $e");
-      rethrow;
-    } finally {
+      final result = await _callPlay(request);
+
+      if (result.externalTrackId == null ||
+          result.externalTrackId!.trim().isEmpty) {
+        throw Exception("ExternalTrackId nije dostupan.");
+      }
+
+      _setCurrentSongFromResponse(result, request);
+
       _isLoading = false;
       notifyListeners();
-    }
-  }
 
-  Future<void> togglePlayPause() async {
-    if (_currentSong == null) return;
-
-    try {
-      if (_audioPlayer.playing) {
-        await _audioPlayer.pause();
-      } else {
-        final shouldRestart =
-            _duration.inMilliseconds > 0 &&
-            _position.inMilliseconds >= _duration.inMilliseconds;
-
-        if (shouldRestart) {
-          await _audioPlayer.seek(Duration.zero);
-        }
-
-        await _audioPlayer.play();
-      }
-
-      await _syncWithBackend();
-      notifyListeners();
+      await _loadAndPlay(result.externalTrackId!);
     } catch (e) {
-      debugPrint("TOGGLE ERROR: $e");
-    }
-  }
-
-  Future<void> pause() async {
-    try {
-      await _audioPlayer.pause();
-      await _syncWithBackend();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("PAUSE ERROR: $e");
-    }
-  }
-
-  Future<void> resume() async {
-    try {
-      if (_currentSong == null) return;
-
-      final shouldRestart =
-          _duration.inMilliseconds > 0 &&
-          _position.inMilliseconds >= _duration.inMilliseconds;
-
-      if (shouldRestart) {
-        await _audioPlayer.seek(Duration.zero);
-      }
-
-      await _audioPlayer.play();
-      await _syncWithBackend();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("RESUME ERROR: $e");
-    }
-  }
-
-  Future<void> seek(Duration value) async {
-    try {
-      await _audioPlayer.seek(value);
-      await _syncWithBackend();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("SEEK ERROR: $e");
-    }
-  }
-
-  Future<void> stop() async {
-    try {
-      await _audioPlayer.stop();
-      _position = Duration.zero;
-      _isPlaying = false;
-      await _syncWithBackend();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("STOP ERROR: $e");
-    }
-  }
-
-  Future<void> closePlayer() async {
-    try {
-      await _audioPlayer.stop();
-
-      _currentSong = null;
-      _currentPreviewUrl = null;
-      _isVisible = false;
+      debugPrint("PLAY ERROR: $e");
+      _repeatTimer?.cancel();
       _isLoading = false;
-      _isPlaying = false;
-      _position = Duration.zero;
-      _duration = Duration.zero;
-
-      if (_playerState != null) {
-        await update(_playerState!.id, {
-          "userId": Session.userId,
-          "songId": _playerState!.songId,
-          "currentSeconds": 0,
-          "isPlaying": false,
-          "isVisible": false,
-        });
-      }
-
+      _isChangingSong = false;
       notifyListeners();
-    } catch (e) {
-      debugPrint("CLOSE PLAYER ERROR: $e");
     }
   }
 
   Future<void> playNext() async {
-    debugPrint("playNext još nije implementiran za queue logiku.");
+    try {
+      if (!_hasNext || _currentSong == null || _currentRequest == null) return;
+
+      _repeatTimer?.cancel();
+      _isLoading = true;
+      _isCompleted = false;
+      notifyListeners();
+
+      final request = {
+        ..._currentRequest!,
+        "songId": _currentSong!.id,
+      };
+
+      final result = await _callNext(request);
+
+      if (result.externalTrackId == null ||
+          result.externalTrackId!.trim().isEmpty) {
+        throw Exception("ExternalTrackId nije dostupan.");
+      }
+
+      _setCurrentSongFromResponse(result, request);
+
+      _isLoading = false;
+      notifyListeners();
+
+      await _loadAndPlay(result.externalTrackId!);
+    } catch (e) {
+      debugPrint("NEXT ERROR: $e");
+      _repeatTimer?.cancel();
+      _isLoading = false;
+      _isChangingSong = false;
+      notifyListeners();
+    }
   }
 
   Future<void> playPrevious() async {
-    debugPrint("playPrevious još nije implementiran za queue logiku.");
+    try {
+      if (!_hasPrevious || _currentSong == null || _currentRequest == null) {
+        return;
+      }
+
+      _repeatTimer?.cancel();
+      _isLoading = true;
+      _isCompleted = false;
+      notifyListeners();
+
+      final request = {
+        ..._currentRequest!,
+        "songId": _currentSong!.id,
+      };
+
+      final result = await _callPrevious(request);
+
+      if (result.externalTrackId == null ||
+          result.externalTrackId!.trim().isEmpty) {
+        throw Exception("ExternalTrackId nije dostupan.");
+      }
+
+      _setCurrentSongFromResponse(result, request);
+
+      _isLoading = false;
+      notifyListeners();
+
+      await _loadAndPlay(result.externalTrackId!);
+    } catch (e) {
+      debugPrint("PREVIOUS ERROR: $e");
+      _repeatTimer?.cancel();
+      _isLoading = false;
+      _isChangingSong = false;
+      notifyListeners();
+    }
   }
 
-  Future<void> _syncWithBackend() async {
-    if (_currentSong == null || Session.userId == null) return;
+  Future<void> pause() async {
+    await _audioPlayer.pause();
 
-    final request = {
-      "userId": Session.userId,
-      "songId": _currentSong!.id,
-      "currentSeconds": _position.inSeconds,
-      "isPlaying": _isPlaying,
-      "isVisible": _isVisible,
+    _repeatTimer?.cancel();
+
+    _isPlaying = false;
+    notifyListeners();
+  }
+
+  Future<void> resume() async {
+    if (_currentSong == null) return;
+
+    if (_isCompleted) {
+      await repeatCurrentSong();
+      return;
+    }
+
+    await _audioPlayer.play();
+
+    _isPlaying = true;
+    _isCompleted = false;
+
+    _startRepeatTimerFromCurrentPosition();
+
+    notifyListeners();
+  }
+
+  Future<void> togglePlayPause() async {
+    if (_audioPlayer.playing) {
+      await pause();
+    } else {
+      await resume();
+    }
+  }
+
+  Future<void> repeatCurrentSong() async {
+    if (_currentSong == null) return;
+
+    _repeatTimer?.cancel();
+    _isChangingSong = true;
+
+    await _audioPlayer.seek(Duration.zero);
+    await _audioPlayer.play();
+
+    _isChangingSong = false;
+
+    _position = Duration.zero;
+    _isPlaying = true;
+    _isCompleted = false;
+
+    _startRepeatTimerFromCurrentPosition();
+
+    notifyListeners();
+  }
+
+  Future<void> stopPlayer() async {
+  try {
+    _repeatTimer?.cancel();
+
+    await _audioPlayer.stop();
+
+    _currentSong = null;
+    _currentRequest = null;
+
+    _isPlaying = false;
+    _isLoading = false;
+    _isCompleted = false;
+    _isChangingSong = false;
+
+    _hasNext = false;
+    _hasPrevious = false;
+
+    _position = Duration.zero;
+    _duration = Duration.zero;
+
+    notifyListeners();
+  } catch (e) {
+    debugPrint("STOP ERROR: $e");
+  }
+}
+
+  Future<void> seek(Duration position) async {
+    await _audioPlayer.seek(position);
+    _position = position;
+
+    if (_isCompleted && position < _duration) {
+      _isCompleted = false;
+    }
+
+    if (_audioPlayer.playing) {
+      _startRepeatTimerFromCurrentPosition();
+    } else {
+      _repeatTimer?.cancel();
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> _loadAndPlay(String externalTrackId) async {
+    final previewUrl = await DeezerTrackProvider.getPreviewUrl(externalTrackId);
+
+    if (previewUrl == null || previewUrl.trim().isEmpty) {
+      throw Exception("Preview nije dostupan.");
+    }
+
+    _repeatTimer?.cancel();
+    _isChangingSong = true;
+
+    await _audioPlayer.stop();
+    await _audioPlayer.setUrl(previewUrl);
+    await _audioPlayer.play();
+
+    _isChangingSong = false;
+
+    _isPlaying = true;
+    _isCompleted = false;
+
+    _startRepeatTimerFromCurrentPosition();
+
+    notifyListeners();
+  }
+
+  void _startRepeatTimerFromCurrentPosition() {
+    _repeatTimer?.cancel();
+
+    if (_duration.inMilliseconds <= 0) return;
+
+    final remaining = _duration - _position;
+
+    if (remaining.inMilliseconds <= 0) {
+      _markCompleted();
+      return;
+    }
+
+    _repeatTimer = Timer(remaining, _markCompleted);
+  }
+
+  void _markCompleted() {
+    _repeatTimer?.cancel();
+
+    _isPlaying = false;
+    _isCompleted = true;
+
+    notifyListeners();
+  }
+
+  void _setCurrentSongFromResponse(
+    PlayerResponse result,
+    Map<String, dynamic> request,
+  ) {
+    _currentSong = PlayerSong(
+      id: result.songId,
+      title: result.title ?? "",
+      artistName: result.artistName,
+      duration: result.duration,
+      coverUrl: result.coverUrl,
+      externalTrackId: result.externalTrackId!,
+    );
+
+    _currentRequest = {
+      "userId": request["userId"],
+      "songId": result.songId,
+      "purpose": request["purpose"],
+      "artistId": request["artistId"],
+      "playlistId": request["playlistId"],
     };
 
-    try {
-      final result = await get(filter: {"UserId": Session.userId});
+    _hasNext = result.hasNext;
+    _hasPrevious = result.hasPrevious;
 
-      if (result.items.isEmpty) {
-        final inserted = await insert(request);
-        _playerState = inserted;
-      } else {
-        final existing = result.items.first;
-        final updated = await update(existing.id, request);
-        _playerState = updated;
-      }
-    } catch (e) {
-      debugPrint("PLAYER SYNC ERROR: $e");
-    }
-  }
-
-  Future<void> loadPlayerFromBackend() async {
-    if (Session.userId == null) return;
-
-    try {
-      final result = await get(filter: {"UserId": Session.userId});
-
-      if (result.items.isNotEmpty) {
-        _playerState = result.items.first;
-        _isVisible = _playerState!.isVisible;
-        _isPlaying = _playerState!.isPlaying;
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint("LOAD PLAYER ERROR: $e");
-    }
+    _position = Duration.zero;
+    _duration = Duration.zero;
   }
 
   String formatDuration(Duration value) {
@@ -300,16 +372,48 @@ class PlayerProvider extends BaseProvider<PlayerResponse> {
     return "$minutes:${seconds.toString().padLeft(2, '0')}";
   }
 
-  @override
-  PlayerResponse fromJson(data) {
-    return PlayerResponse.fromJson(data);
+  Future<PlayerResponse> _callPlay(Map<String, dynamic> request) async {
+    final url = Uri.parse('${ApiConfig.apiBase}/api/player/random/play');
+
+    final response = await http.post(
+      url,
+      headers: HttpHelper.getHeaders(),
+      body: jsonEncode(request),
+    );
+
+    HttpHelper.checkResponse(response);
+    return PlayerResponse.fromJson(jsonDecode(response.body));
+  }
+
+  Future<PlayerResponse> _callNext(Map<String, dynamic> request) async {
+    final url = Uri.parse('${ApiConfig.apiBase}/api/player/random/next');
+
+    final response = await http.post(
+      url,
+      headers: HttpHelper.getHeaders(),
+      body: jsonEncode(request),
+    );
+
+    HttpHelper.checkResponse(response);
+    return PlayerResponse.fromJson(jsonDecode(response.body));
+  }
+
+  Future<PlayerResponse> _callPrevious(Map<String, dynamic> request) async {
+    final url = Uri.parse('${ApiConfig.apiBase}/api/player/random/previous');
+
+    final response = await http.post(
+      url,
+      headers: HttpHelper.getHeaders(),
+      body: jsonEncode(request),
+    );
+
+    HttpHelper.checkResponse(response);
+    return PlayerResponse.fromJson(jsonDecode(response.body));
   }
 
   @override
   void dispose() {
-    _positionSub?.cancel();
-    _durationSub?.cancel();
-    _playerStateSub?.cancel();
+    _repeatTimer?.cancel();
     _audioPlayer.dispose();
     super.dispose();
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/screens/universal_album_preview_screen.dart';
 import 'package:provider/provider.dart';
+
 import 'package:grooveon_mobile/helper/univerzal_pagging_helper.dart';
 import 'package:grooveon_mobile/models/album_response.dart';
 import 'package:grooveon_mobile/models/song_response.dart';
@@ -9,6 +10,7 @@ import 'package:grooveon_mobile/providers/song_provider.dart';
 import 'package:grooveon_mobile/providers/player_provider.dart';
 import 'package:grooveon_mobile/widgets/swipe_widget.dart';
 import 'package:grooveon_mobile/widgets/mini_player_bar.dart';
+import 'package:grooveon_mobile/utils/Session.dart';
 
 class ArtistInfoScreen extends StatefulWidget {
   final int artistId;
@@ -34,7 +36,6 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
     with SingleTickerProviderStateMixin {
   static const Color groovePurple = Color(0xFF9C27B0);
   static const Color groovePurpleDark = Color(0xFF4A148C);
-  static const Color groovePurpleSoft = Color(0xFFB64FC8);
 
   static const Color bg = Color(0xFFF8F6FB);
   static const Color card = Color(0xFFFFFFFF);
@@ -137,6 +138,7 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
       });
     } catch (e) {
       if (!mounted) return;
+
       setState(() {
         _headerError = e.toString();
         _headerLoading = false;
@@ -152,10 +154,55 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
     }
 
     if (!mounted) return;
+
     setState(() {
       _albumCount = _albumsPaging.totalCount;
       _songCount = _songsPaging.totalCount;
     });
+  }
+
+  Future<void> _playRandomArtistSong(SongResponse song) async {
+    try {
+      final userId = Session.userId;
+
+      if (userId == null) {
+        throw Exception("Korisnik nije prijavljen.");
+      }
+
+      await context.read<PlayerProvider>().playSongWithPurpose(
+            request: {
+              "userId": userId,
+              "songId": song.id,
+              "purpose": "RandomMusicArtist",
+              "artistId": widget.artistId,
+            },
+          );
+    } catch (e) {
+      debugPrint("RANDOM ARTIST PLAY ERROR: $e");
+
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Preview trenutno nije dostupan za ovu pjesmu."),
+        ),
+      );
+    }
+  }
+
+  Future<void> _startRandomArtistMusic() async {
+    final songs = _songsPaging.items;
+
+    if (songs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Ovaj artist trenutno nema pjesama."),
+        ),
+      );
+      return;
+    }
+
+    await _playRandomArtistSong(songs.first);
   }
 
   @override
@@ -220,8 +267,10 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
                                             child: Row(
                                               children: [
                                                 _circleIconButton(
-                                                  icon: Icons.arrow_back_ios_new,
-                                                  onTap: () => Navigator.pop(context),
+                                                  icon:
+                                                      Icons.arrow_back_ios_new,
+                                                  onTap: () =>
+                                                      Navigator.pop(context),
                                                 ),
                                               ],
                                             ),
@@ -238,7 +287,6 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                const SizedBox(height: 8),
                                                 Text(
                                                   widget.artistName,
                                                   maxLines: 2,
@@ -253,13 +301,32 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
                                                 ),
                                                 const SizedBox(height: 8),
                                                 Text(
-                                                  "${_formatCount(widget.playCount)} total plays",
+                                                  "${_formatCount(widget.playCount)} total plays • $_songCount songs • $_albumCount albums",
                                                   style: const TextStyle(
                                                     color: Colors.white70,
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
+                                                if (widget.description != null &&
+                                                    widget.description!
+                                                        .trim()
+                                                        .isNotEmpty) ...[
+                                                  const SizedBox(height: 10),
+                                                  Text(
+                                                    widget.description!,
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      color: Colors.white70,
+                                                      fontSize: 13,
+                                                      height: 1.35,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
                                                 const SizedBox(height: 18),
                                                 _actionRow(),
                                                 const SizedBox(height: 18),
@@ -315,7 +382,11 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [groovePurpleDark, groovePurple, Color(0xFFE9D8F1)],
+          colors: [
+            groovePurpleDark,
+            groovePurple,
+            Color(0xFFE9D8F1),
+          ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -386,25 +457,28 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
                 ),
         ),
         const Spacer(),
-        const SizedBox(width: 14),
-        Container(
-          width: 62,
-          height: 62,
-          decoration: const BoxDecoration(
-            color: groovePurple,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Color(0x559C27B0),
-                blurRadius: 18,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.play_arrow_rounded,
-            color: Colors.white,
-            size: 34,
+        InkWell(
+          onTap: _startRandomArtistMusic,
+          borderRadius: BorderRadius.circular(31),
+          child: Container(
+            width: 62,
+            height: 62,
+            decoration: const BoxDecoration(
+              color: groovePurple,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x559C27B0),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.play_arrow_rounded,
+              color: Colors.white,
+              size: 34,
+            ),
           ),
         ),
       ],
@@ -444,9 +518,9 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 90),
       children: [
-        const Text(
-          "Popular",
-          style: TextStyle(
+        Text(
+          "Popular ($_songCount)",
+          style: const TextStyle(
             color: textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w900,
@@ -491,19 +565,7 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
   Widget _buildSongRow(SongResponse song, int number) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () async {
-        try {
-          await context.read<PlayerProvider>().playSong(song);
-        } catch (_) {
-          if (!context.mounted) return;
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Preview trenutno nije dostupan za ovu pjesmu."),
-            ),
-          );
-        }
-      },
+      onTap: () => _playRandomArtistSong(song),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
@@ -578,7 +640,113 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
             ),
             const SizedBox(width: 8),
             const Icon(
-              Icons.more_horiz_rounded,
+              Icons.play_circle_fill_rounded,
+              color: groovePurple,
+              size: 28,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlbumRow(AlbumResponse album) {
+    final year = album.releaseDate?.year;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => UniversalAlbumPreviewScreen(album: album),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: divider),
+          boxShadow: [
+            BoxShadow(
+              color: groovePurple.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: card2,
+                borderRadius: BorderRadius.circular(12),
+                image: album.coverUrl != null &&
+                        album.coverUrl!.trim().isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(album.coverUrl!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: album.coverUrl == null || album.coverUrl!.trim().isEmpty
+                  ? const Icon(
+                      Icons.album_rounded,
+                      color: groovePurple,
+                      size: 30,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    album.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: groovePurple,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    year != null
+                        ? "$year • ${album.songCount} songs"
+                        : "${album.songCount} songs",
+                    style: const TextStyle(
+                      color: textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (album.description != null &&
+                      album.description!.trim().isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      album.description!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: textSecondary,
+                        fontSize: 12.5,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.chevron_right_rounded,
               color: textSecondary,
               size: 24,
             ),
@@ -588,116 +756,13 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
     );
   }
 
-  Widget _buildAlbumRow(AlbumResponse album) {
-  final year = album.releaseDate?.year;
-
-  return InkWell(
-    borderRadius: BorderRadius.circular(16),
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => UniversalAlbumPreviewScreen(album: album),
-        ),
-      );
-    },
-    child: Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: divider),
-        boxShadow: [
-          BoxShadow(
-            color: groovePurple.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: card2,
-              borderRadius: BorderRadius.circular(12),
-              image: album.coverUrl != null && album.coverUrl!.trim().isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(album.coverUrl!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-            child: album.coverUrl == null || album.coverUrl!.trim().isEmpty
-                ? const Icon(
-                    Icons.album_rounded,
-                    color: groovePurple,
-                    size: 30,
-                  )
-                : null,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  album.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: groovePurple,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  year != null
-                      ? "$year • ${album.songCount} songs"
-                      : "${album.songCount} songs",
-                  style: const TextStyle(
-                    color: textSecondary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (album.description != null &&
-                    album.description!.trim().isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    album.description!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: textSecondary,
-                      fontSize: 12.5,
-                      height: 1.3,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: textSecondary,
-            size: 24,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
   String _songSubtitle(SongResponse song) {
     final duration = _formatDuration(song.durationSeconds);
+
     if (song.albumTitle != null && song.albumTitle!.trim().isNotEmpty) {
       return "$duration • ${song.albumTitle}";
     }
+
     return duration;
   }
 
@@ -711,9 +776,11 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
     if (value >= 1000000) {
       return "${(value / 1000000).toStringAsFixed(1)}M";
     }
+
     if (value >= 1000) {
       return "${(value / 1000).toStringAsFixed(1)}K";
     }
+
     return "$value";
   }
 

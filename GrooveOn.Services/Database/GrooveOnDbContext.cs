@@ -14,7 +14,6 @@ namespace GrooveOn.Services.Database
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<User> Users { get; set; }
-
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Album> Albums { get; set; }
         public DbSet<Genre> Genres { get; set; }

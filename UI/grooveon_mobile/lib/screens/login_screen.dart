@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      Navigator.pushReplacementNamed(context, AppRoutes.navigation);
     } catch (e) {
       if (!mounted) return;
       SnackbarHelper.showError(context, '$e');
