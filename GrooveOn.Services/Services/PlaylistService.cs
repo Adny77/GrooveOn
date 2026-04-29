@@ -8,7 +8,7 @@ using GrooveOn.Services.Services;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
-namespace GrooveOn.Services
+namespace GrooveOn.Services.Services
 {
     public class PlaylistService
         : BaseCRUDService<PlaylistResponse, PlaylistSearchObject, Playlist, PlaylistUpsertRequest, PlaylistUpsertRequest>,
@@ -28,7 +28,43 @@ namespace GrooveOn.Services
             return query;
         }
 
-        protected override IQueryable<Playlist> ApplyFilter(IQueryable<Playlist> query, PlaylistSearchObject? search = null)
+        protected override async Task BeforeInsert(Playlist entity, PlaylistUpsertRequest request)
+        {
+            await ValidateRequest(request);
+
+            entity.CreatedAt = DateTime.UtcNow;
+
+            var userId = request.UserId;
+
+            var hasPremium = await _context.Subscriptions
+                .Include(x => x.SubscriptionPlan)
+                .AnyAsync(x =>
+                    x.UserId == userId &&
+                    x.IsActive &&
+                    x.SubscriptionPlan != null &&
+                    x.SubscriptionPlan.Name != "Basic Account" &&
+                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.Now)
+                );
+
+            if (!hasPremium)
+            {
+                var playlistCount = await _context.Playlists
+                    .CountAsync(x => x.UserId == userId);
+
+                if (playlistCount >= 3)
+                {
+                    throw new UserException(
+                        "Basic users can create a maximum of 3 playlists. Upgrade to a premium subscription to create more playlists."
+                    );
+                }
+            }
+
+            await base.BeforeInsert(entity, request);
+        }
+
+        protected override IQueryable<Playlist> ApplyFilter(
+    IQueryable<Playlist> query,
+    PlaylistSearchObject? search = null)
         {
             query = base.ApplyFilter(query, search);
 
@@ -38,6 +74,11 @@ namespace GrooveOn.Services
             if (search.UserId.HasValue)
             {
                 query = query.Where(x => x.UserId == search.UserId.Value);
+            }
+
+            if (search.ExcludeUserId.HasValue)
+            {
+                query = query.Where(x => x.UserId != search.ExcludeUserId.Value);
             }
 
             if (search.IsPublic.HasValue)
@@ -58,15 +99,6 @@ namespace GrooveOn.Services
             return query;
         }
 
-        protected override async Task BeforeInsert(Playlist entity, PlaylistUpsertRequest request)
-        {
-            await ValidateRequest(request);
-
-            entity.CreatedAt = DateTime.UtcNow;
-
-            await base.BeforeInsert(entity, request);
-        }
-
         protected override async Task BeforeUpdate(Playlist entity, PlaylistUpsertRequest request)
         {
             await ValidateRequest(request, entity.Id);
@@ -77,16 +109,16 @@ namespace GrooveOn.Services
         private async Task ValidateRequest(PlaylistUpsertRequest request, int? playlistId = null)
         {
             if (request.UserId <= 0)
-                throw new UserException("UserId je obavezan.");
+                throw new UserException("UserId is required.");
 
             if (string.IsNullOrWhiteSpace(request.Name))
-                throw new UserException("Naziv playliste je obavezan.");
+                throw new UserException("Playlist name is required.");
 
             var userExists = await _context.Set<User>()
                 .AnyAsync(x => x.Id == request.UserId);
 
             if (!userExists)
-                throw new UserException("Korisnik nije pronađen.");
+                throw new UserException("User was not found.");
 
             var playlistNameExists = await _context.Set<Playlist>()
                 .AnyAsync(x =>
@@ -95,7 +127,7 @@ namespace GrooveOn.Services
                     (!playlistId.HasValue || x.Id != playlistId.Value));
 
             if (playlistNameExists)
-                throw new UserException("Već postoji playlista sa istim nazivom.");
+                throw new UserException("A playlist with the same name already exists.");
         }
 
         protected override PlaylistResponse MapToResponse(Playlist entity)

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/dialogs/forgot_password_dialog.dart';
+import 'package:grooveon_desktop/helper/snackBar_helper.dart';
 import 'package:grooveon_desktop/screens/base_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final authProvider = context.read<AuthProvider>();
-      final result = await authProvider.prijava(request);
+      final result = await authProvider.login(request);
 
       if (!mounted) return;
 
@@ -69,31 +70,19 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      String message = "Došlo je do greške. Pokušaj ponovo.";
+      String message = "An error occurred. Try again.";
 
       if (result == "NEISPRAVNO") {
-        message = "Pogrešno korisničko ime ili lozinka.";
-      } else if (result == "ZABRANJENO") {
-        message = "Nemate administratorski pristup.";
+        message = "Incorrect username or password.";
+      } else if (result == "FORBIDDEN") {
+        message = "You do not have administrator access.";
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red.shade600,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      SnackbarHelper.showError(context, message);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Greška pri prijavi: $e"),
-          backgroundColor: Colors.red.shade600,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      SnackbarHelper.showError(context, e.toString());
     } finally {
       if (!mounted) return;
 
@@ -233,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return "Username je obavezan.";
+                        return "Username is required.";
                       }
                       return null;
                     },
@@ -278,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return "Password je obavezan.";
+                        return "Password is required.";
                       }
                       return null;
                     },

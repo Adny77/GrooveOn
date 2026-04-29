@@ -19,7 +19,7 @@ class HttpHelper {
   if (response.statusCode == 403) {
     throw ApiException(message.isNotEmpty
         ? message
-        : "ZABRANJENO");
+        : "FORBIDDEN");
   }
 
   if (response.statusCode == 404) {

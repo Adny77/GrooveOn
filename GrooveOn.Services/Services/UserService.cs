@@ -1,21 +1,23 @@
-using GrooveOn.Services.Database;
-using GrooveOn.Services.Interfaces;
+using GrooveOn.MailingService.Configuration;
+using GrooveOn.MailingService.Messages;
 using GrooveOn.Model.RequestObjects;
+using GrooveOn.Model.ResponseObject;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
-using MapsterMapper;
-using Microsoft.EntityFrameworkCore;
-using GrooveOn.Model.ResponseObject;
-using GrooveOn.Services.Helpers;
-using Microsoft.Extensions.Configuration;
-using System.Text.Json;
-using System.Text;
-using GrooveOn.MailingService.Messages;
-using RabbitMQ.Client;
+using GrooveOn.Services.Database;
 using GrooveOn.Services.Exceptions;
-using GrooveOn.MailingService.Configuration;
+using GrooveOn.Services.Helpers;
+using GrooveOn.Services.Interfaces;
+using MapsterMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace GrooveOn.Services.Services
 {
@@ -24,18 +26,21 @@ namespace GrooveOn.Services.Services
         private readonly IConfiguration _configuration;
         private readonly IConnection _rabbitConnection;
         private readonly AppConfig _appConfig;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(
             GrooveOnDbContext context,
             IMapper mapper,
             IConfiguration configuration,
             IConnection rabbitConnection,
-            IOptions<AppConfig> appConfig
+            IOptions<AppConfig> appConfig,
+            IHttpContextAccessor httpContextAccessor
         ) : base(context, mapper)
         {
             _configuration = configuration;
             _rabbitConnection = rabbitConnection;
             _appConfig = appConfig.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         protected override IQueryable<User> ApplyFilter(IQueryable<User> query, UserSearchObject? search = null)
@@ -82,6 +87,36 @@ namespace GrooveOn.Services.Services
             {
                 entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
+        }
+
+        public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null || !user.IsActive)
+                throw new NotFoundException("User was not found.");
+
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+                throw new UserException("Current password is required.");
+
+            if (string.IsNullOrWhiteSpace(request.NewPassword))
+                throw new UserException("New password is required.");
+
+            if (request.NewPassword.Length < 8)
+                throw new UserException("New password must be at least 8 characters long.");
+
+            if (request.NewPassword != request.ConfirmPassword)
+                throw new UserException("New password and password confirmation do not match.");
+
+            if (!UserHelper.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+                throw new UserException("Current password is incorrect.");
+
+            if (request.CurrentPassword == request.NewPassword)
+                throw new UserException("New password cannot be the same as the current password.");
+
+            user.PasswordHash = UserHelper.CreatePasswordHash(request.NewPassword);
+
+            await _context.SaveChangesAsync();
         }
 
         protected override async Task BeforeInsert(User entity, UserInsertRequest request)
@@ -135,10 +170,29 @@ namespace GrooveOn.Services.Services
             return response;
         }
 
+        public async Task<bool> CurrentUserHasPremiumAsync()
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                throw new UserException("User is not signed in.");
+
+            return await _context.Subscriptions
+                .Include(x => x.SubscriptionPlan)
+                .AnyAsync(x =>
+                    x.UserId == userId &&
+                    x.IsActive &&
+                    x.SubscriptionPlan != null &&
+                    x.SubscriptionPlan.Name != "Basic Account" &&
+                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.Now)
+                );
+        }
+
         public async Task ForgotPasswordAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new UserException("Email je obavezan.");
+                throw new UserException("Email is required.");
 
             var normalizedEmail = email.Trim();
 
@@ -146,7 +200,7 @@ namespace GrooveOn.Services.Services
                 .FirstOrDefaultAsync(x => x.Email == normalizedEmail);
 
             if (user == null)
-                throw new UserException("Email nije povezan ni sa jednim nalogom.");
+                throw new UserException("Email is not linked to any account.");
 
             var newPassword = GenerateRandomPassword();
 
@@ -169,7 +223,7 @@ namespace GrooveOn.Services.Services
             var message = new ResetPasswordEmailMessage
             {
                 To = user.Email!,
-                Name = user.FirstName ?? "Korisnik",
+                Name = user.FirstName ?? "User",
                 UserName = user.Username,
                 NewPassword = newPassword
             };

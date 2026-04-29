@@ -7,14 +7,13 @@ import '../helper/http_helper.dart';
 import '../models/mobile_home_response.dart';
 
 class ReportProvider with ChangeNotifier {
-  static String baseUrl = '${ApiConfig.apiBase}/api/Report';
 
   Future<MobileHomeResponse> getMobileHome({
     int takeTracks = 4,
     int takeArtists = 8,
   }) async {
     final uri = Uri.parse(
-      '$baseUrl/mobile-home?takeTracks=$takeTracks&takeArtists=$takeArtists',
+      '${ApiConfig.apiBase}/api/Report/mobile-home?takeTracks=$takeTracks&takeArtists=$takeArtists',
     );
 
     final response = await http.get(

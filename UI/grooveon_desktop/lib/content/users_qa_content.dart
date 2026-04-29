@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:grooveon_desktop/helper/snackbar_helper.dart';
-import 'package:grooveon_desktop/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_desktop/helper/universal_paging_helper.dart';
 import 'package:grooveon_desktop/models/request/answer_upsert_request.dart';
 import 'package:grooveon_desktop/models/request/question_upsert_request.dart';
 import 'package:grooveon_desktop/models/response/answer_response.dart';
@@ -114,25 +114,25 @@ class _UsersQaContentState extends State<UsersQaContent> {
       builder: (_) => StatefulBuilder(
         builder: (context, setDialogState) {
           return BaseDialog(
-            title: existingAnswer == null ? "Odgovori na pitanje" : "Uredi odgovor",
+            title: existingAnswer == null ? "Answer question" : "Edit answer",
             width: 700,
             height: 420,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _DialogInfoBlock(
-                  label: "Pitanje",
+                  label: "Question",
                   value: question.title,
                 ),
                 const SizedBox(height: 14),
                 _DialogInfoBlock(
-                  label: "Sadržaj",
+                  label: "Content",
                   value: question.content,
                   isBody: true,
                 ),
                 const SizedBox(height: 18),
                 const Text(
-                  "Odgovor",
+                  "Answer",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -146,7 +146,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                     maxLines: null,
                     expands: true,
                     decoration: InputDecoration(
-                      hintText: "Unesi odgovor...",
+                      hintText: "Enter answer...",
                       filled: true,
                       fillColor: const Color(0xFFF9F9FB),
                       border: OutlineInputBorder(
@@ -185,7 +185,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                             color: UsersScreen.borderColor,
                           ),
                         ),
-                        child: const Text("Otkaži"),
+                        child: const Text("Cancel"),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -199,7 +199,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                                 if (message.isEmpty) {
                                   SnackbarHelper.showError(
                                     context,
-                                    "Odgovor ne može biti prazan.",
+                                    "Answer cannot be empty.",
                                   );
                                   return;
                                 }
@@ -238,7 +238,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                                     if (!mounted) return;
                                     SnackbarHelper.showSuccess(
                                       context,
-                                      "Odgovor je uspješno poslan.",
+                                      "Answer was sent successfully.",
                                     );
                                   } else {
                                     await _answerProvider.update(
@@ -269,14 +269,14 @@ class _UsersQaContentState extends State<UsersQaContent> {
                                     if (!mounted) return;
                                     SnackbarHelper.showUpdate(
                                       context,
-                                      "Odgovor je uspješno ažuriran.",
+                                      "Answer was updated successfully.",
                                     );
                                   }
                                 } catch (e) {
                                   if (!mounted) return;
                                   SnackbarHelper.showError(
                                     context,
-                                    "Greška: $e",
+                                    "Error: $e",
                                   );
                                 } finally {
                                   if (mounted) {
@@ -301,7 +301,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                                   color: Colors.white,
                                 ),
                               )
-                            : Text(existingAnswer == null ? "Pošalji odgovor" : "Sačuvaj izmjene"),
+                            : Text(existingAnswer == null ? "Send answer" : "Save changes"),
                       ),
                     ),
                   ],
@@ -348,7 +348,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                         ),
                         SizedBox(height: 6),
                         Text(
-                          "Pregled svih pitanja korisnika i upravljanje odgovorima administratora.",
+                          "Overview of all user questions and administrator answer management.",
                           style: TextStyle(
                             fontSize: 14,
                             color: UsersScreen.subTextColor,
@@ -369,7 +369,7 @@ class _UsersQaContentState extends State<UsersQaContent> {
                   Expanded(
                     child: _SearchBox(
                       controller: _searchController,
-                      hintText: "Pretraži pitanja...",
+                      hintText: "Search questions...",
                       onSubmitted: (_) => _searchQuestions(),
                     ),
                   ),
@@ -424,8 +424,8 @@ class _UsersQaContentState extends State<UsersQaContent> {
 
     if (_paging.items.isEmpty) {
       return const _EmptyState(
-        title: "Nema pitanja",
-        subtitle: "Trenutno nema dostupnih pitanja za prikaz.",
+        title: "No questions",
+        subtitle: "There are currently no questions available to display.",
       );
     }
 
@@ -578,7 +578,7 @@ class _QaItem extends StatelessWidget {
                     ],
                   )
                 : const Text(
-                    "Još nema odgovora na ovo pitanje.",
+                    "There are no answers to this question yet.",
                     style: TextStyle(
                       fontSize: 13,
                       color: UsersScreen.subTextColor,
@@ -594,7 +594,7 @@ class _QaItem extends StatelessWidget {
                 _hasAnswer ? Icons.edit_rounded : Icons.reply_rounded,
                 size: 18,
               ),
-              label: Text(_hasAnswer ? "Uredi odgovor" : "Odgovori"),
+              label: Text(_hasAnswer ? "Edit answer" : "Answer"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: UsersScreen.primaryColor,
                 foregroundColor: Colors.white,

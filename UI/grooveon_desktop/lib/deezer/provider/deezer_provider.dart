@@ -22,7 +22,7 @@ class DeezerProvider {
 
     final response = await http.get(uri);
 
-    _throwIfFailed(response, 'Greška pri pretrazi pjesama.');
+    _throwIfFailed(response, 'Error while searching songs.');
 
     final Map<String, dynamic> jsonMap =
         jsonDecode(response.body) as Map<String, dynamic>;
@@ -64,7 +64,7 @@ class DeezerProvider {
 
     final response = await http.get(uri);
 
-    _throwIfFailed(response, 'Greška pri pretrazi albuma.');
+    _throwIfFailed(response, 'Error while searching albums.');
 
     final Map<String, dynamic> jsonMap =
         jsonDecode(response.body) as Map<String, dynamic>;
@@ -85,7 +85,7 @@ class DeezerProvider {
 
     final response = await http.get(uri);
 
-    _throwIfFailed(response, 'Greška pri dohvaćanju top pjesama.');
+    _throwIfFailed(response, 'Error while fetching top songs.');
 
     final Map<String, dynamic> jsonMap =
         jsonDecode(response.body) as Map<String, dynamic>;
@@ -123,7 +123,7 @@ class DeezerProvider {
 
     final response = await http.get(uri);
 
-    _throwIfFailed(response, 'Greška pri dohvaćanju detalja albuma.');
+    _throwIfFailed(response, 'Error while fetching album details.');
 
     final Map<String, dynamic> jsonMap =
         jsonDecode(response.body) as Map<String, dynamic>;
@@ -139,7 +139,7 @@ class DeezerProvider {
   ) async {
     final response = await http.get(Uri.parse(nextUrl));
 
-    _throwIfFailed(response, 'Greška pri dohvaćanju naredne stranice pjesama.');
+    _throwIfFailed(response, 'Error while fetching the next page of songs.');
 
     final Map<String, dynamic> jsonMap =
         jsonDecode(response.body) as Map<String, dynamic>;
@@ -169,7 +169,7 @@ class DeezerProvider {
   ) async {
     final response = await http.get(Uri.parse(nextUrl));
 
-    _throwIfFailed(response, 'Greška pri dohvaćanju naredne stranice albuma.');
+    _throwIfFailed(response, 'Error while fetching the next page of albums.');
 
     final Map<String, dynamic> jsonMap =
         jsonDecode(response.body) as Map<String, dynamic>;

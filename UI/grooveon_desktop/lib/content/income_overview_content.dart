@@ -131,7 +131,7 @@ class _IncomeOverContentState extends State<IncomeOverContent> {
                       ),
                     ),
                     child: Text(
-                      "Greška pri učitavanju income podataka: ${snapshot.error}",
+                      "Error while loading income data: ${snapshot.error}",
                       style: const TextStyle(
                         color: Colors.red,
                         fontSize: 14,

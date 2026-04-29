@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 class AuthProvider with ChangeNotifier {
   static String apiUrl = '${ApiConfig.apiBase}/api/User/login';
 
-  Future<String> prijava(LoginRequest request) async {
+  Future<String> login(LoginRequest request) async {
     final url = Uri.parse(apiUrl);
 
     final response = await http.post(
@@ -25,13 +25,13 @@ class AuthProvider with ChangeNotifier {
     final data = jsonDecode(response.body);
     final loginResp = LoginResponse.fromJson(data);
 
-    final allowedRoles = {'Korisnik'};
+    final allowedRoles = {'User'};
 
-    final imaPristup = loginResp.roles.any(
+    final hasAccess = loginResp.roles.any(
       (role) => allowedRoles.contains(role),
     );
 
-    if (!imaPristup) return "ZABRANJENO";
+    if (!hasAccess) return "FORBIDDEN";
 
     Session.token = loginResp.token;
     Session.userId = loginResp.userId;

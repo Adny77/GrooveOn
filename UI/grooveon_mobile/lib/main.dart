@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:grooveon_mobile/providers/album_provider.dart';
 import 'package:grooveon_mobile/providers/auth_provider.dart';
 import 'package:grooveon_mobile/providers/music_search_provider.dart';
 import 'package:grooveon_mobile/providers/player_provider.dart';
+import 'package:grooveon_mobile/providers/question_provider.dart';
 import 'package:grooveon_mobile/providers/song_provider.dart';
+import 'package:grooveon_mobile/providers/subscription_plan_provider.dart';
+import 'package:grooveon_mobile/providers/subscription_provider.dart';
 import 'package:grooveon_mobile/providers/user_provider.dart';
+import 'package:grooveon_mobile/providers/payment_provider.dart';
 import 'package:grooveon_mobile/routes/app_routes.dart';
-import 'package:intl/date_symbol_data_file.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+
+  Stripe.publishableKey = dotenv.get('STRIPE_PUBLISHABLE_KEY');
+      
+  await Stripe.instance.applySettings();
 
   runApp(
     MultiProvider(
@@ -21,6 +31,11 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SongProvider()),
         ChangeNotifierProvider(create: (_) => AlbumProvider()),
         ChangeNotifierProvider(create: (_) => MusicSearchProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
+        ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
+        ChangeNotifierProvider(create: (_) => SubscriptionPlanProvider()),
+        ChangeNotifierProvider(create: (_) => QuestionProvider()),
 
       ],
       child: const GrooveOnApp(),
@@ -41,9 +56,7 @@ class GrooveOnApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF9C27B0),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF9C27B0)),
       ),
     );
   }

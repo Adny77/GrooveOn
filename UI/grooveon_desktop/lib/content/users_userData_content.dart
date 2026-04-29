@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grooveon_desktop/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_desktop/helper/universal_paging_helper.dart';
 import 'package:grooveon_desktop/models/response/search_result.dart';
 import 'package:grooveon_desktop/providers/user_provider.dart';
 import 'package:grooveon_desktop/screens/users_screen.dart';

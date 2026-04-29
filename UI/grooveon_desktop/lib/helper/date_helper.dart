@@ -19,7 +19,7 @@ class DateHelper {
   final parts = value.split('.');
 
   if (parts.length < 3) {
-    throw FormatException('Neispravan format datuma (dd.MM.yyyy)');
+    throw FormatException('Invalid date format (dd.MM.yyyy)');
   }
 
   final day = parts[0].trim().padLeft(2, '0');

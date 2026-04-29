@@ -11,5 +11,7 @@ namespace GrooveOn.Services.Interfaces
         Task<SongDuplicateCheckResponse> CheckDuplicatesAsync(SongDuplicateCheckRequest request);
 
         Task<SongBulkInsertResponse> BulkInsertDeezerSongsAsync(SongBulkInsertRequest request);
+
+        Task<List<SongResponse>> GetRecommendedForUserAsync(int userId, int take = 4);
     }
 }

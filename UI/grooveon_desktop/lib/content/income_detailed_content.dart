@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:grooveon_desktop/helper/snackbar_helper.dart';
 import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
 import 'package:grooveon_desktop/providers/report_provider.dart';
 import 'package:grooveon_desktop/screens/income_screen.dart';
@@ -446,9 +447,7 @@ class _IncomeDetailedContentState extends State<IncomeDetailedContent> {
       await OpenFilex.open(file.path);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Cannot create PDF: $e")),
-      );
+      SnackbarHelper.showError(context, e.toString());
     }
   }
 

@@ -1,6 +1,7 @@
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GrooveOn.API.Controllers
@@ -16,6 +17,7 @@ namespace GrooveOn.API.Controllers
             _reportService = subscriptionService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<SubscriptionAnalyticsResponse> Get([FromQuery] int year, [FromQuery] int? month)
         {
@@ -23,6 +25,7 @@ namespace GrooveOn.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("user-growth-by-month")]
         public ActionResult<List<UserGrowthPointResponse>> GetUserGrowthByMonth([FromQuery] int year)
         {
@@ -30,12 +33,14 @@ namespace GrooveOn.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("income-by-month")]
         public ActionResult<List<IncomeByMonthResponse>> GetIncomeByMonth([FromQuery] int year)
         {
             return Ok(_reportService.GetIncomeByMonth(year));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("music-overview")]
         public ActionResult<MusicOverviewResponse> GetMusicOverview([FromQuery] MusicOverviewRequest request)
         {
@@ -43,12 +48,14 @@ namespace GrooveOn.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("new-users-subscription-analytics")]
         public SubscriptionAnalyticsResponse GetNewUsersSubscriptionAnalytics([FromQuery] int year, [FromQuery] int? month)
         {
             return _reportService.GetNewUsersSubscriptionAnalytics(year, month);
         }
 
+        [Authorize(Roles = "User,Admin")]
         [HttpGet("mobile-home")]
         public ActionResult<MobileHomeResponse> GetMobileHome(
         [FromQuery] int takeTracks = 4,

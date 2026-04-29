@@ -132,6 +132,165 @@ namespace GrooveOn.Services.Services
             };
         }
 
+        public async Task<List<SongResponse>> GetRecommendedForUserAsync(int userId, int take = 4)
+        {
+            if (take <= 0)
+                take = 4;
+
+            var listenedSongIds = await _context.PlayHistories
+                .Where(x => x.UserId == userId)
+                .Select(x => x.SongId)
+                .Distinct()
+                .ToListAsync();
+
+            if (!listenedSongIds.Any())
+            {
+                return await GetColdStartRecommendedAsync(take);
+            }
+
+            var listenedArtistIds = await _context.Songs
+                .Where(x => listenedSongIds.Contains(x.Id))
+                .Select(x => x.ArtistId)
+                .Distinct()
+                .ToListAsync();
+
+            var listenedGenreIds = await _context.Songs
+                .Where(x => listenedSongIds.Contains(x.Id) && x.Album != null)
+                .SelectMany(x => x.Album!.AlbumGenres)
+                .Select(x => x.GenreId)
+                .Distinct()
+                .ToListAsync();
+
+            var recommendedCandidates = await _context.Songs
+                .Include(x => x.Artist)
+                .Include(x => x.Album)
+                    .ThenInclude(x => x.AlbumGenres)
+                .Where(x =>
+                    x.IsActive &&
+                    !listenedSongIds.Contains(x.Id) &&
+                    (
+                        listenedArtistIds.Contains(x.ArtistId) ||
+                        x.Album!.AlbumGenres.Any(ag => listenedGenreIds.Contains(ag.GenreId))
+                    ))
+                .OrderByDescending(x => listenedArtistIds.Contains(x.ArtistId) ? 2 : 0)
+                .ThenByDescending(x =>
+                    x.Album!.AlbumGenres.Count(ag => listenedGenreIds.Contains(ag.GenreId)))
+                .Take(50)
+                .ToListAsync();
+
+            var recommended = recommendedCandidates
+                .GroupBy(x => x.ArtistId)
+                .Select(g => g.First())
+                .Take(take)
+                .ToList();
+
+            if (recommended.Count < take)
+            {
+                var existingSongIds = recommended.Select(x => x.Id).ToList();
+                var existingArtistIds = recommended.Select(x => x.ArtistId).ToList();
+
+                var fallbackCandidates = await _context.PlayHistories
+                    .Where(x =>
+                        !listenedSongIds.Contains(x.SongId) &&
+                        !existingSongIds.Contains(x.SongId))
+                    .GroupBy(x => x.SongId)
+                    .Select(g => new
+                    {
+                        SongId = g.Key,
+                        PlayCount = g.Count()
+                    })
+                    .OrderByDescending(x => x.PlayCount)
+                    .Take(100)
+                    .Join(
+                        _context.Songs
+                            .Include(x => x.Artist)
+                            .Include(x => x.Album),
+                        x => x.SongId,
+                        s => s.Id,
+                        (x, s) => s
+                    )
+                    .Where(x =>
+                        x.IsActive &&
+                        !existingArtistIds.Contains(x.ArtistId))
+                    .ToListAsync();
+
+                var fallback = fallbackCandidates
+                    .GroupBy(x => x.ArtistId)
+                    .Select(g => g.First())
+                    .Take(take - recommended.Count)
+                    .ToList();
+
+                recommended.AddRange(fallback);
+            }
+
+            if (recommended.Count < take)
+            {
+                var existingSongIds = recommended.Select(x => x.Id).ToList();
+                var existingArtistIds = recommended.Select(x => x.ArtistId).ToList();
+
+                var extraSongs = await _context.Songs
+                    .Include(x => x.Artist)
+                    .Include(x => x.Album)
+                    .Where(x =>
+                        x.IsActive &&
+                        !listenedSongIds.Contains(x.Id) &&
+                        !existingSongIds.Contains(x.Id) &&
+                        !existingArtistIds.Contains(x.ArtistId))
+                    .OrderBy(x => x.Title)
+                    .Take(take - recommended.Count)
+                    .ToListAsync();
+
+                recommended.AddRange(extraSongs);
+            }
+
+            return recommended
+                .Take(take)
+                .Select(MapToResponse)
+                .ToList();
+        }
+
+        private async Task<List<SongResponse>> GetColdStartRecommendedAsync(int take)
+        {
+            var topSongs = await _context.PlayHistories
+                .GroupBy(x => x.SongId)
+                .Select(g => new
+                {
+                    SongId = g.Key,
+                    PlayCount = g.Count()
+                })
+                .OrderByDescending(x => x.PlayCount)
+                .Take(take)
+                .Join(
+                    _context.Songs
+                        .Include(x => x.Artist)
+                        .Include(x => x.Album),
+                    x => x.SongId,
+                    s => s.Id,
+                    (x, s) => s
+                )
+                .ToListAsync();
+
+            if (topSongs.Count < take)
+            {
+                var existingIds = topSongs.Select(x => x.Id).ToList();
+
+                var extraSongs = await _context.Songs
+                    .Include(x => x.Artist)
+                    .Include(x => x.Album)
+                    .Where(x => x.IsActive && !existingIds.Contains(x.Id))
+                    .OrderBy(x => x.Title)
+                    .Take(take - topSongs.Count)
+                    .ToListAsync();
+
+                topSongs.AddRange(extraSongs);
+            }
+
+            return topSongs
+                .Take(take)
+                .Select(MapToResponse)
+                .ToList();
+        }
+
         public async Task<SongBulkInsertResponse> BulkInsertDeezerSongsAsync(SongBulkInsertRequest request)
         {
             var items = request.Songs

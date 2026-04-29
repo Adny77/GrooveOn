@@ -5,6 +5,7 @@ import 'package:grooveon_desktop/deezer/models/deezer_album_details.dart';
 import 'package:grooveon_desktop/deezer/models/deezer_track.dart';
 import 'package:grooveon_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:grooveon_desktop/dialogs/confirmation_dialogs.dart';
+import 'package:grooveon_desktop/helper/snackBar_helper.dart';
 import 'package:grooveon_desktop/models/request/album_upsert_request.dart';
 import 'package:grooveon_desktop/models/request/genre_upsert_request.dart';
 import 'package:grooveon_desktop/models/request/song_bulk_insert_request.dart';
@@ -129,10 +130,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
     final exists = _selectedSongs.any((x) => x.id == track.id);
 
     if (exists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Song is already added to the selected list."),
-        ),
+      SnackbarHelper.showInfo(
+        context,
+        "Song is already added to the selected list.",
       );
       return;
     }
@@ -152,14 +152,12 @@ class _MusicAddContentState extends State<MusicAddContent> {
             externalAlbumId: resolvedAlbum?.id.toString(),
             title: track.title,
             artistName: track.artist?.name ?? 'Unknown artist',
-            artistPicture:
-                track.artist?.pictureMedium ??
+            artistPicture: track.artist?.pictureMedium ??
                 track.artist?.pictureBig ??
                 track.artist?.picture,
             duration: _formatDuration(track.duration),
             durationSeconds: track.duration ?? 0,
-            coverUrl:
-                resolvedAlbum?.coverMedium ??
+            coverUrl: resolvedAlbum?.coverMedium ??
                 resolvedAlbum?.coverBig ??
                 resolvedAlbum?.cover,
             previewUrl: track.preview,
@@ -171,13 +169,14 @@ class _MusicAddContentState extends State<MusicAddContent> {
           ),
         );
       });
+
+      SnackbarHelper.showSuccess(context, "Song added to the selected list.");
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error while preparing song: $e"),
-        ),
+      SnackbarHelper.showError(
+        context,
+        "Error while preparing song: $e",
       );
     }
   }
@@ -186,12 +185,16 @@ class _MusicAddContentState extends State<MusicAddContent> {
     setState(() {
       _selectedSongs.removeWhere((x) => x.id == id);
     });
+
+    SnackbarHelper.showInfo(context, "Song removed from the selected list.");
   }
 
   void _clearSelectedSongs() {
     setState(() {
       _selectedSongs.clear();
     });
+
+    SnackbarHelper.showInfo(context, "Selected song list has been cleared.");
   }
 
   SongUpsertRequest _mapToSongUpsertRequest(_SongPreviewModel song) {
@@ -229,8 +232,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
           title: track.title,
           artistName:
               track.artist?.name ?? details.artist?.name ?? 'Unknown artist',
-          artistPicture:
-              track.artist?.pictureMedium ??
+          artistPicture: track.artist?.pictureMedium ??
               track.artist?.pictureBig ??
               track.artist?.picture ??
               details.artist?.pictureMedium ??
@@ -239,8 +241,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
           albumTitle: details.title,
           durationSeconds: track.duration ?? 0,
           previewUrl: track.preview,
-          coverUrl:
-              details.coverMedium ?? details.coverBig ?? details.cover,
+          coverUrl: details.coverMedium ?? details.coverBig ?? details.cover,
           releaseDate: details.releaseDate != null
               ? DateTime.tryParse(details.releaseDate!)
               : null,
@@ -275,8 +276,7 @@ class _MusicAddContentState extends State<MusicAddContent> {
     try {
       final duplicateResponse = await _songProvider.checkDuplicates(
         SongDuplicateCheckRequest(
-          externalTrackIds:
-              _selectedSongs.map((e) => e.externalTrackId).toList(),
+          externalTrackIds: _selectedSongs.map((e) => e.externalTrackId).toList(),
         ),
       );
 
@@ -318,10 +318,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         _selectedSongs.clear();
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("${result.savedCount} song(s) successfully saved."),
-        ),
+      SnackbarHelper.showSuccess(
+        context,
+        "${result.savedCount} song(s) successfully saved.",
       );
     } catch (e) {
       if (!mounted) return;
@@ -330,10 +329,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         _isSavingSongs = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error while saving songs: $e"),
-        ),
+      SnackbarHelper.showError(
+        context,
+        "Error while saving songs: $e",
       );
     }
   }
@@ -423,10 +421,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         .toList();
 
     if (songsToSave.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("There are no new songs to save."),
-        ),
+      SnackbarHelper.showError(
+        context,
+        "There are no new songs to save.",
       );
       return;
     }
@@ -461,10 +458,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         );
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("${result.savedCount} new song(s) successfully saved."),
-        ),
+      SnackbarHelper.showSuccess(
+        context,
+        "${result.savedCount} new song(s) successfully saved.",
       );
     } catch (e) {
       if (!mounted) return;
@@ -473,10 +469,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         _isSavingSongs = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error while saving new songs: $e"),
-        ),
+      SnackbarHelper.showError(
+        context,
+        "Error while saving new songs: $e",
       );
     }
   }
@@ -488,13 +483,10 @@ class _MusicAddContentState extends State<MusicAddContent> {
       if (!mounted) return;
 
       if (details == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _deezerHelper.albumDetailsError ??
-                  'Error while loading album details.',
-            ),
-          ),
+        SnackbarHelper.showError(
+          context,
+          _deezerHelper.albumDetailsError ??
+              "Error while loading album details.",
         );
         return;
       }
@@ -508,10 +500,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error while previewing album: $e"),
-        ),
+      SnackbarHelper.showError(
+        context,
+        "Error while previewing album: $e",
       );
     }
   }
@@ -670,12 +661,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         _isSavingAlbum = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Album saved. New tracks: ${result.savedTracksCount}, existing tracks: ${result.existingTracksCount}.',
-          ),
-        ),
+      SnackbarHelper.showSuccess(
+        context,
+        "Album saved successfully. New tracks: ${result.savedTracksCount}, existing tracks: ${result.existingTracksCount}.",
       );
     } catch (e) {
       if (!mounted) return;
@@ -684,10 +672,9 @@ class _MusicAddContentState extends State<MusicAddContent> {
         _isSavingAlbum = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error while saving album: $e"),
-        ),
+      SnackbarHelper.showError(
+        context,
+        "Error while saving album: $e",
       );
     }
   }
@@ -755,12 +742,12 @@ class _MusicAddContentState extends State<MusicAddContent> {
             subtitle:
                 "Search Deezer songs and prepare a list of songs you want to save.",
             action: _RefreshIconButton(
-  isLoading: _deezerHelper.isLoadingSongs,
-  onPressed: () async {
-    _songSearchController.clear(); 
-    await _deezerHelper.loadInitialTopTracks();
-  },
-),
+              isLoading: _deezerHelper.isLoadingSongs,
+              onPressed: () async {
+                _songSearchController.clear();
+                await _deezerHelper.loadInitialTopTracks();
+              },
+            ),
             child: Column(
               children: [
                 Row(
@@ -943,12 +930,12 @@ class _MusicAddContentState extends State<MusicAddContent> {
       subtitle:
           "Browse suggested albums or search Deezer albums. Clicking Add should open a preview dialog with album tracks.",
       action: _RefreshIconButton(
-  isLoading: _deezerHelper.isLoadingAlbums,
-  onPressed: () async {
-    _albumSearchController.clear(); 
-    await _deezerHelper.loadInitialAlbums();
-  },
-),
+        isLoading: _deezerHelper.isLoadingAlbums,
+        onPressed: () async {
+          _albumSearchController.clear();
+          await _deezerHelper.loadInitialAlbums();
+        },
+      ),
       child: Column(
         children: [
           Row(

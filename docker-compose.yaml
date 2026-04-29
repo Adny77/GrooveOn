@@ -1,0 +1,124 @@
+version: "3.9"
+
+networks:
+  grooveonnet:
+    driver: bridge
+
+services:
+  grooveon-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: grooveon-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    networks:
+      - grooveonnet
+    volumes:
+      - grooveon_sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\" -C || exit 1"
+        ]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 25s
+
+  grooveon-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: grooveon-rabbitmq
+    hostname: grooveon-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "8080:15672"
+      - "15692:15692"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VIRTUALHOST}
+    networks:
+      - grooveonnet
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  grooveon-api:
+    container_name: grooveon-api
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: GrooveOn.WebAPI/DockerFile.api
+
+    env_file:
+      - .env
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+
+      ConnectionStrings__DefaultConnection: ${CONNECTION_STRING}
+
+      RABBITMQ_HOST: grooveon-rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY}
+      Stripe__WebhookSecret: ${STRIPE_WEBHOOK_SECRET}
+
+    ports:
+      - "${API_PORT}:8080"
+    depends_on:
+      grooveon-sqlserver:
+        condition: service_healthy
+      grooveon-rabbitmq:
+        condition: service_healthy
+    networks:
+      - grooveonnet
+    volumes:
+      - ./GrooveOn.API/data/wwwroot:/app/wwwroot
+
+  grooveon-emailconsumer:
+    container_name: grooveon-emailconsumer
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: GrooveOn.MailingService/DockerFile.mailingService
+
+    env_file:
+      - .env
+
+    environment:
+      RABBITMQ_HOST: grooveon-rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_VIRTUALHOST: ${RABBITMQ_VIRTUALHOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_SSL: ${SMTP_SSL}
+      FROM_EMAIL: ${FROM_EMAIL}
+      FROM_NAME: ${FROM_NAME}
+
+    depends_on:
+      grooveon-rabbitmq:
+        condition: service_healthy
+    networks:
+      - grooveonnet
+
+volumes:
+  grooveon_sqlserver_data:

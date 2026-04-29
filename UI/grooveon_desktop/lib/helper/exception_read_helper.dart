@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:grooveon_desktop/exception/ApiException.dart';
 
-
-
 String extractApiErrorMessage(String responseBody) {
   try {
     final data = jsonDecode(responseBody);
@@ -36,9 +34,9 @@ String extractApiErrorMessage(String responseBody) {
       }
     }
 
-    return "Došlo je do greške.";
+    return "An error occurred.";
   } catch (_) {
-    return "Greška u komunikaciji sa serverom.";
+    return "Server communication error.";
   }
 }
 
@@ -56,6 +54,6 @@ String extractErrorMessage(dynamic e) {
 
     return message;
   } catch (_) {
-    return "Došlo je do greške.";
+    return "An error occurred.";
   }
 }

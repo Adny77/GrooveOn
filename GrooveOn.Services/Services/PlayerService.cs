@@ -8,7 +8,7 @@ using GrooveOn.Services.Services;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
-namespace GrooveOn.Services
+namespace GrooveOn.Services.Services
 {
     public class PlayerService
         : BaseCRUDService<PlayerResponse, PlayerSearchObject, Player, PlayerUpsertRequest, PlayerUpsertRequest>,
@@ -44,7 +44,7 @@ namespace GrooveOn.Services
             else if (request.Purpose == "PlaylistList")
                 return await StartPlaylistQueueAsync(request);
 
-            throw new UserException("Nepodržan purpose.");
+            throw new UserException("Unsupported purpose.");
         }
 
         public async Task<PlayerResponse> PlayNextRandomMusicAsync(PlayerUpsertRequest request)
@@ -57,7 +57,7 @@ namespace GrooveOn.Services
             else if (request.Purpose == "AlbumList" || request.Purpose == "PlaylistList")
                 return await PlayNextAlbumQueueAsync(request);
 
-            throw new UserException("Nepodržan purpose.");
+            throw new UserException("Unsupported purpose.");
         }
 
         public async Task<PlayerResponse> PlayPreviousRandomMusicAsync(PlayerUpsertRequest request)
@@ -70,10 +70,9 @@ namespace GrooveOn.Services
             else if (request.Purpose == "AlbumList" || request.Purpose == "PlaylistList")
                 return await PlayPreviousAlbumQueueAsync(request);
 
-            throw new UserException("Nepodržan purpose.");
+            throw new UserException("Unsupported purpose.");
         }
 
-        // ================= RANDOM =================
 
         private async Task<PlayerResponse> StartRandomQueueAsync(PlayerUpsertRequest request)
         {
@@ -82,7 +81,7 @@ namespace GrooveOn.Services
                 .FirstOrDefaultAsync(x => x.Id == request.SongId);
 
             if (clickedSong == null)
-                throw new UserException("Pjesma nije pronađena.");
+                throw new UserException("Song was not found.");
 
             await ClearUserQueueAsync(request.UserId);
 
@@ -100,7 +99,6 @@ namespace GrooveOn.Services
             return MapToPlayerResponse(playerItem, clickedSong, false, true);
         }
 
-        // ================= ALBUM =================
 
         private async Task<PlayerResponse> StartAlbumQueueAsync(PlayerUpsertRequest request)
         {
@@ -109,7 +107,7 @@ namespace GrooveOn.Services
                 .FirstOrDefaultAsync(x => x.Id == request.SongId);
 
             if (clickedSong == null)
-                throw new UserException("Pjesma nije pronađena.");
+                throw new UserException("Song was not found.");
 
             if (clickedSong.AlbumId == null)
                 throw new UserException("Pjesma ne pripada albumu.");
@@ -161,7 +159,6 @@ namespace GrooveOn.Services
             );
         }
 
-        // ================= PLAYLIST =================
 
         private async Task<PlayerResponse> StartPlaylistQueueAsync(PlayerUpsertRequest request)
         {
@@ -170,32 +167,32 @@ namespace GrooveOn.Services
                 .FirstOrDefaultAsync(x => x.Id == request.SongId);
 
             if (clickedSong == null)
-                throw new UserException("Pjesma nije pronađena.");
+                throw new UserException("Song not found.");
 
-            var playlistSong = await _context.Set<PlaylistSong>()
-                .FirstOrDefaultAsync(x => x.SongId == request.SongId);
+            if (request.PlaylistId == null)
+                throw new UserException("PlaylistId is required.");
 
-            if (playlistSong == null)
-                throw new UserException("Pjesma ne pripada playlisti.");
+            var exists = await _context.Set<PlaylistSong>()
+                .AnyAsync(x =>
+                    x.PlaylistId == request.PlaylistId &&
+                    x.SongId == request.SongId);
 
-            var search = new PlaylistSongSearchObject
-            {
-                PlaylistId = playlistSong.PlaylistId,
-                Page = 0,
-                PageSize = 1000,
-                IncludeTotalCount = true
-            };
+            if (!exists)
+                throw new UserException("Song does not belong to this playlist.");
 
-            var result = await _playlistSongService.GetAsync(search);
+            var playlistSongs = await _context.Set<PlaylistSong>()
+                .Where(x => x.PlaylistId == request.PlaylistId)
+                .OrderBy(x => x.Id) // you can change this if you have a custom order
+                .ToListAsync();
 
-            var orderedIds = result.Items.Select(x => x.SongId).ToList();
+            var songIds = playlistSongs.Select(x => x.SongId).ToList();
 
             var songs = await _context.Set<Song>()
                 .Include(x => x.Artist)
-                .Where(x => orderedIds.Contains(x.Id) && x.ExternalTrackId != null)
+                .Where(x => songIds.Contains(x.Id) && x.ExternalTrackId != null)
                 .ToListAsync();
 
-            var orderedSongs = orderedIds
+            var orderedSongs = songIds
                 .Select(id => songs.FirstOrDefault(x => x.Id == id))
                 .Where(x => x != null)
                 .ToList();
@@ -203,13 +200,14 @@ namespace GrooveOn.Services
             await ClearUserQueueAsync(request.UserId);
 
             var queue = orderedSongs
-                .Select((song, i) => new Player
+                .Select((song, index) => new Player
                 {
                     UserId = request.UserId,
                     SongId = song!.Id,
                     Purpose = request.Purpose,
-                    OrderIndex = i + 1
-                }).ToList();
+                    OrderIndex = index + 1
+                })
+                .ToList();
 
             _context.AddRange(queue);
             await _context.SaveChangesAsync();
@@ -225,7 +223,6 @@ namespace GrooveOn.Services
             );
         }
 
-        // ================= NEXT / PREVIOUS =================
 
         private async Task<PlayerResponse> PlayNextRandomQueueAsync(PlayerUpsertRequest request)
         {
@@ -267,7 +264,7 @@ namespace GrooveOn.Services
                 .CountAsync(x => x.UserId == request.UserId && x.Purpose == request.Purpose);
 
             if (current.OrderIndex >= total)
-                throw new UserException("Nema sljedeće pjesme.");
+                throw new UserException("There is no next song.");
 
             var next = await _context.Set<Player>()
                 .Include(x => x.Song).ThenInclude(x => x.Artist)
@@ -312,7 +309,7 @@ namespace GrooveOn.Services
             var current = await GetCurrentQueueItemAsync(request);
 
             if (current.OrderIndex <= 1)
-                throw new UserException("Nema prethodne pjesme.");
+                throw new UserException("There is no previous song.");
 
             var total = await _context.Set<Player>()
                 .CountAsync(x => x.UserId == request.UserId && x.Purpose == request.Purpose);
@@ -332,15 +329,14 @@ namespace GrooveOn.Services
             );
         }
 
-        // ================= HELPERS =================
 
         private void ValidatePlayerRequest(PlayerUpsertRequest request)
         {
             if (request.UserId <= 0)
-                throw new UserException("UserId je obavezan.");
+                throw new UserException("UserId is required.");
 
             if (request.SongId <= 0)
-                throw new UserException("SongId je obavezan.");
+                throw new UserException("SongId is required.");
 
             var allowed = new[]
             {
@@ -351,7 +347,7 @@ namespace GrooveOn.Services
             };
 
             if (!allowed.Contains(request.Purpose))
-                throw new UserException("Nepodržan purpose.");
+                throw new UserException("Unsupported purpose.");
         }
 
         private async Task<Player> GetCurrentQueueItemAsync(PlayerUpsertRequest request)
@@ -363,7 +359,7 @@ namespace GrooveOn.Services
                     x.Purpose == request.Purpose);
 
             if (item == null)
-                throw new UserException("Trenutna pjesma nije pronađena.");
+                throw new UserException("Current song was not found.");
 
             return item;
         }

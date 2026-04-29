@@ -8,7 +8,7 @@ using GrooveOn.Services.Services;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
-namespace GrooveOn.Services
+namespace GrooveOn.Services.Services
 {
     public class PlaylistSongService
         : BaseCRUDService<PlaylistSongResponse, PlaylistSongSearchObject, PlaylistSong, PlaylistSongUpsertRequest, PlaylistSongUpsertRequest>,
@@ -91,22 +91,22 @@ namespace GrooveOn.Services
             int? playlistSongId = null)
         {
             if (request.PlaylistId <= 0)
-                throw new UserException("PlaylistId je obavezan.");
+                throw new UserException("PlaylistId is required.");
 
             if (request.SongId <= 0)
-                throw new UserException("SongId je obavezan.");
+                throw new UserException("SongId is required.");
 
             var playlistExists = await _context.Set<Playlist>()
                 .AnyAsync(x => x.Id == request.PlaylistId);
 
             if (!playlistExists)
-                throw new UserException("Playlista nije pronađena.");
+                throw new UserException("Playlist was not found.");
 
             var songExists = await _context.Set<Song>()
                 .AnyAsync(x => x.Id == request.SongId);
 
             if (!songExists)
-                throw new UserException("Pjesma nije pronađena.");
+                throw new UserException("Song was not found.");
 
             var alreadyExists = await _context.Set<PlaylistSong>()
                 .AnyAsync(x =>
@@ -115,7 +115,7 @@ namespace GrooveOn.Services
                     (!playlistSongId.HasValue || x.Id != playlistSongId.Value));
 
             if (alreadyExists)
-                throw new UserException("Pjesma je već dodana u playlistu.");
+                throw new UserException("Song has already been added to the playlist.");
         }
 
         protected override PlaylistSongResponse MapToResponse(PlaylistSong entity)

@@ -36,7 +36,7 @@ public class EmailSender
 
             <p>Vaši podaci za prijavu:</p>
 
-            <p><strong>Korisničko ime:</strong> {username}</p>
+            <p><strong>Username:</strong> {username}</p>
             <p><strong>Nova lozinka:</strong></p>
 
             <div style="background:#f4f4f4;padding:10px;border-radius:5px;">

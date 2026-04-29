@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using GrooveOn.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GrooveOn.WebAPI.Controllers
 {
@@ -14,12 +15,12 @@ namespace GrooveOn.WebAPI.Controllers
             _imageService = imageService;
         }
 
-        // POST api/images/upload?folder=users
+        [Authorize(Roles = "User,Admin")]
         [HttpPost("upload")]
         [RequestSizeLimit(10 * 1024 * 1024)]
         public async Task<IActionResult> Upload([FromQuery] string folder, IFormFile file, [FromQuery] string? fileName = null, CancellationToken ct = default)
         {
-            if (file == null) return BadRequest("File je obavezan.");
+            if (file == null) return BadRequest("File is required.");
 
             var savedName = await _imageService.SaveAsync(file, folder, fileName, ct);
             var url = _imageService.GetPublicUrl(savedName, folder);
@@ -31,11 +32,11 @@ namespace GrooveOn.WebAPI.Controllers
             });
         }
 
-        // DELETE api/images?folder=users&fileName=abc.jpg
+        [Authorize(Roles = "User,Admin")]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] string folder, [FromQuery] string fileName, CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("fileName je obavezan.");
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("fileName is required.");
 
             var ok = await _imageService.DeleteAsync(fileName, folder, ct);
             return ok ? Ok(new { deleted = true }) : NotFound(new { deleted = false });

@@ -5,11 +5,12 @@ enum TriConfirmResult { cancel, bad, good }
 class ConfirmDialogs {
   ConfirmDialogs._();
 
-  // 🎧 GROOVEON COLORS
   static const Color _primary = Color(0xFF9C27B0);
   static const Color _primaryDark = Color(0xFF4A148C);
-  static const Color _dangerRed = Color(0xFFE53935);
-  static const Color _warningOrange = Color(0xFFF59E0B);
+  static const Color _primarySoft = Color(0xFFEAD7F2);
+  static const Color _premiumGold = Color(0xFFFFC857);
+  static const Color _premiumGoldDark = Color(0xFFB8860B);
+  static const Color _lockedPurple = Color(0xFF6A1B9A);
   static const Color _text = Color(0xFF1C1C1C);
   static const Color _muted = Color(0xFF6E6E6E);
 
@@ -22,16 +23,19 @@ class ConfirmDialogs {
     required List<Widget> actions,
     bool barrierDismissible = false,
     Color? headerColor,
+    Color? headerEndColor,
     IconData? headerIcon,
   }) {
-    final Color headerBg = headerColor ?? _primaryDark;
+    final Color startColor = headerColor ?? _primaryDark;
+    final Color endColor = headerEndColor ?? _primary;
 
     return showDialog<T>(
       context: context,
       barrierDismissible: barrierDismissible,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withOpacity(0.45),
       builder: (_) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_radius),
           ),
@@ -40,7 +44,6 @@ class ConfirmDialogs {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // HEADER
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -51,14 +54,7 @@ class ConfirmDialogs {
                     gradient: LinearGradient(
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
-                      colors: [
-                        headerBg,
-                        headerBg == _dangerRed
-                            ? _dangerRed
-                            : headerBg == _warningOrange
-                                ? _warningOrange
-                                : _primary,
-                      ],
+                      colors: [startColor, endColor],
                     ),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(_radius),
@@ -67,7 +63,7 @@ class ConfirmDialogs {
                   child: Row(
                     children: [
                       if (headerIcon != null) ...[
-                        Icon(headerIcon, color: Colors.white, size: 18),
+                        Icon(headerIcon, color: Colors.white, size: 20),
                         const SizedBox(width: 10),
                       ],
                       Expanded(
@@ -84,7 +80,6 @@ class ConfirmDialogs {
                   ),
                 ),
 
-                // BODY
                 Padding(
                   padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
                   child: Text(
@@ -98,7 +93,6 @@ class ConfirmDialogs {
                   ),
                 ),
 
-                // ACTIONS
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
                   child: Row(
@@ -125,7 +119,10 @@ class ConfirmDialogs {
     );
   }
 
-  static ButtonStyle _filledBtn({required Color bg, Color fg = Colors.white}) {
+  static ButtonStyle _filledBtn({
+    required Color bg,
+    Color fg = Colors.white,
+  }) {
     return ElevatedButton.styleFrom(
       backgroundColor: bg,
       foregroundColor: fg,
@@ -151,10 +148,10 @@ class ConfirmDialogs {
       title: title,
       message: question,
       barrierDismissible: barrierDismissible,
-      headerColor: danger ? _dangerRed : _primaryDark,
-      headerIcon: danger
-          ? Icons.warning_amber_rounded
-          : Icons.help_outline_rounded,
+      headerColor: danger ? _lockedPurple : _primaryDark,
+      headerEndColor: danger ? _primary : _primary,
+      headerIcon:
+          danger ? Icons.lock_outline_rounded : Icons.help_outline_rounded,
       actions: [
         OutlinedButton(
           onPressed: () => Navigator.of(context).pop(false),
@@ -167,7 +164,7 @@ class ConfirmDialogs {
         const SizedBox(width: 12),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),
-          style: _filledBtn(bg: danger ? _dangerRed : _primaryDark),
+          style: _filledBtn(bg: danger ? _lockedPurple : _primaryDark),
           child: Text(
             yesText,
             style: const TextStyle(fontWeight: FontWeight.w800),
@@ -192,14 +189,14 @@ class ConfirmDialogs {
       title: title,
       message: message,
       barrierDismissible: barrierDismissible,
-      headerColor: danger ? _dangerRed : _primaryDark,
-      headerIcon: danger
-          ? Icons.error_outline_rounded
-          : Icons.info_outline_rounded,
+      headerColor: danger ? _lockedPurple : _primaryDark,
+      headerEndColor: danger ? _primary : _primary,
+      headerIcon:
+          danger ? Icons.lock_outline_rounded : Icons.info_outline_rounded,
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: _filledBtn(bg: danger ? _dangerRed : _primaryDark),
+          style: _filledBtn(bg: danger ? _lockedPurple : _primaryDark),
           child: Text(
             okText,
             style: const TextStyle(fontWeight: FontWeight.w800),
@@ -224,11 +221,12 @@ class ConfirmDialogs {
       message: question,
       barrierDismissible: barrierDismissible,
       headerColor: _primaryDark,
-      headerIcon: Icons.fact_check_outlined,
+      headerEndColor: _primary,
+      headerIcon: Icons.workspace_premium_rounded,
       actions: [
         OutlinedButton(
           onPressed: () => Navigator.of(context).pop(false),
-          style: _outlineBtn(color: _dangerRed),
+          style: _outlineBtn(color: _muted),
           child: Text(
             badText,
             style: const TextStyle(fontWeight: FontWeight.w800),
@@ -237,7 +235,9 @@ class ConfirmDialogs {
         const SizedBox(width: 12),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),
-          style: _filledBtn(bg: goodIsPrimary ? _primaryDark : _primary),
+          style: _filledBtn(
+            bg: goodIsPrimary ? _primaryDark : _primary,
+          ),
           child: Text(
             goodText,
             style: const TextStyle(fontWeight: FontWeight.w800),
@@ -249,11 +249,40 @@ class ConfirmDialogs {
     return res ?? false;
   }
 
+  static Future<void> premiumLockedDialog(
+    BuildContext context, {
+    String title = "Premium content",
+    String message =
+        "This feature is available only to premium users.\n\nActivate premium and unlock all GrooveOn app features.",
+    String okText = "U redu",
+    bool barrierDismissible = false,
+  }) async {
+    await _baseDialog<void>(
+      context,
+      title: title,
+      message: message,
+      barrierDismissible: barrierDismissible,
+      headerColor: _lockedPurple,
+      headerEndColor: _primary,
+      headerIcon: Icons.lock_outline_rounded,
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: _filledBtn(bg: _lockedPurple),
+          child: Text(
+            okText,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ),
+      ],
+    );
+  }
+
   static Future<void> paymentSuccessDialog(
     BuildContext context, {
     String title = "Premium aktiviran",
     String message =
-        "Vaša uplata je uspješno evidentirana i premium pristup je aktiviran.",
+        "Your payment has been recorded successfully and premium access is active.",
     String okText = "Nastavi",
     bool barrierDismissible = false,
   }) async {
@@ -263,6 +292,7 @@ class ConfirmDialogs {
       message: message,
       barrierDismissible: barrierDismissible,
       headerColor: _primaryDark,
+      headerEndColor: _primary,
       headerIcon: Icons.check_circle_rounded,
       actions: [
         ElevatedButton(
@@ -279,9 +309,9 @@ class ConfirmDialogs {
 
   static Future<void> paymentFailedDialog(
     BuildContext context, {
-    String title = "Uplata nije završena",
+    String title = "Payment was not completed",
     String message =
-        "Uplata za premium nije uspješno završena. Pokušajte ponovo ili provjerite podatke kartice.",
+        "The premium payment was not completed successfully. Try again or check your card details.",
     String okText = "U redu",
     bool barrierDismissible = false,
   }) async {
@@ -290,12 +320,13 @@ class ConfirmDialogs {
       title: title,
       message: message,
       barrierDismissible: barrierDismissible,
-      headerColor: _dangerRed,
-      headerIcon: Icons.cancel_rounded,
+      headerColor: _lockedPurple,
+      headerEndColor: _primary,
+      headerIcon: Icons.credit_card_off_rounded,
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: _filledBtn(bg: _dangerRed),
+          style: _filledBtn(bg: _lockedPurple),
           child: Text(
             okText,
             style: const TextStyle(fontWeight: FontWeight.w700),
@@ -309,7 +340,7 @@ class ConfirmDialogs {
     BuildContext context, {
     String title = "Uplata otkazana",
     String message =
-        "Proces plaćanja je otkazan. Premium nije naplaćen i nije došlo do promjena na vašem računu.",
+        "The payment process was canceled. Premium was not charged and no changes were made to your account.",
     String okText = "U redu",
     bool barrierDismissible = false,
   }) async {
@@ -318,12 +349,13 @@ class ConfirmDialogs {
       title: title,
       message: message,
       barrierDismissible: barrierDismissible,
-      headerColor: _dangerRed,
+      headerColor: _lockedPurple,
+      headerEndColor: _primary,
       headerIcon: Icons.remove_circle_outline_rounded,
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: _filledBtn(bg: _dangerRed),
+          style: _filledBtn(bg: _lockedPurple),
           child: Text(
             okText,
             style: const TextStyle(fontWeight: FontWeight.w700),
@@ -335,9 +367,9 @@ class ConfirmDialogs {
 
   static Future<void> paymentPendingDialog(
     BuildContext context, {
-    String title = "Provjera uplate",
+    String title = "Payment check",
     String message =
-        "Uplata je pokrenuta, ali status još nije potvrđen. Molimo sačekajte nekoliko sekundi i provjerite ponovo.",
+        "Payment has started, but the status has not been confirmed yet. Please wait a few seconds and check again.",
     String okText = "U redu",
     bool barrierDismissible = false,
   }) async {
@@ -346,12 +378,13 @@ class ConfirmDialogs {
       title: title,
       message: message,
       barrierDismissible: barrierDismissible,
-      headerColor: _warningOrange,
+      headerColor: _premiumGoldDark,
+      headerEndColor: _premiumGold,
       headerIcon: Icons.hourglass_top_rounded,
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: _filledBtn(bg: _warningOrange),
+          style: _filledBtn(bg: _premiumGoldDark),
           child: Text(
             okText,
             style: const TextStyle(fontWeight: FontWeight.w700),
@@ -363,9 +396,9 @@ class ConfirmDialogs {
 
   static Future<void> paymentErrorDialog(
     BuildContext context, {
-    String title = "Greška pri provjeri uplate",
+    String title = "Payment verification error",
     String message =
-        "Došlo je do greške pri provjeri statusa uplate za premium. Pokušajte ponovo za nekoliko trenutaka.",
+        "An error occurred while checking the premium payment status. Try again in a few moments.",
     String okText = "U redu",
     bool barrierDismissible = false,
   }) async {
@@ -374,12 +407,13 @@ class ConfirmDialogs {
       title: title,
       message: message,
       barrierDismissible: barrierDismissible,
-      headerColor: _warningOrange,
-      headerIcon: Icons.error_outline_rounded,
+      headerColor: _lockedPurple,
+      headerEndColor: _primary,
+      headerIcon: Icons.sync_problem_rounded,
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: _filledBtn(bg: _warningOrange),
+          style: _filledBtn(bg: _lockedPurple),
           child: Text(
             okText,
             style: const TextStyle(fontWeight: FontWeight.w700),

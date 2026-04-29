@@ -61,7 +61,6 @@ namespace GrooveOn.Services.Services
 
         public MobileHomeResponse GetMobileHome(int takeTracks = 4, int takeArtists = 8)
         {
-            // TOP TRACKS
             var topTracks = _context.PlayHistories
                 .GroupBy(ph => ph.SongId)
                 .Select(g => new
@@ -70,7 +69,7 @@ namespace GrooveOn.Services.Services
                     PlayCount = g.Count()
                 })
                 .OrderByDescending(x => x.PlayCount)
-                .Take(10) // uzimamo 10 za izbor "pjesme dana"
+                .Take(10) 
                 .ToList();
 
             var songIds = topTracks.Select(x => x.SongId).ToList();
@@ -95,7 +94,6 @@ namespace GrooveOn.Services.Services
                 })
                 .ToList();
 
-            // SONG OF THE DAY (random iz top 10)
             MusicStatItemResponse? songOfTheDay = null;
 
             if (topTracks.Any())
@@ -114,7 +112,6 @@ namespace GrooveOn.Services.Services
                 };
             }
 
-            // TOP ARTISTS
             var topArtists = _context.PlayHistories
                 .Where(ph => ph.Song != null)
                 .GroupBy(ph => ph.Song!.ArtistId)
@@ -243,11 +240,14 @@ namespace GrooveOn.Services.Services
 
         public List<IncomeByMonthResponse> GetIncomeByMonth(int year)
         {
-            var result = _context.Subscriptions
+            var result = _context.Payments
+                .Include(x => x.Subscription)
                 .Where(x =>
-                    x.SubscriptionPlanId == 2 &&
+                    x.PaymentStatus == "Paid" &&
                     x.PaymentDate.HasValue &&
-                    x.PaymentDate.Value.Year == year)
+                    x.PaymentDate.Value.Year == year &&
+                    x.Subscription != null &&
+                    x.Subscription.SubscriptionPlanId == 2)
                 .GroupBy(x => x.PaymentDate!.Value.Month)
                 .Select(g => new IncomeByMonthResponse
                 {
@@ -257,15 +257,13 @@ namespace GrooveOn.Services.Services
                 .OrderBy(x => x.Month)
                 .ToList();
 
-            var completed = Enumerable.Range(1, 12)
+            return Enumerable.Range(1, 12)
                 .Select(month => new IncomeByMonthResponse
                 {
                     Month = month,
                     TotalIncome = result.FirstOrDefault(x => x.Month == month)?.TotalIncome ?? 0
                 })
                 .ToList();
-
-            return completed;
         }
 
         public MusicOverviewResponse GetMusicOverview(MusicOverviewRequest request)

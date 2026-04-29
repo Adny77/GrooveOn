@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/dialogs/confirmation_dialogs.dart';
-import 'package:grooveon_desktop/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_desktop/helper/snackBar_helper.dart';
+import 'package:grooveon_desktop/helper/universal_paging_helper.dart';
 import 'package:grooveon_desktop/models/response/album_response.dart';
 import 'package:grooveon_desktop/models/response/song_response.dart';
 import 'package:grooveon_desktop/providers/album_provider.dart';
@@ -107,11 +108,7 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
   void _addSongToSelection(SongResponse song) {
     final exists = _selectedSongs.any((x) => x.id == song.id);
     if (exists) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Song is already added to the delete list."),
-        ),
-      );
+      SnackbarHelper.showInfo(context, "Song is already added to the delete list.");
       return;
     }
 
@@ -164,19 +161,11 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "${songsToDelete.length} song(s) deleted successfully.",
-          ),
-        ),
-      );
+      SnackbarHelper.showSuccess(context, "${songsToDelete.length} song(s) deleted successfully.");
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error while deleting songs: $e")),
-      );
+      SnackbarHelper.showError(context, e.toString());
     } finally {
       if (mounted) {
         setState(() {
@@ -212,15 +201,11 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
 
       _selectedSongs.removeWhere((x) => x.albumTitle == album.title);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Album '${album.title}' deleted successfully.")),
-      );
+      SnackbarHelper.showSuccess(context, "Album '${album.title}' deleted successfully.");
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error while deleting album: $e")),
-      );
+      SnackbarHelper.showError(context, e.toString());
     } finally {
       if (mounted) {
         setState(() {

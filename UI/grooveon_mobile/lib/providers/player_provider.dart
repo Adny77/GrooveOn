@@ -100,7 +100,7 @@ class PlayerProvider with ChangeNotifier {
 
       if (result.externalTrackId == null ||
           result.externalTrackId!.trim().isEmpty) {
-        throw Exception("ExternalTrackId nije dostupan.");
+        throw Exception("ExternalTrackId is not available.");
       }
 
       _setCurrentSongFromResponse(result, request);
@@ -136,7 +136,7 @@ class PlayerProvider with ChangeNotifier {
 
       if (result.externalTrackId == null ||
           result.externalTrackId!.trim().isEmpty) {
-        throw Exception("ExternalTrackId nije dostupan.");
+        throw Exception("ExternalTrackId is not available.");
       }
 
       _setCurrentSongFromResponse(result, request);
@@ -174,7 +174,7 @@ class PlayerProvider with ChangeNotifier {
 
       if (result.externalTrackId == null ||
           result.externalTrackId!.trim().isEmpty) {
-        throw Exception("ExternalTrackId nije dostupan.");
+        throw Exception("ExternalTrackId is not available.");
       }
 
       _setCurrentSongFromResponse(result, request);
@@ -294,7 +294,7 @@ class PlayerProvider with ChangeNotifier {
     final previewUrl = await DeezerTrackProvider.getPreviewUrl(externalTrackId);
 
     if (previewUrl == null || previewUrl.trim().isEmpty) {
-      throw Exception("Preview nije dostupan.");
+      throw Exception("Preview is not available.");
     }
 
     _repeatTimer?.cancel();

@@ -1,13 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:grooveon_mobile/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
+import 'package:grooveon_mobile/helper/snackBar_helper.dart';
+import 'package:grooveon_mobile/helper/universal_paging_helper.dart';
+import 'package:grooveon_mobile/models/album_response.dart';
 import 'package:grooveon_mobile/models/music_search_item_response.dart';
 import 'package:grooveon_mobile/models/search_results.dart';
+import 'package:grooveon_mobile/providers/album_provider.dart';
 import 'package:grooveon_mobile/providers/music_search_provider.dart';
 import 'package:grooveon_mobile/providers/player_provider.dart';
+import 'package:grooveon_mobile/providers/user_provider.dart';
 import 'package:grooveon_mobile/screens/add_song_to%20playlist_dialog.dart';
 import 'package:grooveon_mobile/screens/artist_info_screen.dart';
+import 'package:grooveon_mobile/screens/universal_album_preview_screen.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
 import 'package:grooveon_mobile/widgets/mini_player_bar.dart';
 import 'package:grooveon_mobile/widgets/swipe_widget.dart';
@@ -30,38 +36,40 @@ class _SearchScreenState extends State<SearchScreen> {
   Timer? _debounce;
 
   late final UniversalPagingProvider<MusicSearchItemResponse> _pagingProvider;
+  late final UserProvider _userProvider;
 
   @override
   void initState() {
     super.initState();
 
+    _userProvider = context.read<UserProvider>();
+
     _pagingProvider = UniversalPagingProvider<MusicSearchItemResponse>(
       pageSize: 10,
-      fetcher:
-          ({
-            required int page,
-            required int pageSize,
-            String? filter,
-            Map<String, dynamic>? extra,
-            bool includeTotalCount = true,
-          }) async {
-            final musicSearchProvider = context.read<MusicSearchProvider>();
+      fetcher: ({
+        required int page,
+        required int pageSize,
+        String? filter,
+        Map<String, dynamic>? extra,
+        bool includeTotalCount = true,
+      }) async {
+        final musicSearchProvider = context.read<MusicSearchProvider>();
 
-            final result = await musicSearchProvider.search(
-              fts: filter,
-              page: page,
-              pageSize: pageSize,
-              includeTotalCount: includeTotalCount,
-              retrieveAll: false,
-            );
+        final result = await musicSearchProvider.search(
+          fts: filter,
+          page: page,
+          pageSize: pageSize,
+          includeTotalCount: includeTotalCount,
+          retrieveAll: false,
+        );
 
-            final sorted = _sortResults(result.items.toList(), filter ?? "");
+        final sorted = _sortResults(result.items.toList(), filter ?? "");
 
-            return SearchResult<MusicSearchItemResponse>(
-              items: sorted,
-              totalCount: result.totalCount ?? 0,
-            );
-          },
+        return SearchResult<MusicSearchItemResponse>(
+          items: sorted,
+          totalCount: result.totalCount ?? 0,
+        );
+      },
     );
   }
 
@@ -140,33 +148,100 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {});
   }
 
-  void _openArtist(MusicSearchItemResponse item) {
+  Future<void> _openArtist(MusicSearchItemResponse item) async {
+    try {
+      final hasPremium = await _userProvider.hasPremium();
+
+      if (!hasPremium) {
+        if (!mounted) return;
+
+        await ConfirmDialogs.okConfirmation(
+          context,
+          title: "Premium Required",
+          message:
+              "A premium subscription is required to access artist profiles.\n\nActivate premium to continue.",
+          okText: "OK",
+          danger: true,
+        );
+
+        return;
+      }
+
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ArtistInfoScreen(
+            artistId: item.artistId ?? item.id,
+            artistName: item.title,
+            artistImageUrl: item.imageUrl,
+            description: null,
+            playCount: 0,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      SnackbarHelper.showError(context, e.toString());
+    }
+  }
+
+  Future<void> _openAlbum(MusicSearchItemResponse album) async {
+  try {
+    final hasPremium = await _userProvider.hasPremium();
+
+    if (!hasPremium) {
+      if (!mounted) return;
+
+      await ConfirmDialogs.okConfirmation(
+        context,
+        title: "Premium Required",
+        message:
+            "A premium subscription is required to access albums.\n\nActivate premium to continue.",
+        okText: "OK",
+        danger: true,
+      );
+
+      return;
+    }
+
+    if (!mounted) return;
+
+    final albumProvider = context.read<AlbumProvider>();
+
+    final albumResponse = await albumProvider.getById(album.id);
+
+    if (!mounted) return;
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ArtistInfoScreen(
-          artistId: item.artistId ?? item.id,
-          artistName: item.title,
-          artistImageUrl: item.imageUrl,
-          description: null,
-          playCount: 0,
+        builder: (_) => UniversalAlbumPreviewScreen(
+          album: albumResponse,
         ),
       ),
     );
+  } catch (e) {
+    if (!mounted) return;
+
+    SnackbarHelper.showError(context, e.toString());
   }
+}
 
   Future<void> _openAddToPlaylistDialog(MusicSearchItemResponse song) async {
-  await showDialog<bool>(
-    context: context,
-    builder: (_) => AddSongToPlaylistDialog(song: song),
-  );
-}
+    await showDialog<bool>(
+      context: context,
+      builder: (_) => AddSongToPlaylistDialog(song: song),
+    );
+  }
 
   Future<void> _playSong(MusicSearchItemResponse song) async {
     try {
       final extId = song.externalTrackId;
+
       if (extId == null || extId.trim().isEmpty) {
-        throw Exception("Pjesma nema externalTrackId.");
+        throw Exception("Song does not have an externalTrackId.");
       }
 
       final player = context.read<PlayerProvider>();
@@ -181,9 +256,7 @@ class _SearchScreenState extends State<SearchScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Greška pri pokretanju pjesme: $e")),
-      );
+      SnackbarHelper.showError(context, e.toString());
     }
   }
 
@@ -373,124 +446,114 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _songTile(MusicSearchItemResponse song) {
-  final subtitle = song.subtitle?.trim().isNotEmpty == true
-      ? song.subtitle!
-      : "Song";
+    final subtitle =
+        song.subtitle?.trim().isNotEmpty == true ? song.subtitle! : "Song";
 
-  return InkWell(
-    onTap: () => _playSong(song), // ostaje play na cijeli tile
-    borderRadius: BorderRadius.circular(16),
-    child: Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _imageBox(
-            imageUrl: song.imageUrl,
-            size: 58,
-            isCircle: false,
-            fallbackIcon: Icons.music_note_rounded,
-          ),
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () => _playSong(song),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _imageBox(
+              imageUrl: song.imageUrl,
+              size: 58,
+              isCircle: false,
+              fallbackIcon: Icons.music_note_rounded,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    song.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: textDark,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  song.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: textDark,
+                InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    _openAddToPlaylistDialog(song);
+                  },
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: const BoxDecoration(
+                      color: lightPurple,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: primaryDark,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(width: 8),
+                InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => _playSong(song),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: const BoxDecoration(
+                      color: lightPurple,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: primaryDark,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// ➕ ADD TO PLAYLIST
-              InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () {
-                  _openAddToPlaylistDialog(song);
-                },
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: const BoxDecoration(
-                    color: lightPurple,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    color: primaryDark,
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 8),
-
-              /// ▶ PLAY
-              InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => _playSong(song),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: const BoxDecoration(
-                    color: lightPurple,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.play_arrow_rounded,
-                    color: primaryDark,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _albumTile(MusicSearchItemResponse album) {
-    final subtitle = album.subtitle?.trim().isNotEmpty == true
-        ? album.subtitle!
-        : "Album";
+    final subtitle =
+        album.subtitle?.trim().isNotEmpty == true ? album.subtitle! : "Album";
 
     return InkWell(
-      onTap: () {
-        // kasnije album preview
-      },
+      onTap: () => _openAlbum(album),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -567,7 +630,10 @@ class _SearchScreenState extends State<SearchScreen> {
         shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
         borderRadius: isCircle ? null : BorderRadius.circular(14),
         image: imageUrl != null && imageUrl.trim().isNotEmpty
-            ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
+            ? DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+              )
             : null,
       ),
       child: imageUrl == null || imageUrl.trim().isEmpty

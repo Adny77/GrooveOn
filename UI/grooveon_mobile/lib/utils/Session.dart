@@ -4,7 +4,7 @@ class Session {
   static String? username;
   static List<String> roles = [];
 
-  static void odjava() {
+  static void logout() {
     token = null;
     userId = null;
     username = null;

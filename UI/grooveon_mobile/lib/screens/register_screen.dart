@@ -150,12 +150,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             children: [
                               _header(),
                               const SizedBox(height: 18),
-                              _avatarPicker(),
-                              const SizedBox(height: 18),
-                              _sectionTitle("Osnovni podaci"),
+                              _sectionTitle("Basic information"),
                               const SizedBox(height: 10),
                               _field(
-                                label: "Ime",
+                                label: "First name",
                                 controller: fields.controller('firstName'),
                                 errorText: fieldErrors['firstName'],
                                 textInputAction: TextInputAction.next,
@@ -163,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 12),
                               _field(
-                                label: "Prezime",
+                                label: "Last name",
                                 controller: fields.controller('lastName'),
                                 errorText: fieldErrors['lastName'],
                                 textInputAction: TextInputAction.next,
@@ -171,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 12),
                               _field(
-                                label: "Korisničko ime",
+                                label: "Username",
                                 controller: fields.controller('username'),
                                 errorText: fieldErrors['username'],
                                 textInputAction: TextInputAction.next,
@@ -187,10 +185,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 icon: Icons.mail_outline_rounded,
                               ),
                               const SizedBox(height: 18),
-                              _sectionTitle("Kontakt"),
+                              _sectionTitle("Contact"),
                               const SizedBox(height: 10),
                               _field(
-                                label: "Broj telefona",
+                                label: "Phone number",
                                 controller: fields.controller('phoneNumber'),
                                 errorText: fieldErrors['phoneNumber'],
                                 keyboardType: TextInputType.phone,
@@ -198,10 +196,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 icon: Icons.phone_outlined,
                               ),
                               const SizedBox(height: 18),
-                              _sectionTitle("Sigurnost"),
+                              _sectionTitle("Security"),
                               const SizedBox(height: 10),
                               _field(
-                                label: "Lozinka",
+                                label: "Password",
                                 controller: fields.controller('password'),
                                 errorText: fieldErrors['password'],
                                 obscure: _obscurePassword,
@@ -223,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 12),
                               _field(
-                                label: "Potvrdi lozinku",
+                                label: "Confirm password",
                                 controller: fields.controller('confirmPassword'),
                                 errorText: fieldErrors['confirmPassword'],
                                 obscure: _obscureConfirmPassword,
@@ -245,12 +243,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               const SizedBox(height: 18),
-                              _sectionTitle("Dodatno"),
+                              _sectionTitle("Additional"),
                               const SizedBox(height: 10),
                               _dateTile(
-                                label: "Datum rođenja",
+                                label: "Date of birth",
                                 valueText: _dob == null
-                                    ? "Odaberi datum"
+                                    ? "Select date"
                                     : "${_dob!.day.toString().padLeft(2, '0')}.${_dob!.month.toString().padLeft(2, '0')}.${_dob!.year}",
                                 onTap: _pickDate,
                                 errorText: fieldErrors['birthDate'],
@@ -300,7 +298,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                                     )
                                   : const Text(
-                                      "Registruj se",
+                                      "Register",
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w900,
@@ -361,7 +359,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(height: 8),
         const Text(
-          "Kreiraj svoj muzički račun",
+          "Create your music account",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -380,72 +378,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         fontSize: 14,
         fontWeight: FontWeight.w900,
         color: RegisterScreen.textDark,
-      ),
-    );
-  }
-
-  Widget _avatarPicker() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F6FB),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE7DDF0)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFE2D8EA)),
-            ),
-            child: _pickedImage != null
-                ? ClipOval(child: Image.file(_pickedImage!, fit: BoxFit.cover))
-                : Icon(
-                    _hasImage ? Icons.check_circle : Icons.person_rounded,
-                    color: RegisterScreen.darkPurple,
-                  ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Profilna slika",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    color: RegisterScreen.textDark,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _hasImage ? "Slika odabrana" : "Odaberi sliku (opcionalno)",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: RegisterScreen.subText,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          IconButton(
-            onPressed: _pickImage,
-            icon: const Icon(Icons.photo_library_outlined),
-            color: RegisterScreen.darkPurple,
-            tooltip: "Odaberi",
-          ),
-          IconButton(
-            onPressed: _pickedImage == null ? null : _removeImage,
-            icon: const Icon(Icons.delete_outline),
-            color: const Color(0xFF8A8A8A),
-            tooltip: "Ukloni",
-          ),
-        ],
       ),
     );
   }
@@ -526,7 +458,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
-          "Već imaš račun?",
+          "Already have an account?",
           style: TextStyle(
             color: RegisterScreen.subText,
             fontWeight: FontWeight.w600,
@@ -535,7 +467,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text(
-            "Prijavi se",
+            "Sign in",
             style: TextStyle(
               fontWeight: FontWeight.w900,
               color: RegisterScreen.darkPurple,
@@ -603,7 +535,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       initialDate: _dob ?? DateTime(now.year - 20, 1, 1),
       firstDate: firstDate,
       lastDate: lastDate,
-      helpText: "Datum rođenja",
+      helpText: "Date of birth",
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -638,8 +570,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       await ConfirmDialogs.okConfirmation(
         context,
-        title: "Greška",
-        message: "Ne mogu otvoriti galeriju.\n$e",
+        title: "Error",
+        message: "Cannot open gallery.\n$e",
       );
     }
   }
@@ -653,17 +585,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Rules.requiredText(
         'firstName',
         fields.text('firstName'),
-        'Ime je obavezno.',
+        'First name je obavezno.',
       ),
       Rules.requiredText(
         'lastName',
         fields.text('lastName'),
-        'Prezime je obavezno.',
+        'Last name je obavezno.',
       ),
       Rules.requiredText(
         'username',
         fields.text('username'),
-        'Username je obavezan.',
+        'Username is required.',
       ),
       Rules.username(
         'username',
@@ -672,7 +604,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Rules.requiredText(
         'email',
         fields.text('email'),
-        'Email je obavezan.',
+        'Email is required.',
       ),
       Rules.email(
         'email',
@@ -681,7 +613,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Rules.requiredText(
         'phoneNumber',
         fields.text('phoneNumber'),
-        'Telefon je obavezan.',
+        'Phone is required.',
       ),
       Rules.phone(
         'phoneNumber',
@@ -690,7 +622,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Rules.requiredText(
         'password',
         fields.text('password'),
-        'Lozinka je obavezna.',
+        'Password is required.',
       ),
       Rules.strongPassword(
         'password',
@@ -699,14 +631,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Rules.requiredText(
         'confirmPassword',
         fields.text('confirmPassword'),
-        'Potvrda lozinke je obavezna.',
+        'Password confirmation is required.',
       ),
       FieldRule('confirmPassword', () {
         return fields.text('confirmPassword') == fields.text('password')
             ? null
-            : 'Lozinke se ne podudaraju.';
+            : 'Passwords do not match.';
       }),
-      Rules.requiredDate('birthDate', _dob, 'Datum rođenja je obavezan.'),
+      Rules.requiredDate('birthDate', _dob, 'Date of birth is required.'),
     ];
 
     final isValid = ValidationEngine.validate(
@@ -750,8 +682,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       await ConfirmDialogs.okConfirmation(
         context,
-        title: "Uspješno",
-        message: "Račun je kreiran. Sada se možeš prijaviti.",
+        title: "Success",
+        message: "Account created. You can now sign in.",
       );
 
       Navigator.of(context).pushNamedAndRemoveUntil(
@@ -762,7 +694,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       await ConfirmDialogs.okConfirmation(
         context,
-        title: "Greška",
+        title: "Error",
         message: e.toString(),
       );
     } finally {

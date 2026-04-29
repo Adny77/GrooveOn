@@ -1,12 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/config/api_config.dart';
+import 'package:grooveon_desktop/helper/http_helper.dart';
 import 'package:grooveon_desktop/models/response/income_by_month_response.dart';
 import 'package:grooveon_desktop/models/response/music_overview_response.dart';
-import 'package:grooveon_desktop/models/response/new_users_summary.dart';
 import 'package:grooveon_desktop/models/response/subscription_analytics.dart';
 import 'package:grooveon_desktop/models/response/user_growth_point.dart';
-import 'package:grooveon_desktop/utils/session.dart';
 import 'package:http/http.dart' as http;
 
 class ReportProvider with ChangeNotifier {
@@ -22,15 +22,10 @@ class ReportProvider with ChangeNotifier {
 
     final response = await http.get(
       Uri.parse(url),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
     );
 
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw Exception("Greška pri dohvatu analytics podataka.");
-    }
+    HttpHelper.checkResponse(response);
 
     return SubscriptionAnalytics.fromJson(jsonDecode(response.body));
   }
@@ -39,34 +34,21 @@ class ReportProvider with ChangeNotifier {
     required int year,
     int? month,
   }) async {
-    final queryParams = <String, String>{'year': year.toString()};
-
-    if (month != null) {
-      queryParams['month'] = month.toString();
-    }
-
     final uri = Uri.parse(
       '${ApiConfig.apiBase}/api/Report/new-users-subscription-analytics',
-    ).replace(queryParameters: queryParams);
+    ).replace(queryParameters: {
+      "year": year.toString(),
+      if (month != null) "month": month.toString(),
+    });
 
     final response = await http.get(
       uri,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
     );
 
-    if (response.statusCode == 401) {
-      throw Exception("Unauthorized");
-    }
+    HttpHelper.checkResponse(response);
 
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw Exception("API Error: ${response.statusCode} → ${response.body}");
-    }
-
-    final data = jsonDecode(response.body);
-    return SubscriptionAnalytics.fromJson(data);
+    return SubscriptionAnalytics.fromJson(jsonDecode(response.body));
   }
 
   Future<MusicOverviewResponse> getMusicOverview({
@@ -76,39 +58,21 @@ class ReportProvider with ChangeNotifier {
     int? month,
     int take = 4,
   }) async {
-    final query = <String, dynamic>{
-      "mode": mode,
-      "userId": userId,
-      "year": year,
-      "take": take,
-    };
-
-    if (month != null) {
-      query["month"] = month;
-    }
-
     final uri = Uri.parse("${ApiConfig.apiBase}/api/Report/music-overview")
-        .replace(
-          queryParameters: query.map(
-            (key, value) => MapEntry(key, value.toString()),
-          ),
-        );
+        .replace(queryParameters: {
+      "mode": mode,
+      "userId": userId.toString(),
+      "year": year.toString(),
+      "take": take.toString(),
+      if (month != null) "month": month.toString(),
+    });
 
     final response = await http.get(
       uri,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
     );
 
-    if (response.statusCode == 401) {
-      throw Exception("Unauthorized");
-    }
-
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw Exception("API Error: ${response.statusCode} → ${response.body}");
-    }
+    HttpHelper.checkResponse(response);
 
     return MusicOverviewResponse.fromJson(jsonDecode(response.body));
   }
@@ -121,15 +85,10 @@ class ReportProvider with ChangeNotifier {
 
     final response = await http.get(
       Uri.parse(url),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
     );
 
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw Exception("Greška pri učitavanju user growth podataka.");
-    }
+    HttpHelper.checkResponse(response);
 
     final data = jsonDecode(response.body) as List;
     return data.map((e) => UserGrowthPoint.fromJson(e)).toList();
@@ -142,18 +101,12 @@ class ReportProvider with ChangeNotifier {
 
     final response = await http.get(
       Uri.parse(url),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ${Session.token}",
-      },
+      headers: HttpHelper.getHeaders(),
     );
 
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw Exception("Greška pri učitavanju income podataka.");
-    }
+    HttpHelper.checkResponse(response);
 
     final data = jsonDecode(response.body) as List;
-
     return data.map((e) => IncomeByMonthResponse.fromJson(e)).toList();
   }
 }

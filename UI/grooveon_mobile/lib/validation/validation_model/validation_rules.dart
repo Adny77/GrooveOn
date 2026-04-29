@@ -31,11 +31,11 @@ class Rules {
       final v = value.trim();
 
       if (!required && v.isEmpty) return null;
-      if (v.isEmpty) return 'Email je obavezan.';
+      if (v.isEmpty) return 'Email is required.';
 
       final regex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
       if (!regex.hasMatch(v)) {
-        return 'Unesi ispravan email.';
+        return 'Enter a valid email.';
       }
 
       return null;
@@ -43,72 +43,80 @@ class Rules {
   }
 
   static FieldRule username(
-    String field,
-    String value, {
-    bool required = true,
-    int min = 3,
-    int max = 20,
-  }) {
-    return FieldRule(field, () {
-      final v = value.trim();
+  String field,
+  String value, {
+  bool required = true,
+  int min = 3,
+  int max = 20,
+}) {
+  return FieldRule(field, () {
+    final v = value.trim();
 
-      if (!required && v.isEmpty) return null;
-      if (v.isEmpty) return 'Username je obavezan.';
+    if (!required && v.isEmpty) return null;
+    if (v.isEmpty) return 'Username is required.';
 
-      if (v.length < min || v.length > max) {
-        return 'Username mora imati između $min i $max karaktera.';
-      }
+    if (v.length < min || v.length > max) {
+      return 'Username must be between $min and $max characters.';
+    }
 
-      if (v.contains(' ')) {
-        return 'Username ne smije sadržavati razmake.';
-      }
+    if (v.contains(' ')) {
+      return 'Username must not contain spaces.';
+    }
 
-      return null;
-    });
-  }
+    if (!RegExp(r'[a-zA-Z]').hasMatch(v)) {
+      return 'Username must contain at least one letter.';
+    }
+
+    if (!RegExp(r'[0-9]').hasMatch(v)) {
+      return 'Username must contain at least one number.';
+    }
+
+    return null;
+  });
+}
 
   static FieldRule phone(String field, String value, {bool required = false}) {
     return FieldRule(field, () {
       final v = value.trim();
 
       if (!required && v.isEmpty) return null;
-      if (v.isEmpty) return 'Telefon je obavezan.';
+      if (v.isEmpty) return 'Phone is required.';
 
       final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
       if (!allowedChars.hasMatch(v)) {
-        return 'Unesi ispravan broj telefona.';
+        return 'Enter a valid phone number.';
       }
 
       if (v.contains('+') && !v.startsWith('+')) {
-        return 'Znak + može biti samo na početku.';
+        return 'The + sign can only be at the beginning.';
       }
 
       final digits = v.replaceAll(RegExp(r'\D'), '');
 
       if (digits.startsWith('060')) {
         if (digits.length != 10) {
-          return 'Broj 060 mora imati 7 cifara nakon pozivnog.';
+          return 'The 060 number must have 7 digits after the prefix.';
         }
         return null;
       }
 
       if (digits.startsWith('061') || digits.startsWith('062')) {
         if (digits.length != 9) {
-          return 'Broj 061/062 mora imati 6 cifara nakon pozivnog.';
+          return 'The 061/062 number must have 6 digits after the prefix.';
         }
         return null;
       }
 
       if (digits.startsWith('38760')) {
         if (digits.length != 12) {
-          return 'Broj 38760 mora imati 7 cifara nakon pozivnog.';
+          return 'The 38760 number must have 7 digits after the prefix.';
         }
         return null;
       }
 
       if (digits.startsWith('38761') || digits.startsWith('38762')) {
         if (digits.length != 11) {
-          return 'Broj 38761/38762 mora imati 6 cifara nakon pozivnog.';
+          return 'The 38761/38762 number must have 6 digits after the prefix.';
         }
         return null;
       }
@@ -128,7 +136,7 @@ class Rules {
       final hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(v);
 
       if (!hasMin || !hasUpper || !hasLower || !hasDigit || !hasSpecial) {
-        return 'Lozinka mora imati 8+ znakova, veliko, malo, broj i specijalni znak.';
+        return 'Password must have 8+ characters, uppercase, lowercase, a number, and a special character.';
       }
 
       return null;

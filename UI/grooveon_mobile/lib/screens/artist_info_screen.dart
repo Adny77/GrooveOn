@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/screens/universal_album_preview_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'package:grooveon_mobile/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_mobile/helper/universal_paging_helper.dart';
 import 'package:grooveon_mobile/models/album_response.dart';
 import 'package:grooveon_mobile/models/song_response.dart';
 import 'package:grooveon_mobile/providers/album_provider.dart';
@@ -166,7 +167,7 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
       final userId = Session.userId;
 
       if (userId == null) {
-        throw Exception("Korisnik nije prijavljen.");
+        throw Exception("User is not signed in.");
       }
 
       await context.read<PlayerProvider>().playSongWithPurpose(
@@ -182,11 +183,7 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
 
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Preview trenutno nije dostupan za ovu pjesmu."),
-        ),
-      );
+      SnackbarHelper.showInfo(context, "Preview is currently unavailable for this song.");
     }
   }
 
@@ -194,11 +191,7 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
     final songs = _songsPaging.items;
 
     if (songs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Ovaj artist trenutno nema pjesama."),
-        ),
-      );
+      SnackbarHelper.showInfo(context, "This artist currently has no songs.");
       return;
     }
 

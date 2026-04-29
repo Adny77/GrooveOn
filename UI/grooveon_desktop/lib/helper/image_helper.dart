@@ -26,23 +26,6 @@ class ImageHelper {
     return File(picked.path);
   }
 
-//   static String httpCheck(String? imagePath, String folder) {
-//   final basePath = ApiConfig.imageFolders[folder];
-
-//   if (basePath == null) {
-//     throw Exception('Nepoznat image folder: $folder');
-//   }
-
-//   if (imagePath == null || imagePath.trim().isEmpty) {
-//     return '$basePath/default.jpg';
-//   }
-
-//   if (imagePath.startsWith('http')) {
-//     return imagePath;
-//   }
-
-//   return '$basePath/$imagePath';
-// }
 
 
   static bool isHttp(String imagePath) {
@@ -60,14 +43,6 @@ class ImageHelper {
     if (v.toLowerCase() == 'null') return false;
     return true;
   }
-
-  // static String safeUserImageUrl(String? userImage) {
-  // if (!hasValidImage(userImage)) {
-  //   return httpCheck(null, 'users');
-  // }
-
-  // return httpCheck(userImage, 'users');
-  // }
 
 
   static Widget userPlaceholder(String username, {double fontSize = 26}) {

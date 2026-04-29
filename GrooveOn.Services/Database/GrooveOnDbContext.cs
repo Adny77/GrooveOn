@@ -1,4 +1,4 @@
-﻿using GrooveOn.Services.Helpers;
+using GrooveOn.Services.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -6,6 +6,37 @@ namespace GrooveOn.Services.Database
 {
     public class GrooveOnDbContext : DbContext
     {
+        private static readonly string[] FirstNames =
+{
+    "Amar", "Lejla", "Benjamin", "Sara", "Adnan", "Emina", "Haris", "Jasmin",
+    "Tarik", "Amina", "Dino", "Lamija", "Kenan", "Naida", "Emir", "Selma",
+    "Faruk", "Mila", "Anes", "Ilma", "Kerim", "Nejra", "Samir", "Hana",
+    "Armin", "Ajla", "Nedim", "Dalia", "Ermin", "Nora", "Damir", "Ilda"
+};
+
+    private static readonly string[] LastNames =
+    {
+    "Had�ic", "Kovacevic", "Mehic", "Delic", "Karic", "Selimovic", "Mujic",
+    "Alic", "Begic", "Softic", "Hod�ic", "�aric", "Mujanovic", "Imamovic",
+    "Pjanic", "Bajric", "Osmanovic", "Halilovic", "Muratovic", "Colic",
+    "Spahic", "Zukic", "Velagic", "Brkic", "Demirovic", "Lulic", "Be�ic"
+};
+
+    private static string NormalizeForUsername(string value)
+    {
+        return value
+            .ToLower()
+            .Replace("c", "c")
+            .Replace("c", "c")
+            .Replace("d", "d")
+            .Replace("�", "s")
+            .Replace("�", "z");
+    }
+
+    private static string GetLoremPicsumImage(string type, int id)
+    {
+        return $"https://picsum.photos/seed/grooveon-{type}-{id}/500/500";
+    }
         public GrooveOnDbContext(DbContextOptions<GrooveOnDbContext> options)
             : base(options)
         {
@@ -22,8 +53,9 @@ namespace GrooveOn.Services.Database
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
-        public DbSet<PlayHistory> ListeningHistories { get; set; }
         public DbSet<Player> Players { get; set; }
+
+        public DbSet<Payment> Payments { get; set; }
 
         public DbSet<Question> Questions { get; set; }
 
@@ -109,8 +141,8 @@ namespace GrooveOn.Services.Database
                 new Role
                 {
                     Id = 2,
-                    Name = "Korisnik",
-                    Description = "Standardni korisnik aplikacije",
+                    Name = "User",
+                    Description = "Standard application user",
                     CreatedAt = new DateTime(2026, 3, 10),
                     IsActive = true
                 }
@@ -124,12 +156,12 @@ namespace GrooveOn.Services.Database
         new User
         {
             Id = 1,
-            FirstName = "Marko",
-            LastName = "Petrović",
-            Username = "markopetrovic01",
+            FirstName = "Dejan",
+            LastName = "Music",
+            Username = "dejanmusic01",
             Password = string.Empty,
             PasswordHash = adminHash,
-            Email = "admin@grooveon.com",
+            Email = "testniadminmuzicar@gmail.com",
             UserImage = null,
             DateOfBirth = new DateTime(2000, 1, 15),
             PhoneNumber = "061111111",
@@ -140,9 +172,9 @@ namespace GrooveOn.Services.Database
         new User
         {
             Id = 2,
-            FirstName = "Nikola",
-            LastName = "Jovanović",
-            Username = "nikolajovanovic02",
+            FirstName = "Milan",
+            LastName = "Kostadinovic",
+            Username = "milankostadinovic02",
             Password = string.Empty,
             PasswordHash = adminHash,
             Email = "admin2@grooveon.com",
@@ -157,7 +189,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 3,
             FirstName = "Amar",
-            LastName = "Hadžić",
+            LastName = "Hadzic",
             Username = "amarhadzic03",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -173,7 +205,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 4,
             FirstName = "Lejla",
-            LastName = "Kovačević",
+            LastName = "Kovacevic",
             Username = "lejlakovacevic04",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -189,7 +221,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 5,
             FirstName = "Benjamin",
-            LastName = "Mehić",
+            LastName = "Mehic",
             Username = "benjaminmehic05",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -205,7 +237,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 6,
             FirstName = "Sara",
-            LastName = "Delić",
+            LastName = "Delic",
             Username = "saradelic06",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -221,7 +253,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 7,
             FirstName = "Adnan",
-            LastName = "Karić",
+            LastName = "Karic",
             Username = "adnankaric07",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -237,7 +269,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 8,
             FirstName = "Emina",
-            LastName = "Selimović",
+            LastName = "Selimovic",
             Username = "eminaselimovic08",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -253,7 +285,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 9,
             FirstName = "Haris",
-            LastName = "Mujić",
+            LastName = "Mujic",
             Username = "harismujic09",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -269,7 +301,7 @@ namespace GrooveOn.Services.Database
         {
             Id = 10,
             FirstName = "Jasmin",
-            LastName = "Alić",
+            LastName = "Alic",
             Username = "jasminalic10",
             Password = string.Empty,
             PasswordHash = userHash,
@@ -280,7 +312,24 @@ namespace GrooveOn.Services.Database
             IsActive = true,
             JoinDate = new DateTime(2026, 3, 10),
             LastLogin = null
-        }
+        },
+
+        new User
+{
+    Id = 11,
+    FirstName = "Fahrudin",
+    LastName = "Music",
+    Username = "fahrudinmusic11",
+    Password = string.Empty,
+    PasswordHash = userHash,
+    Email = "testnimuzicar@gmail.com",
+    UserImage = GetLoremPicsumImage("user", 3),
+    DateOfBirth = new DateTime(2001, 5, 10),
+    PhoneNumber = "061555555",
+    IsActive = true,
+    JoinDate = new DateTime(2026, 3, 10),
+    LastLogin = null
+}
     };
 
             modelBuilder.Entity<Artist>().HasData(
@@ -424,7 +473,7 @@ namespace GrooveOn.Services.Database
 
             new Song { Id = 42, ExternalTrackId = "2386586085", Source = "Deezer", Title = "FE!N (feat. Playboi Carti)", ArtistId = 3, AlbumId = 3, DurationSeconds = 191, PreviewUrl = "https://cdnt-preview.dzcdn.net/api/1/1/0/2/7/0/02700631951a33db90a0024531e2378d.mp3?hdnea=exp=1776617536~acl=/api/1/1/0/2/7/0/02700631951a33db90a0024531e2378d.mp3*~data=user_id=0,application_id=42~hmac=6082c278cba36f3e31a89115f827a5651aa58e924610dc63d04df5aa078dc621", CoverUrl = "https://cdn-images.dzcdn.net/images/cover/6c91e64b7157f1332a4f6b0de9e4c714/250x250-000000-80-0-0.jpg", ReleaseDate = new DateTime(2023, 7, 28), IsActive = true, LastSyncedAt = new DateTime(2020, 7, 29), CreatedAt = new DateTime(2020, 7, 28) },
 
-            new Song { Id = 43, ExternalTrackId = "2386586095", Source = "Deezer", Title = "DELRESTO (ECHOES) (feat. Beyoncé)", ArtistId = 3, AlbumId = 3, DurationSeconds = 274, PreviewUrl = "https://cdnt-preview.dzcdn.net/api/1/1/5/f/2/0/5f28e1e7b206ba51b76a1b8787e2f70a.mp3?hdnea=exp=1776617537~acl=/api/1/1/5/f/2/0/5f28e1e7b206ba51b76a1b8787e2f70a.mp3*~data=user_id=0,application_id=42~hmac=2152cbd5ac8470be0925155badd55b9435082d65b9b26d7d849225299c270819", CoverUrl = "https://cdn-images.dzcdn.net/images/cover/6c91e64b7157f1332a4f6b0de9e4c714/250x250-000000-80-0-0.jpg", ReleaseDate = new DateTime(2023, 7, 28), IsActive = true, LastSyncedAt = new DateTime(2020, 7, 29), CreatedAt = new DateTime(2020, 7, 28) },
+            new Song { Id = 43, ExternalTrackId = "2386586095", Source = "Deezer", Title = "DELRESTO (ECHOES) (feat. Beyonc�)", ArtistId = 3, AlbumId = 3, DurationSeconds = 274, PreviewUrl = "https://cdnt-preview.dzcdn.net/api/1/1/5/f/2/0/5f28e1e7b206ba51b76a1b8787e2f70a.mp3?hdnea=exp=1776617537~acl=/api/1/1/5/f/2/0/5f28e1e7b206ba51b76a1b8787e2f70a.mp3*~data=user_id=0,application_id=42~hmac=2152cbd5ac8470be0925155badd55b9435082d65b9b26d7d849225299c270819", CoverUrl = "https://cdn-images.dzcdn.net/images/cover/6c91e64b7157f1332a4f6b0de9e4c714/250x250-000000-80-0-0.jpg", ReleaseDate = new DateTime(2023, 7, 28), IsActive = true, LastSyncedAt = new DateTime(2020, 7, 29), CreatedAt = new DateTime(2020, 7, 28) },
 
             new Song { Id = 44, ExternalTrackId = "2386586105", Source = "Deezer", Title = "I KNOW ?", ArtistId = 3, AlbumId = 3, DurationSeconds = 211, PreviewUrl = "https://cdnt-preview.dzcdn.net/api/1/1/9/e/7/0/9e79ca53ba0e2b159e96cf606a39a8b8.mp3?hdnea=exp=1776617537~acl=/api/1/1/9/e/7/0/9e79ca53ba0e2b159e96cf606a39a8b8.mp3*~data=user_id=0,application_id=42~hmac=7b81b4bebec46766e39857b0642cc32532b9c6bb80bdb59264f1c306dc985da2", CoverUrl = "https://cdn-images.dzcdn.net/images/cover/6c91e64b7157f1332a4f6b0de9e4c714/250x250-000000-80-0-0.jpg", ReleaseDate = new DateTime(2023, 7, 28), IsActive = true, LastSyncedAt = new DateTime(2020, 7, 29), CreatedAt = new DateTime(2020, 7, 28) },
 
@@ -1268,9 +1317,8 @@ namespace GrooveOn.Services.Database
             );
 
 
-            var additionalUsers = GenerateAdditionalUsers(userHash, 400);
+            var additionalUsers = GenerateAdditionalUsers(userHash, 300);
             var allUsers = baseUsers.Concat(additionalUsers).ToList();
-            var playHistories = GeneratePlayHistories(allUsers.Count, 417, 2000);
 
             modelBuilder.Entity<User>().HasData(allUsers);
 
@@ -1278,41 +1326,93 @@ namespace GrooveOn.Services.Database
                 GenerateUserRoles(allUsers.Count)
             );
 
-            modelBuilder.Entity<PlayHistory>().HasData(playHistories);
-
             modelBuilder.Entity<SubscriptionPlan>().HasData(
                 new SubscriptionPlan
                 {
                     Id = 1,
                     Name = "Basic account",
+                    Description = "Free account with limited features.",
                     Price = 0,
                     DurationDays = 0,
-                    Description = "Osnovni plan sa preview pristupom",
-                    IsActive = true
+                    IsActive = true,
                 },
                 new SubscriptionPlan
                 {
                     Id = 2,
-                    Name = "Premium account",
-                    Price = 4.99f,
+                    Name = "Premium",
+                    Description = "Premium account with full access.",
+                    Price = 9.99f,
                     DurationDays = 30,
-                    Description = "Premium plan za 30 dana",
-                    IsActive = true
-                },
-                new SubscriptionPlan
-                {
-                    Id = 3,
-                    Name = "Premium Plus account",
-                    Price = 8.99f,
-                    DurationDays = 30,
-                    Description = "Napredni premium plan za 30 dana",
-                    IsActive = true
+                    IsActive = true,
                 }
             );
 
-            modelBuilder.Entity<Subscription>().HasData(
-                GenerateSubscriptions(allUsers, 1)
+            var allSeedUsers = allUsers;
+
+            // ======================= SUBSCRIPTIONS =======================
+            var subscriptions = new List<Subscription>();
+            int subscriptionId = 1;
+
+            foreach (var user in allUsers)
+            {
+                if (user.Id == 1 || user.Id == 2)
+                    continue;
+
+                int planId =
+                    user.Id % 3 == 0 ? 2 :
+                    user.Id % 5 == 0 ? 2 :
+                    1;
+
+                subscriptions.Add(new Subscription
+                {
+                    Id = subscriptionId++,
+                    UserId = user.Id,
+                    SubscriptionPlanId = planId,
+                    StartDate = user.JoinDate,
+                    ExpiryDate = planId == 1 ? null : user.JoinDate.AddMonths(1),
+                    IsActive = true
+                });
+            }
+
+            modelBuilder.Entity<Subscription>().HasData(subscriptions);
+
+
+            // ======================= PAYMENTS =======================
+            var payments = new List<Payment>();
+            int paymentId = 1;
+
+            foreach (var sub in subscriptions)
+            {
+                if (sub.SubscriptionPlanId == 1)
+                    continue;
+
+                payments.Add(new Payment
+                {
+                    Id = paymentId++,
+                    SubscriptionId = sub.Id,
+                    PaymentAmount = 9.99f,
+                    PaymentStatus = "Paid",
+                    PaymentDate = sub.StartDate,
+                    PaymentMethod = "Stripe",
+                    CreatedAt = sub.StartDate,
+                    PaidAt = sub.StartDate,
+                    FailureReason = null,
+                    StripePaymentIntentId = $"pi_seed_{sub.Id}"
+                });
+            }
+
+            modelBuilder.Entity<Payment>().HasData(payments);
+
+            var playlists = GeneratePlaylists(allUsers, subscriptions, 1);
+
+            modelBuilder.Entity<Playlist>().HasData(playlists);
+
+            modelBuilder.Entity<PlaylistSong>().HasData(
+                GeneratePlaylistSongs(playlists, 1)
             );
+            var playHistories = GeneratePlayHistories(allUsers.Count, 417, 2000);
+
+            modelBuilder.Entity<PlayHistory>().HasData(playHistories);
 
             modelBuilder.Entity<Question>().HasData(
 
@@ -1320,10 +1420,10 @@ namespace GrooveOn.Services.Database
     {
         Id = 1,
         UserId = 2,
-        Title = "Kako dodati pjesmu u playlistu?",
-        Content = "Ne mogu pronaći opciju za dodavanje pjesme u playlistu.",
+        Title = "How do I add a song to a playlist?",
+        Content = "I cannot find the option to add a song to a playlist.",
         Status = "Answered",
-        Answer = "Klikni na tri tačke pored pjesme i izaberi 'Add to playlist'.",
+        Answer = "Click the three dots next to the song and choose 'Add to playlist'.",
         CreatedAt = new DateTime(2026, 3, 20, 10, 15, 0),
         AnsweredAt = new DateTime(2026, 3, 20, 11, 0, 0)
     },
@@ -1332,10 +1432,10 @@ namespace GrooveOn.Services.Database
     {
         Id = 2,
         UserId = 3,
-        Title = "Zašto mi ne radi search?",
-        Content = "Kada tražim pjesme ne vraća mi rezultate.",
+        Title = "Why is search not working for me?",
+        Content = "When I search for songs, it does not return results.",
         Status = "Answered",
-        Answer = "Provjeri internet konekciju i pokušaj ponovo.",
+        Answer = "Check your internet connection and try again.",
         CreatedAt = new DateTime(2026, 3, 21, 14, 30, 0),
         AnsweredAt = new DateTime(2026, 3, 21, 15, 10, 0)
     },
@@ -1344,8 +1444,8 @@ namespace GrooveOn.Services.Database
     {
         Id = 3,
         UserId = 4,
-        Title = "Kako promijeniti email?",
-        Content = "Želim promijeniti email na svom profilu.",
+        Title = "How do I change my email?",
+        Content = "I want to change the email on my profile.",
         Status = "Pending",
         Answer = null,
         CreatedAt = new DateTime(2026, 3, 22, 9, 45, 0),
@@ -1356,8 +1456,8 @@ namespace GrooveOn.Services.Database
     {
         Id = 4,
         UserId = 5,
-        Title = "Premium pretplata ne radi",
-        Content = "Kupio sam premium ali nemam pristup premium funkcijama.",
+        Title = "Premium subscription is not working",
+        Content = "I bought premium but do not have access to premium features.",
         Status = "Pending",
         Answer = null,
         CreatedAt = new DateTime(2026, 3, 23, 18, 20, 0),
@@ -1372,7 +1472,7 @@ namespace GrooveOn.Services.Database
                     Id = 1,
                     QuestionId = 1,
                     AdminId = 1,
-                    Message = "Klikni na tri tačke pored pjesme i izaberi 'Add to playlist'.",
+                    Message = "Click the three dots next to the song and choose 'Add to playlist'.",
                     CreatedAt = new DateTime(2026, 3, 20, 11, 0, 0)
                 },
 
@@ -1381,7 +1481,7 @@ namespace GrooveOn.Services.Database
                     Id = 2,
                     QuestionId = 2,
                     AdminId = 1,
-                    Message = "Provjeri internet konekciju i pokušaj ponovo.",
+                    Message = "Check your internet connection and try again.",
                     CreatedAt = new DateTime(2026, 3, 21, 15, 10, 0)
                 },
 
@@ -1395,6 +1495,7 @@ namespace GrooveOn.Services.Database
                 }
             );
 
+
         }
 
 
@@ -1404,23 +1505,40 @@ namespace GrooveOn.Services.Database
             var random = new Random(20260311);
             var users = new List<User>();
 
-            int startId = 11;
+            int startId = 12;
             int currentId = startId;
+
+            var usedFullNames = new HashSet<string>();
 
             void AddUser(int year, int month)
             {
+                string firstName;
+                string lastName;
+                string fullNameKey;
+
+                do
+                {
+                    firstName = FirstNames[random.Next(FirstNames.Length)];
+                    lastName = LastNames[random.Next(LastNames.Length)];
+                    fullNameKey = $"{firstName} {lastName}".ToLower();
+                }
+                while (!usedFullNames.Add(fullNameKey));
+
                 int day = random.Next(1, DateTime.DaysInMonth(year, month) + 1);
+
+                var username =
+                    $"{NormalizeForUsername(firstName)}{NormalizeForUsername(lastName)}{currentId}";
 
                 users.Add(new User
                 {
                     Id = currentId,
-                    FirstName = $"User{currentId}",
-                    LastName = $"Test{currentId}",
-                    Username = $"user{currentId}",
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = username,
                     Password = string.Empty,
                     PasswordHash = userHash,
-                    Email = $"user{currentId}@grooveon.com",
-                    UserImage = null,
+                    Email = $"{username}@grooveon.com",
+                    UserImage = GetLoremPicsumImage("user", currentId),
                     DateOfBirth = new DateTime(
                         random.Next(1995, 2006),
                         random.Next(1, 13),
@@ -1473,6 +1591,142 @@ namespace GrooveOn.Services.Database
             }
 
             return users;
+        }
+
+        private static List<Playlist> GeneratePlaylists(
+    List<User> users,
+    List<Subscription> subscriptions,
+    int startId)
+        {
+            var random = new Random(20260428);
+            var playlists = new List<Playlist>();
+            int playlistId = startId;
+
+            var playlistNames = new[]
+            {
+        "Late Night Vibes",
+        "Workout Energy",
+        "Road Trip Mix",
+        "Chill Zone",
+        "Focus Beats",
+        "Throwback Hits",
+        "Weekend Mood",
+        "Daily Rotation",
+        "Heartbreak Sessions",
+        "Party Starters",
+        "Morning Boost",
+        "Deep Focus",
+        "Rap Essentials",
+        "Pop Favorites",
+        "Rock Classics",
+        "Electronic Flow",
+        "Summer Drive",
+        "Acoustic Mood",
+        "Gym Mode",
+        "After Hours"
+    };
+
+            foreach (var user in users)
+            {
+                if (user.Id == 1 || user.Id == 2)
+                    continue;
+
+                var userSubscription = subscriptions
+                    .FirstOrDefault(x => x.UserId == user.Id && x.IsActive);
+
+                var isBasicAccount =
+                    userSubscription == null ||
+                    userSubscription.SubscriptionPlanId == 1;
+
+                int playlistCount = isBasicAccount
+                    ? random.Next(1, 4)      // Basic: 1 do 3 playliste
+                    : random.Next(4, 9);     // Premium: 4 do 8 playlisti
+
+                for (int i = 0; i < playlistCount; i++)
+                {
+                    var baseName = playlistNames[random.Next(playlistNames.Length)];
+
+                    playlists.Add(new Playlist
+                    {
+                        Id = playlistId++,
+                        UserId = user.Id,
+                        Name = $"{baseName} #{i + 1}",
+                        Description = GetPlaylistDescription(baseName),
+                        IsPublic = random.Next(100) < 45,
+                        CoverImageUrl = GetLoremPicsumImage("playlist", playlistId),
+                        CreatedAt = user.JoinDate.AddDays(random.Next(1, 60))
+                    });
+                }
+            }
+
+            return playlists;
+        }
+
+        private static List<PlaylistSong> GeneratePlaylistSongs(
+            List<Playlist> playlists,
+            int startId)
+        {
+            var random = new Random(20260429);
+            var playlistSongs = new List<PlaylistSong>();
+            int playlistSongId = startId;
+
+            const int minSongId = 1;
+            const int maxSongId = 120;
+            // If you have fewer songs, reduce maxSongId.
+            // If you have more songs, feel free to increase it.
+
+            foreach (var playlist in playlists)
+            {
+                int songCount = random.Next(5, 16);
+
+                var songIds = new HashSet<int>();
+
+                while (songIds.Count < songCount)
+                {
+                    songIds.Add(random.Next(minSongId, maxSongId + 1));
+                }
+
+                foreach (var songId in songIds)
+                {
+                    playlistSongs.Add(new PlaylistSong
+                    {
+                        Id = playlistSongId++,
+                        PlaylistId = playlist.Id,
+                        SongId = songId,
+                        AddedAt = playlist.CreatedAt.AddDays(random.Next(1, 20))
+                    });
+                }
+            }
+
+            return playlistSongs;
+        }
+
+        private static string GetPlaylistDescription(string name)
+        {
+            return name switch
+            {
+                "Late Night Vibes" => "Songs for late night listening sessions.",
+                "Workout Energy" => "High energy tracks for training and movement.",
+                "Road Trip Mix" => "A playlist made for long drives.",
+                "Chill Zone" => "Relaxed songs for easy listening.",
+                "Focus Beats" => "Music for studying, coding and focus.",
+                "Throwback Hits" => "Older favorites that still sound fresh.",
+                "Weekend Mood" => "Tracks for the weekend mood.",
+                "Daily Rotation" => "Songs played often during the day.",
+                "Heartbreak Sessions" => "Emotional songs for slower moments.",
+                "Party Starters" => "Tracks made for parties and group listening.",
+                "Morning Boost" => "Music to start the day with energy.",
+                "Deep Focus" => "Calm tracks for deep work.",
+                "Rap Essentials" => "Rap tracks selected for daily listening.",
+                "Pop Favorites" => "Popular songs for every mood.",
+                "Rock Classics" => "Rock songs that always hit.",
+                "Electronic Flow" => "Electronic songs with smooth energy.",
+                "Summer Drive" => "Songs for warm weather and open roads.",
+                "Acoustic Mood" => "Soft acoustic songs.",
+                "Gym Mode" => "Strong tracks for gym sessions.",
+                "After Hours" => "Darker and smoother night tracks.",
+                _ => "Custom GrooveOn playlist."
+            };
         }
 
         private static List<UserRole> GenerateUserRoles(int totalUsers)
@@ -1636,56 +1890,21 @@ namespace GrooveOn.Services.Database
 
             foreach (var user in users)
             {
+                if (user.Id == 1 || user.Id == 2)
+                    continue;
+
                 int planId;
 
-                if (user.Id == 1 || user.Id == 2)
+                if (user.JoinDate.Year == 2025)
                 {
-                    continue;
-                }
-
-                if (user.JoinDate.Year == 2026 && user.JoinDate.Month == 4)
-                {
-                    planId = random.Next(100) < 70 ? 1 : 2;
-                }
-                else if (user.JoinDate.Year == 2026 && user.JoinDate.Month == 5)
-                {
-                    int roll = random.Next(100);
-                    if (roll < 30)
-                        planId = 1;
-                    else if (roll < 65)
-                        planId = 2;
-                    else
-                        planId = 3;
+                    planId = random.Next(100) < 55 ? 2 : 1;
                 }
                 else
                 {
-                    int roll = random.Next(100);
-                    if (roll < 50)
-                        planId = 1;
-                    else if (roll < 80)
-                        planId = 2;
-                    else
-                        planId = 3;
+                    planId = random.Next(100) < 70 ? 2 : 1;
                 }
 
                 var startDate = user.JoinDate;
-
-                DateTime? paymentDate = null;
-                float paymentAmount = 0f;
-                string? paymentMethod = null;
-
-                if (planId == 2)
-                {
-                    paymentDate = startDate;
-                    paymentAmount = 4.99f;
-                    paymentMethod = "Card";
-                }
-                else if (planId == 3)
-                {
-                    paymentDate = startDate;
-                    paymentAmount = 8.99f;
-                    paymentMethod = "Card";
-                }
 
                 subscriptions.Add(new Subscription
                 {
@@ -1693,16 +1912,83 @@ namespace GrooveOn.Services.Database
                     UserId = user.Id,
                     SubscriptionPlanId = planId,
                     StartDate = startDate,
-                    ExpiryDate = planId == 1 ? null : startDate.AddDays(30),
-                    IsActive = true,
-                    PaymentDate = paymentDate,
-                    PaymentAmount = paymentAmount,
-                    PaymentMethod = paymentMethod
+                    ExpiryDate = planId == 1 ? null : startDate.AddMonths(random.Next(1, 4)),
+                    IsActive = planId == 1 || random.Next(100) < 85
                 });
             }
 
             return subscriptions;
         }
+
+        private static List<Payment> GeneratePayments(List<Subscription> subscriptions, int startId)
+        {
+            var random = new Random(20260429);
+            var payments = new List<Payment>();
+            int paymentId = startId;
+
+            string[] methods = { "Card", "Stripe", "PayPal" };
+
+            foreach (var subscription in subscriptions)
+            {
+                if (subscription.SubscriptionPlanId != 2)
+                    continue;
+
+                var numberOfPayments = subscription.StartDate.Year == 2025
+                    ? random.Next(2, 6)
+                    : random.Next(1, 4);
+
+                for (int i = 0; i < numberOfPayments; i++)
+                {
+                    var paymentDate = subscription.StartDate.AddMonths(i);
+
+                    if (paymentDate.Year > 2026)
+                        break;
+
+                    var statusRoll = random.Next(100);
+
+                    string status;
+                    DateTime? paidAt;
+                    string? failureReason;
+
+                    if (statusRoll < 82)
+                    {
+                        status = "Paid";
+                        paidAt = paymentDate;
+                        failureReason = null;
+                    }
+                    else if (statusRoll < 92)
+                    {
+                        status = "Pending";
+                        paidAt = null;
+                        failureReason = null;
+                    }
+                    else
+                    {
+                        status = "Failed";
+                        paidAt = null;
+                        failureReason = "Payment was declined.";
+                    }
+
+                    payments.Add(new Payment
+                    {
+                        Id = paymentId++,
+                        SubscriptionId = subscription.Id,
+                        PaymentStatus = status,
+                        StripePaymentIntentId = $"pi_seed_{subscription.Id}_{i + 1}",
+                        CreatedAt = paymentDate.AddDays(-random.Next(0, 3)),
+                        PaidAt = paidAt,
+                        FailureReason = failureReason,
+                        PaymentMethod = methods[random.Next(methods.Length)],
+                        PaymentAmount = 9.99f,
+                        PaymentDate = paymentDate
+                    });
+                }
+            }
+
+            return payments;
+        }
+
+
         private static int GetMaxAllowedMonthForYear(int year)
         {
             var today = DateTime.Today;

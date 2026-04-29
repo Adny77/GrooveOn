@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:provider/provider.dart';
 
-import 'package:grooveon_mobile/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_mobile/helper/universal_paging_helper.dart';
 import 'package:grooveon_mobile/models/album_response.dart';
 import 'package:grooveon_mobile/models/song_response.dart';
 import 'package:grooveon_mobile/providers/song_provider.dart';
@@ -115,8 +116,8 @@ class _UniversalAlbumPreviewScreenState
       final userId = Session.userId;
 
       if (userId == null) {
-        throw Exception("Korisnik nije prijavljen.");
-      }
+  throw Exception("User is not logged in.");
+}
 
       await context.read<PlayerProvider>().playSongWithPurpose(
             request: {
@@ -129,11 +130,7 @@ class _UniversalAlbumPreviewScreenState
     } catch (e) {
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Preview trenutno nije dostupan za ovu pjesmu."),
-        ),
-      );
+      SnackbarHelper.showInfo(context, "Preview is currently not available for this song.");
     }
   }
 
@@ -141,11 +138,8 @@ class _UniversalAlbumPreviewScreenState
     final items = _songsPaging.items;
 
     if (items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Album nema pjesama."),
-        ),
-      );
+        SnackbarHelper.showInfo(context, "This album has no songs.");
+
       return;
     }
 
@@ -335,7 +329,7 @@ class _UniversalAlbumPreviewScreenState
                                     border: Border.all(color: divider),
                                   ),
                                   child: Text(
-                                    "${widget.album.songCount} songs",
+                                    "${_songCount} songs",
                                     style: const TextStyle(
                                       color: textSecondary,
                                       fontSize: 12,
@@ -606,7 +600,7 @@ class _UniversalAlbumPreviewScreenState
       parts.add(widget.album.releaseDate!.year.toString());
     }
 
-    parts.add("${widget.album.songCount} songs");
+    parts.add("${_songCount} songs");
 
     return parts.join(" • ");
   }

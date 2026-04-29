@@ -16,13 +16,13 @@ namespace GrooveOn.WebAPI.Authentication
             var jwtAudience = configuration["JWT_AUDIENCE"];
 
             if (string.IsNullOrWhiteSpace(jwtKey))
-                throw new InvalidOperationException("JWT_SECRET nije konfigurisan.");
+                throw new InvalidOperationException("JWT_SECRET is not configured.");
 
             if (string.IsNullOrWhiteSpace(jwtIssuer))
-                throw new InvalidOperationException("JWT_ISSUER nije konfigurisan.");
+                throw new InvalidOperationException("JWT_ISSUER is not configured.");
 
             if (string.IsNullOrWhiteSpace(jwtAudience))
-                throw new InvalidOperationException("JWT_AUDIENCE nije konfigurisan.");
+                throw new InvalidOperationException("JWT_AUDIENCE is not configured.");
 
             services.AddAuthentication(options =>
             {

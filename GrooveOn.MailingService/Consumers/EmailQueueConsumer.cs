@@ -44,7 +44,7 @@ public class EmailQueueConsumer
     public async Task StartAsync()
     {
         if (_channel == null)
-            throw new InvalidOperationException("Channel nije inicijalizovan. Pozovi InitializeAsync prvo.");
+            throw new InvalidOperationException("Channel is not initialized. Call InitializeAsync first.");
 
         var resetConsumer = new AsyncEventingBasicConsumer(_channel);
 
@@ -56,7 +56,7 @@ public class EmailQueueConsumer
 
                 var message =
                     JsonSerializer.Deserialize<ResetPasswordEmailMessage>(json)
-                    ?? throw new InvalidOperationException("Nevalidna poruka.");
+                    ?? throw new InvalidOperationException("Invalid message.");
 
                 await _emailSender.SendResetPasswordEmailAsync(
     message.To,

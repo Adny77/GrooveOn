@@ -1,12 +1,13 @@
 import 'dart:convert';
+
 import 'package:grooveon_desktop/config/api_config.dart';
+import 'package:grooveon_desktop/helper/http_helper.dart';
 import 'package:grooveon_desktop/models/request/album_upsert_request.dart';
 import 'package:grooveon_desktop/models/response/album_preview_response.dart';
 import 'package:grooveon_desktop/models/response/album_response.dart';
 import 'package:grooveon_desktop/models/response/album_save_response.dart';
 import 'package:grooveon_desktop/models/response/search_result.dart';
 import 'package:grooveon_desktop/providers/base_provider.dart';
-import 'package:grooveon_desktop/utils/session.dart';
 import 'package:http/http.dart' as http;
 
 class AlbumProvider extends BaseProvider<AlbumResponse> {
@@ -44,11 +45,11 @@ class AlbumProvider extends BaseProvider<AlbumResponse> {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: _createHeaders(),
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request.toJson()),
     );
 
-    _throwIfNotSuccess(response, "Greška pri preview-u albuma.");
+    HttpHelper.checkResponse(response);
 
     final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
     return AlbumPreviewResponse.fromJson(jsonMap);
@@ -61,28 +62,13 @@ class AlbumProvider extends BaseProvider<AlbumResponse> {
 
     final response = await http.post(
       Uri.parse(url),
-      headers: _createHeaders(),
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request.toJson()),
     );
 
-    _throwIfNotSuccess(response, "Greška pri spašavanju albuma.");
+    HttpHelper.checkResponse(response);
 
     final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
     return AlbumSaveResponse.fromJson(jsonMap);
-  }
-
-  Map<String, String> _createHeaders() {
-    return {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      if (Session.token != null && Session.token!.isNotEmpty)
-        "Authorization": "Bearer ${Session.token}",
-    };
-  }
-
-  void _throwIfNotSuccess(http.Response response, String message) {
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw Exception("$message ${response.statusCode}: ${response.body}");
-    }
   }
 }

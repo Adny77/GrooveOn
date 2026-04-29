@@ -1,46 +1,94 @@
 class Validators {
 
-  /// Ime / Prezime (obavezno)
   static String? requiredField(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
-      return "$fieldName je obavezno";
+      return "$fieldName is required";
     }
     return null;
   }
 
-  /// Datum rodjenja (obavezno)
   static String? dateOfBirth(DateTime? value) {
     if (value == null) {
-      return "Datum rođenja je obavezan";
+      return "Date of birth is required";
     }
 
     if (value.isAfter(DateTime.now())) {
-      return "Datum rođenja nije validan";
+      return "Date of birth is not valid";
     }
 
     return null;
   }
 
-  /// Username
-  /// mala slova + bar jedan broj + min 8 karaktera
+  static String? phone(String? value, {bool required = false}) {
+  final v = value?.trim() ?? '';
+
+  if (!required && v.isEmpty) return null;
+  if (v.isEmpty) return "Phone number is required";
+
+  // Dozvoljeni karakteri
+  final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
+  if (!allowedChars.hasMatch(v)) {
+    return "Enter a valid phone number";
+  }
+
+  // + može biti samo na početku
+  if (v.contains('+') && !v.startsWith('+')) {
+    return "The + sign can only be at the beginning";
+  }
+
+  // Izvuci samo cifre
+  final digits = v.replaceAll(RegExp(r'\D'), '');
+
+  // Lokalni brojevi
+  if (digits.startsWith('060')) {
+    if (digits.length != 10) {
+      return "060 must have 7 digits after prefix";
+    }
+    return null;
+  }
+
+  if (digits.startsWith('061') || digits.startsWith('062')) {
+    if (digits.length != 9) {
+      return "061/062 must have 6 digits after prefix";
+    }
+    return null;
+  }
+
+  // Internacionalni format
+  if (digits.startsWith('38760')) {
+    if (digits.length != 12) {
+      return "38760 must have 7 digits after prefix";
+    }
+    return null;
+  }
+
+  if (digits.startsWith('38761') || digits.startsWith('38762')) {
+    if (digits.length != 11) {
+      return "38761/38762 must have 6 digits after prefix";
+    }
+    return null;
+  }
+
+  return "Allowed formats: 060, 061, 062 or +387 / 387 variants";
+}
+
   static String? username(String? value) {
     if (value == null || value.isEmpty) {
-      return "Username je obavezan";
+      return "Username is required";
     }
 
     final regex = RegExp(r'^(?=.*[0-9])[a-z0-9]{8,}$');
 
     if (!regex.hasMatch(value)) {
-      return "Username mora imati min 8 karaktera, mala slova i bar jedan broj";
+      return "Username must have at least 8 characters, lowercase letters, and at least one number";
     }
 
     return null;
   }
 
-  /// Email validacija
   static String? email(String? value) {
     if (value == null || value.isEmpty) {
-      return "Email je obavezan";
+      return "Email is required";
     }
 
     final regex = RegExp(
@@ -48,17 +96,15 @@ class Validators {
     );
 
     if (!regex.hasMatch(value)) {
-      return "Email nije validan";
+      return "Email is not valid";
     }
 
     return null;
   }
 
-  /// Lozinka
-  /// veliko slovo, malo slovo, broj, specijalni karakter, min 8
   static String? password(String? value) {
     if (value == null || value.isEmpty) {
-      return "Lozinka je obavezna";
+      return "Password is required";
     }
 
     final regex = RegExp(
@@ -66,25 +112,24 @@ class Validators {
     );
 
     if (!regex.hasMatch(value)) {
-      return "Lozinka mora imati:\n"
-          "- najmanje 8 karaktera\n"
-          "- jedno veliko slovo\n"
-          "- jedno malo slovo\n"
-          "- jedan broj\n"
-          "- jedan specijalni karakter";
+      return "Password must have:\n"
+          "- at least 8 characters\n"
+          "- one uppercase letter\n"
+          "- one lowercase letter\n"
+          "- one number\n"
+          "- one special character";
     }
 
     return null;
   }
 
-  /// Ponovljena lozinka
   static String? confirmPassword(String? value, String password) {
     if (value == null || value.isEmpty) {
-      return "Ponovite lozinku";
+      return "Repeat password";
     }
 
     if (value != password) {
-      return "Lozinke se ne podudaraju";
+      return "Passwords do not match";
     }
 
     return null;

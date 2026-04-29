@@ -4,7 +4,7 @@ part 'music_overview_request.g.dart';
 
 @JsonSerializable()
 class MusicOverviewRequest {
-  final String mode; // "year" ili "month"
+  final String mode; 
   final int userId;
   final int year;
   final int? month;

@@ -24,11 +24,5 @@ namespace GrooveOn.Services.Database
         public DateTime? ExpiryDate { get; set; }
 
         public bool IsActive { get; set; } = true;
-
-        public string? PaymentMethod { get; set; }
-
-        public float PaymentAmount { get; set; }
-
-        public DateTime? PaymentDate { get; set; }
     }
 }

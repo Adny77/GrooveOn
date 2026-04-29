@@ -5,6 +5,7 @@ import 'package:grooveon_desktop/config/api_config.dart';
 import 'package:grooveon_desktop/dialogs/base_dialogs_frame.dart';
 import 'package:grooveon_desktop/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_desktop/helper/image_helper.dart';
+import 'package:grooveon_desktop/helper/snackBar_helper.dart';
 import 'package:grooveon_desktop/providers/image_provider.dart';
 import 'package:grooveon_desktop/providers/user_provider.dart';
 import 'package:grooveon_desktop/routes/app_routes.dart';
@@ -80,6 +81,54 @@ class _SidebarWidgetState extends State<SidebarWidget> {
     super.dispose();
   }
 
+  String? _validatePhone(String? value, {bool required = true}) {
+    final v = value?.trim() ?? '';
+
+    if (!required && v.isEmpty) return null;
+    if (v.isEmpty) return "Phone number is required.";
+
+    final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
+    if (!allowedChars.hasMatch(v)) {
+      return "Enter a valid phone number.";
+    }
+
+    if (v.contains('+') && !v.startsWith('+')) {
+      return "The + sign can only be at the beginning.";
+    }
+
+    final digits = v.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.startsWith('060')) {
+      if (digits.length != 10) {
+        return "060 must have 7 digits after prefix.";
+      }
+      return null;
+    }
+
+    if (digits.startsWith('061') || digits.startsWith('062')) {
+      if (digits.length != 9) {
+        return "061/062 must have 6 digits after prefix.";
+      }
+      return null;
+    }
+
+    if (digits.startsWith('38760')) {
+      if (digits.length != 12) {
+        return "38760 must have 7 digits after prefix.";
+      }
+      return null;
+    }
+
+    if (digits.startsWith('38761') || digits.startsWith('38762')) {
+      if (digits.length != 11) {
+        return "38761/38762 must have 6 digits after prefix.";
+      }
+      return null;
+    }
+
+    return "Allowed formats: 060, 061, 062 or +387 / 387 variants.";
+  }
+
   Future<void> _loadLoggedUser() async {
     try {
       if (Session.userId == null) {
@@ -104,7 +153,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
         _loggedUser = user;
         _isLoadingUser = false;
       });
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
       setState(() {
         _isLoadingUser = false;
@@ -115,15 +164,15 @@ class _SidebarWidgetState extends State<SidebarWidget> {
   Future<void> _logout() async {
     final confirmed = await ConfirmDialogs.yesNoConfirmation(
       context,
-      title: "Odjava",
-      question: "Da li ste sigurni da se želite odjaviti?",
-      yesText: "Da, odjavi me",
-      noText: "Otkaži",
+      title: "Log out",
+      question: "Are you sure you want to sign out?",
+      yesText: "Log out",
+      noText: "Cancel",
     );
 
     if (!confirmed) return;
 
-    Session.odjava();
+    Session.logout();
 
     if (!mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -186,7 +235,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
         ),
       ),
       validator: (v) =>
-          v == null || v.isEmpty ? "Datum rođenja je obavezan." : null,
+          v == null || v.isEmpty ? "Date of birth is required." : null,
       onTap: () async {
         final now = DateTime.now();
 
@@ -247,8 +296,8 @@ class _SidebarWidgetState extends State<SidebarWidget> {
     if (user != null) {
       _firstNameController.text = user.firstName ?? '';
       _lastNameController.text = user.lastName ?? '';
-      _emailController.text = user.email!;
-      _usernameController.text = user.username!;
+      _emailController.text = user.email ?? '';
+      _usernameController.text = user.username ?? '';
       _phoneNumberController.text = user.phoneNumber ?? '';
 
       if (user.dateOfBirth != null) {
@@ -272,14 +321,14 @@ class _SidebarWidgetState extends State<SidebarWidget> {
 
             final originalBirthDate = user.dateOfBirth != null
                 ? "${user.dateOfBirth!.day.toString().padLeft(2, '0')}."
-                  "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
-                  "${user.dateOfBirth!.year}."
+                    "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
+                    "${user.dateOfBirth!.year}."
                 : "";
 
             return _firstNameController.text != (user.firstName ?? '') ||
                 _lastNameController.text != (user.lastName ?? '') ||
-                _emailController.text != user.email ||
-                _usernameController.text != user.username ||
+                _emailController.text != (user.email ?? '') ||
+                _usernameController.text != (user.username ?? '') ||
                 _phoneNumberController.text != (user.phoneNumber ?? '') ||
                 _birthDateController.text != originalBirthDate;
           }
@@ -296,6 +345,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
               onChangeImage: () async {
                 final picked = await ImageHelper.openImagePicker();
                 if (picked == null) return;
+
                 setStateDialog(() {
                   _pickedImage = picked;
                   _isImageChanged = true;
@@ -307,28 +357,47 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                 final ok = _formKey.currentState?.validate() ?? false;
                 if (!ok || user == null) return;
 
-                String? finalImage = user.userImage;
-                if (_pickedImage != null) {
-                  final uploadedFileName = await ImageAppProvider.upload(
-                    file: _pickedImage!,
-                    folder: "users",
+                try {
+                  String? finalImage = user.userImage;
+
+                  if (_pickedImage != null) {
+                    final uploadedFileName = await ImageAppProvider.upload(
+                      file: _pickedImage!,
+                      folder: "users",
+                    );
+
+                    finalImage = uploadedFileName;
+                  }
+
+                  await _userProvider.update(Session.userId!, {
+                    'firstName': _firstNameController.text.trim(),
+                    'lastName': _lastNameController.text.trim(),
+                    'email': _emailController.text.trim(),
+                    'username': _usernameController.text.trim(),
+                    'phoneNumber': _phoneNumberController.text.trim(),
+                    'dateOfBirth': _formatDateForApi(_birthDateController.text),
+                    'userImage': finalImage,
+                  });
+
+                  await _loadLoggedUser();
+
+                  if (!context.mounted) return;
+
+                  Navigator.pop(context);
+
+                  if (!mounted) return;
+                  SnackbarHelper.showSuccess(
+                    this.context,
+                    "Profile updated successfully.",
                   );
-                  finalImage = uploadedFileName;
+                } catch (e) {
+                  if (!context.mounted) return;
+
+                  SnackbarHelper.showError(
+                    context,
+                    e.toString(),
+                  );
                 }
-
-                await _userProvider.update(Session.userId!, {
-                  'firstName': _firstNameController.text.trim(),
-                  'lastName': _lastNameController.text.trim(),
-                  'email': _emailController.text.trim(),
-                  'username': _usernameController.text.trim(),
-                  'phoneNumber': _phoneNumberController.text.trim(),
-                  'dateOfBirth': _formatDateForApi(_birthDateController.text),
-                  'userImage': finalImage,
-                });
-
-                await _loadLoggedUser();
-                if (!context.mounted) return;
-                Navigator.pop(context);
               },
             ),
           );
@@ -346,7 +415,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
   }) {
     if (user == null) {
       return const Center(
-        child: Text("Korisnik nije učitan."),
+        child: Text("User was not loaded."),
       );
     }
 
@@ -382,9 +451,13 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                                   : "${ApiConfig.apiBase}/images/users/${user.userImage!}",
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  ImageHelper.userPlaceholder(user.username!),
+                                  ImageHelper.userPlaceholder(
+                                user.username ?? "User",
+                              ),
                             )
-                          : ImageHelper.userPlaceholder(user.username!)),
+                          : ImageHelper.userPlaceholder(
+                              user.username ?? "User",
+                            )),
                 ),
               ),
               const SizedBox(width: 16),
@@ -393,7 +466,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      fullName!,
+                      fullName ?? "User",
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -402,7 +475,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      user.email!,
+                      user.email ?? "",
                       style: const TextStyle(
                         fontSize: 14,
                         color: SidebarWidget.subTextColor,
@@ -480,9 +553,23 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                             label: "Email",
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (v) => (v == null || !v.contains("@"))
-                                ? "Enter a valid email."
-                                : null,
+                            validator: (v) {
+                              final value = v?.trim() ?? "";
+
+                              if (value.isEmpty) {
+                                return "Email is required.";
+                              }
+
+                              final regex = RegExp(
+                                r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                              );
+
+                              if (!regex.hasMatch(value)) {
+                                return "Enter a valid email.";
+                              }
+
+                              return null;
+                            },
                             onChanged: (_) => onAnyChanged(),
                           ),
                         ),
@@ -511,9 +598,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                       label: "Phone number",
                       controller: _phoneNumberController,
                       keyboardType: TextInputType.phone,
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? "Phone number is required."
-                          : null,
+                      validator: (v) => _validatePhone(v, required: true),
                       onChanged: (_) => onAnyChanged(),
                     ),
                   ],

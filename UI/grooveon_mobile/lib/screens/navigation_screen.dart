@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/screens/home_screen.dart';
 import 'package:grooveon_mobile/screens/my_playlist_screen.dart';
 import 'package:grooveon_mobile/screens/public_playlist_screen.dart';
+import 'package:grooveon_mobile/screens/subscription_screen.dart';
 import 'package:grooveon_mobile/screens/user_screen.dart';
 import 'package:grooveon_mobile/widgets/mini_player_bar.dart';
 
@@ -17,15 +18,26 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   int _selectedIndex = 0;
 
+  final GlobalKey<UserScreenState> _userScreenKey =
+      GlobalKey<UserScreenState>();
+
   late final List<Widget> _screens = [
     const HomeScreen(showBottomNav: false),
-    const UserScreen(),
+    UserScreen(key: _userScreenKey),
     const PublicPlaylistsScreen(),
     const MyPlaylistsScreen(),
+    const SubscriptionScreen(),
   ];
 
-  void _changeTab(int index) {
+  Future<void> _changeTab(int index) async {
     if (_selectedIndex == index) return;
+
+    if (_selectedIndex == 1) {
+      final canLeave =
+          await _userScreenKey.currentState?.confirmLeaveScreen() ?? true;
+
+      if (!canLeave) return;
+    }
 
     setState(() {
       _selectedIndex = index;
@@ -69,6 +81,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           _navItem(Icons.person_outline_rounded, 1),
           _navItem(Icons.favorite_border_rounded, 2),
           _navItem(Icons.grid_view_rounded, 3),
+          _navItem(Icons.workspace_premium_rounded, 4),
         ],
       ),
     );

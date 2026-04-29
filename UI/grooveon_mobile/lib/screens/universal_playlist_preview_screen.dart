@@ -4,7 +4,7 @@ import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:provider/provider.dart';
 
 import 'package:grooveon_mobile/helper/image_helper.dart';
-import 'package:grooveon_mobile/helper/univerzal_pagging_helper.dart';
+import 'package:grooveon_mobile/helper/universal_paging_helper.dart';
 import 'package:grooveon_mobile/models/playlist_response.dart';
 import 'package:grooveon_mobile/models/playlist_song_response.dart';
 import 'package:grooveon_mobile/providers/playlist_song_provider.dart';
@@ -126,6 +126,7 @@ class _UniversalPlaylistPreviewScreenState
               "userId": userId,
               "songId": playlistSong.songId,
               "purpose": "PlaylistList",
+              "playlistId": widget.playlist.id,
             },
           );
     } catch (e) {

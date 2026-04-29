@@ -32,6 +32,21 @@ class UserProvider extends BaseProvider<User> {
   return true;
 }
 
+Future<bool> hasPremium() async {
+  final url = Uri.parse(
+    "${ApiConfig.apiBase}/api/User/current-user/has-premium",
+  );
+
+  final response = await http.get(
+    url,
+    headers: HttpHelper.getHeaders(),
+  );
+
+  HttpHelper.checkResponse(response);
+
+  return response.body.toLowerCase() == "true";
+}
+
 Future<void> changePassword(Map<String, dynamic> request) async {
   final url = Uri.parse("${ApiConfig.apiBase}/api/User/change-password");
 
@@ -43,4 +58,5 @@ Future<void> changePassword(Map<String, dynamic> request) async {
 
   HttpHelper.checkResponse(response);
 }
+
 }

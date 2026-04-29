@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using GrooveOn.Services.Interfaces;
 using GrooveOn.Services.Exceptions;
 
-namespace GrooveOn.Services
+namespace GrooveOn.Services.Services
 {
     public class ImageService : IImageService
     {

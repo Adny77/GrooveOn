@@ -4,6 +4,7 @@ import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/playlist_response.dart';
 import 'package:grooveon_mobile/providers/playlist_provider.dart';
+import 'package:grooveon_mobile/providers/user_provider.dart';
 import 'package:grooveon_mobile/screens/create_playlist_screen.dart';
 import 'package:grooveon_mobile/screens/universal_playlist_preview_screen.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
@@ -21,6 +22,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
   static const Color textDark = Color(0xFF1C1C1C);
 
   final PlaylistProvider _playlistProvider = PlaylistProvider();
+  final UserProvider _userProvider = UserProvider();
 
   bool _isLoading = true;
   String? _error;
@@ -99,17 +101,37 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
   }
 
   Future<void> _openCreatePlaylist() async {
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(builder: (_) => const CreatePlaylistScreen()),
-    );
+    try {
+      final hasPremium = await _userProvider.hasPremium();
 
-    if (created == true) {
-      await _loadPlaylists();
+      if (!hasPremium && _playlists.length >= 3) {
+        await ConfirmDialogs.premiumLockedDialog(
+          context,
+          title: "Playlist limit",
+          message:
+              "Basic users can create up to 3 playlists.\n\nActivate premium to create more playlists.",
+          okText: "OK",
+        );
 
+        return;
+      }
+
+      final created = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(builder: (_) => const CreatePlaylistScreen()),
+      );
+
+      if (created == true) {
+        await _loadPlaylists();
+
+        if (!mounted) return;
+
+        SnackbarHelper.showSuccess(context, "Playlist created successfully.");
+      }
+    } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showSuccess(context, "Playlist created successfully.");
+      SnackbarHelper.showError(context, e.toString());
     }
   }
 

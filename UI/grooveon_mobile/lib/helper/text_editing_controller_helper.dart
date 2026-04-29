@@ -9,7 +9,7 @@ class Fields {
     assert(names.isNotEmpty, 'Names list ne smije biti prazna.');
 
     final unique = names.toSet();
-    assert(unique.length == names.length, 'Imaš duplikat imena u listi.');
+    assert(unique.length == names.length, 'You have a duplicate name in the list.');
 
     return Fields._({
       for (final name in names) name: TextEditingController(),

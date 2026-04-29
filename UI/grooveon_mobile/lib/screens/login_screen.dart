@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/dialogs/forgot_passowrd_dialog.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/login_request.dart';
 import 'package:grooveon_mobile/providers/auth_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:grooveon_mobile/routes/app_routes.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,7 +12,6 @@ class LoginScreen extends StatefulWidget {
   static const Color primaryPurple = Color(0xFF9C27B0);
   static const Color darkPurple = Color(0xFF4A148C);
   static const Color lightPurple = Color(0xFFF3E5F5);
-  static const Color softPurple = Color(0xFFE1BEE7);
   static const Color textDark = Color(0xFF1C1C1C);
   static const Color subText = Color(0xFF6E6E6E);
 
@@ -20,7 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late AuthProvider _authProvider;
+  late final AuthProvider _authProvider;
 
   final _formKey = GlobalKey<FormState>();
   final _username = TextEditingController();
@@ -45,40 +45,34 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     FocusScope.of(context).unfocus();
 
-    if (!_formKey.currentState!.validate()) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final result = await _authProvider.prijava(
-        LoginRequest(
-          username: _username.text.trim(),
-          password: _password.text,
-        ),
+      final result = await _authProvider.login(
+        LoginRequest(username: _username.text.trim(), password: _password.text),
       );
 
       if (!mounted) return;
 
-      if (result == "ZABRANJENO") {
+      if (result == "FORBIDDEN") {
         SnackbarHelper.showError(
           context,
-          'Nemate privilegije za pristup mobilnoj aplikaciji.',
+          'You do not have permission to access the mobile app.',
         );
         return;
       }
 
       if (result != "OK") {
-        SnackbarHelper.showError(
-          context,
-          'Pogrešno korisničko ime ili lozinka.',
-        );
+        SnackbarHelper.showError(context, 'Incorrect username or password.');
         return;
       }
 
       Navigator.pushReplacementNamed(context, AppRoutes.navigation);
     } catch (e) {
       if (!mounted) return;
-      SnackbarHelper.showError(context, '$e');
+      SnackbarHelper.showError(context, e.toString());
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -167,26 +161,31 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(height: 6),
                               _buildHeader(),
                               const SizedBox(height: 22),
+
                               _inputField(
                                 controller: _username,
-                                hintText: 'Korisničko ime',
+                                hintText: 'Username',
                                 icon: Icons.person_rounded,
                                 keyboardType: TextInputType.text,
                                 autofillHints: const [AutofillHints.username],
                                 validator: (v) {
                                   if (v == null || v.trim().isEmpty) {
-                                    return 'Unesi korisničko ime';
+                                    return 'Enter username';
                                   }
+
                                   if (v.trim().length < 3) {
-                                    return 'Korisničko ime je prekratko';
+                                    return 'Username is too short';
                                   }
+
                                   return null;
                                 },
                               ),
+
                               const SizedBox(height: 14),
+
                               _inputField(
                                 controller: _password,
-                                hintText: 'Lozinka',
+                                hintText: 'Password',
                                 icon: Icons.lock_rounded,
                                 obscureText: _obscure,
                                 keyboardType: TextInputType.visiblePassword,
@@ -204,26 +203,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
-                                    return 'Unesi lozinku';
+                                    return 'Enter password';
                                   }
+
                                   if (v.length < 4) {
-                                    return 'Lozinka je prekratka';
+                                    return 'Password is too short';
                                   }
+
                                   return null;
                                 },
                               ),
+
                               const SizedBox(height: 12),
+
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
-                                  onPressed: () {
-                                    SnackbarHelper.showInfo(
-                                      context,
-                                      'Forgot password ekran još nije dodat.',
-                                    );
-                                  },
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () async {
+                                          await showDialog(
+                                            context: context,
+                                            builder: (_) =>
+                                                const ForgotPasswordDialog(),
+                                          );
+                                        },
                                   child: const Text(
-                                    'Zaboravljena lozinka?',
+                                    'Forgot password?',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       color: LoginScreen.darkPurple,
@@ -231,7 +237,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 6),
+
                               SizedBox(
                                 height: 56,
                                 child: ElevatedButton(
@@ -240,6 +248,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     elevation: 0,
                                     backgroundColor: LoginScreen.darkPurple,
                                     foregroundColor: Colors.white,
+                                    disabledBackgroundColor: LoginScreen
+                                        .darkPurple
+                                        .withOpacity(0.65),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(18),
                                     ),
@@ -254,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                         )
                                       : const Text(
-                                          'Uloguj se',
+                                          'Log in',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w800,
@@ -262,26 +273,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                 ),
                               ),
+
                               const SizedBox(height: 18),
+
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Text(
-                                    'Nemaš račun?',
+                                    "Don't have an account?",
                                     style: TextStyle(
                                       color: LoginScreen.subText,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.register,
-                                      );
-                                    },
+                                    onPressed: _isLoading
+                                        ? null
+                                        : () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              AppRoutes.register,
+                                            );
+                                          },
                                     child: const Text(
-                                      'Registruj se',
+                                      'Register',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w900,
                                         color: LoginScreen.darkPurple,
@@ -290,6 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ],
                               ),
+
                               const SizedBox(height: 6),
                             ],
                           ),
@@ -315,10 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const LinearGradient(
-              colors: [
-                LoginScreen.primaryPurple,
-                LoginScreen.darkPurple,
-              ],
+              colors: [LoginScreen.primaryPurple, LoginScreen.darkPurple],
             ),
             boxShadow: [
               BoxShadow(
@@ -400,31 +413,19 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Color(0xFFE7DDF0),
-            width: 1.1,
-          ),
+          borderSide: const BorderSide(color: Color(0xFFE7DDF0), width: 1.1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: LoginScreen.darkPurple,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: LoginScreen.darkPurple, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Colors.redAccent,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Colors.redAccent,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
         ),
       ),
     );

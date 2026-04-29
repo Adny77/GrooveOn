@@ -43,7 +43,6 @@ class GrooveOnBaseDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // HEADER
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
