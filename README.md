@@ -24,18 +24,16 @@ koriste sistem preporuka.
 git clone `<GITHUB_REPO_LINK>`
 
 
-
-
 ## 🔐 Konfiguracija
 
-Fajl: ENV.7z\
-Šifra: FIT
+Fajl: Enviorment.7z
+Šifra: fit
 
-Izvaditi .env i staviti u root folder.
+Izvaditi .env i staviti u root folder (GrooveOn).
 
 
 
-## ▶️ Pokretanje Dockera
+## ▶️ Pokretanje Stripe
 
 Instalirajte Stripe CLI:
 https://docs.stripe.com/stripe-cli/install
@@ -67,8 +65,8 @@ docker compose up -d --build
 
 ## ▶️ Pokretanje aplikacije
 
-Arhiva: GrooveOn-Apps.7z\
-Šifra: FIT
+Arhiva: IB220034-GrooveOn-Apps.7z\
+Šifra: fit
 
 Sadrži: 
 - Release (desktop) folder u kojem je .exe 
@@ -86,15 +84,17 @@ Desktop (Admin):
 Username: dejanmusic01
 Password: Admin123!
 
+
+
 ## ▶️ Testiranje email
 
 Testiranje za desktop - dejanmusic01
 
-- **Email:** `testnimuzicar@gmail.com`
-- **Password:** `TestniMuzicar123!`
+- **Email:** `testniadminmuzicar@gmail.com`
+- **Password:** `TestniAdminMuzicar123!`
 
 Testiranje za mobile - fahrudinmusic11
 
-- **Email:** `testniadminmuzicar@gmail.com`
-- **Password:** `TestniAdminMuzicar123!`
+- **Email:** `testnimuzicar@gmail.com`
+- **Password:** `TestniMuzicar123!`
 
