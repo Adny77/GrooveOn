@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_mobile/helper/image_helper.dart';
@@ -23,10 +25,12 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
 
   final PlaylistProvider _playlistProvider = PlaylistProvider();
   final UserProvider _userProvider = UserProvider();
+  final TextEditingController _searchController = TextEditingController();
 
   bool _isLoading = true;
   String? _error;
   List<PlaylistResponse> _playlists = [];
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -81,6 +85,8 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
           "Page": 0,
           "PageSize": 50,
           "IncludeTotalCount": true,
+          if (_searchController.text.trim().isNotEmpty)
+            "FTS": _searchController.text.trim(),
         },
       );
 
@@ -100,11 +106,38 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
     }
   }
 
+  void _onSearchChanged(String value) {
+    setState(() {});
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      _loadPlaylists();
+    });
+  }
+
+  void _clearSearch() {
+    if (_searchController.text.isEmpty) return;
+
+    _searchController.clear();
+    setState(() {});
+    _loadPlaylists();
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _openCreatePlaylist() async {
     try {
       final hasPremium = await _userProvider.hasPremium();
 
-      if (!hasPremium && _playlists.length >= 3) {
+      final playlistCount = hasPremium
+          ? _playlists.length
+          : await _getCurrentUserPlaylistCount();
+
+      if (!hasPremium && playlistCount >= 3) {
         await ConfirmDialogs.premiumLockedDialog(
           context,
           title: "Playlist limit",
@@ -135,6 +168,25 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
     }
   }
 
+  Future<int> _getCurrentUserPlaylistCount() async {
+    final userId = Session.userId;
+
+    if (userId == null) {
+      throw Exception("User is not logged in.");
+    }
+
+    final result = await _playlistProvider.get(
+      filter: {
+        "UserId": userId,
+        "Page": 0,
+        "PageSize": 1,
+        "IncludeTotalCount": true,
+      },
+    );
+
+    return result.totalCount;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,6 +201,8 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
             children: [
               _header(),
               const SizedBox(height: 20),
+              _searchBar(),
+              const SizedBox(height: 16),
               if (_isLoading)
                 const Padding(
                   padding: EdgeInsets.only(top: 120),
@@ -165,6 +219,53 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _searchBar() {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.search_rounded, color: primary, size: 23),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              textInputAction: TextInputAction.search,
+              decoration: const InputDecoration(
+                hintText: "Search my playlists",
+                border: InputBorder.none,
+                isCollapsed: true,
+              ),
+              style: const TextStyle(
+                color: textDark,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          if (_searchController.text.isNotEmpty)
+            IconButton(
+              onPressed: _clearSearch,
+              icon: const Icon(Icons.close_rounded, color: Colors.black45),
+              tooltip: "Clear search",
+            ),
+        ],
       ),
     );
   }

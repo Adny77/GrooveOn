@@ -4,6 +4,7 @@ class PlayerSong {
   final String artistName;
   final int duration;
   final String? coverUrl;
+  final String? previewUrl;
   final String? externalTrackId;
 
   PlayerSong({
@@ -13,5 +14,6 @@ class PlayerSong {
     required this.artistName,
     required this.duration,
     this.coverUrl,
+    this.previewUrl,
   });
 }

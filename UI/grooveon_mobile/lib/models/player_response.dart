@@ -10,6 +10,7 @@ class PlayerResponse {
   final String artistName;
   final int duration;
   final String coverUrl;
+  final String? previewUrl;
   final String externalTrackId;
   final bool hasPrevious;
   final bool hasNext;
@@ -21,6 +22,7 @@ class PlayerResponse {
     required this.artistName,
     required this.duration,
     required this.coverUrl,
+    this.previewUrl,
     required this.externalTrackId,
     required this.hasPrevious,
     required this.hasNext,

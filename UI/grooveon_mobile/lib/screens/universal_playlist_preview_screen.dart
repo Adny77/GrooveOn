@@ -15,10 +15,12 @@ import 'package:grooveon_mobile/utils/Session.dart';
 
 class UniversalPlaylistPreviewScreen extends StatefulWidget {
   final PlaylistResponse playlist;
+  final bool canRemoveSongs;
 
   const UniversalPlaylistPreviewScreen({
     super.key,
     required this.playlist,
+    this.canRemoveSongs = true,
   });
 
   @override
@@ -141,37 +143,39 @@ class _UniversalPlaylistPreviewScreenState
   }
 
   Future<void> _removeSongFromPlaylist(PlaylistSongResponse playlistSong) async {
-  final confirmed = await ConfirmDialogs.yesNoConfirmation(
-    context,
-    title: "Remove song",
-    question: "Are you sure you want to remove this song from the playlist?",
-    yesText: "Remove",
-    noText: "Cancel",
-    danger: true,
-  );
+    if (!widget.canRemoveSongs) return;
 
-  if (!confirmed) return;
-
-  try {
-    await _playlistSongProvider.delete(playlistSong.id);
-
-    if (!mounted) return;
-
-    SnackbarHelper.showSuccess(
+    final confirmed = await ConfirmDialogs.yesNoConfirmation(
       context,
-      "Song removed from playlist.",
+      title: "Remove song",
+      question: "Are you sure you want to remove this song from the playlist?",
+      yesText: "Remove",
+      noText: "Cancel",
+      danger: true,
     );
 
-    await _refresh();
-  } catch (e) {
-    if (!mounted) return;
+    if (!confirmed) return;
 
-    SnackbarHelper.showError(
-      context,
-      e.toString(),
-    );
+    try {
+      await _playlistSongProvider.delete(playlistSong.id);
+
+      if (!mounted) return;
+
+      SnackbarHelper.showSuccess(
+        context,
+        "Song removed from playlist.",
+      );
+
+      await _refresh();
+    } catch (e) {
+      if (!mounted) return;
+
+      SnackbarHelper.showError(
+        context,
+        e.toString(),
+      );
+    }
   }
-}
 
   Future<void> _startPlaylistFromFirstSong() async {
     final items = _songsPaging.items;
@@ -612,29 +616,31 @@ class _UniversalPlaylistPreviewScreenState
             ),
             const SizedBox(width: 8),
             Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () => _removeSongFromPlaylist(playlistSong),
-      child: const SizedBox(
-        width: 34,
-        height: 34,
-        child: Icon(
-          Icons.close_rounded,
-          color: Colors.redAccent,
-          size: 24,
-        ),
-      ),
-    ),
-    const SizedBox(width: 6),
-    const Icon(
-      Icons.play_circle_fill_rounded,
-      color: groovePurple,
-      size: 28,
-    ),
-  ],
-),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.canRemoveSongs) ...[
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => _removeSongFromPlaylist(playlistSong),
+                    child: const SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.redAccent,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                const Icon(
+                  Icons.play_circle_fill_rounded,
+                  color: groovePurple,
+                  size: 28,
+                ),
+              ],
+            ),
           ],
         ),
       ),

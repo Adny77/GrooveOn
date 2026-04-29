@@ -695,6 +695,30 @@ namespace GrooveOn.Services.Migrations
                             CreatedAt = new DateTime(2026, 3, 20, 11, 5, 0, 0, DateTimeKind.Unspecified),
                             Message = "Ako i dalje ne radi, probaj restartovati aplikaciju.",
                             QuestionId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AdminId = 1,
+                            CreatedAt = new DateTime(2026, 4, 2, 12, 42, 0, 0, DateTimeKind.Unspecified),
+                            Message = "Open your playlist settings, turn off Public playlist, and save the changes.",
+                            QuestionId = 5
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AdminId = 1,
+                            CreatedAt = new DateTime(2026, 4, 9, 10, 5, 0, 0, DateTimeKind.Unspecified),
+                            Message = "Your existing playlists stay saved, but Basic account limits apply again after premium expires.",
+                            QuestionId = 7
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AdminId = 1,
+                            CreatedAt = new DateTime(2026, 4, 17, 15, 18, 0, 0, DateTimeKind.Unspecified),
+                            Message = "Refresh the app after uploading. If the old image remains, sign out and sign back in.",
+                            QuestionId = 9
                         });
                 });
 
@@ -143874,6 +143898,66 @@ namespace GrooveOn.Services.Migrations
                             Status = "Pending",
                             Title = "Premium subscription is not working",
                             UserId = 5
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Answer = "Open your playlist settings, turn off Public playlist, and save the changes.",
+                            AnsweredAt = new DateTime(2026, 4, 2, 12, 42, 0, 0, DateTimeKind.Unspecified),
+                            Content = "I published one of my playlists by mistake and want to hide it from public playlists.",
+                            CreatedAt = new DateTime(2026, 4, 2, 12, 10, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Answered",
+                            Title = "Can I make my playlist private again?",
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Content = "Sometimes random play gives me a song I already listened to in the same session.",
+                            CreatedAt = new DateTime(2026, 4, 5, 20, 18, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Pending",
+                            Title = "Why does random play repeat songs?",
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Answer = "Your existing playlists stay saved, but Basic account limits apply again after premium expires.",
+                            AnsweredAt = new DateTime(2026, 4, 9, 10, 5, 0, 0, DateTimeKind.Unspecified),
+                            Content = "If I activate premium, will my existing playlists stay available after the subscription ends?",
+                            CreatedAt = new DateTime(2026, 4, 9, 9, 35, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Answered",
+                            Title = "Premium playlist limit question",
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Content = "Can I add a song directly from the artist page into one of my playlists?",
+                            CreatedAt = new DateTime(2026, 4, 12, 17, 25, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Pending",
+                            Title = "Add songs from artist page",
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Answer = "Refresh the app after uploading. If the old image remains, sign out and sign back in.",
+                            AnsweredAt = new DateTime(2026, 4, 17, 15, 18, 0, 0, DateTimeKind.Unspecified),
+                            Content = "I uploaded a new profile image but the old one still appears on my account.",
+                            CreatedAt = new DateTime(2026, 4, 17, 14, 55, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Answered",
+                            Title = "Profile image is not updating",
+                            UserId = 11
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Content = "I would like to quickly search my own playlists by name or description.",
+                            CreatedAt = new DateTime(2026, 4, 23, 11, 40, 0, 0, DateTimeKind.Unspecified),
+                            Status = "Pending",
+                            Title = "Search inside my playlists",
+                            UserId = 11
                         });
                 });
 
@@ -153417,7 +153501,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Music",
                             Password = "",
-                            PasswordHash = "Q63Smql2gDBsdH3LtU8Qow==.4.65536.4.1RLTeEPfE+o29MGYYfIojwE/eR97dmSEAA0T2oviVEU=",
+                            PasswordHash = "8S7aQWZ8O+VBYGKkFcjz9g==.4.65536.4.uz17XEm+RBz22hpNPlK5iWoUVELQIB8oRc8VlLaLOv4=",
                             PhoneNumber = "061111111",
                             Username = "dejanmusic01"
                         },
@@ -153431,7 +153515,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kostadinovic",
                             Password = "",
-                            PasswordHash = "Q63Smql2gDBsdH3LtU8Qow==.4.65536.4.1RLTeEPfE+o29MGYYfIojwE/eR97dmSEAA0T2oviVEU=",
+                            PasswordHash = "8S7aQWZ8O+VBYGKkFcjz9g==.4.65536.4.uz17XEm+RBz22hpNPlK5iWoUVELQIB8oRc8VlLaLOv4=",
                             PhoneNumber = "061111112",
                             Username = "milankostadinovic02"
                         },
@@ -153445,7 +153529,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Hadzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111113",
                             Username = "amarhadzic03"
                         },
@@ -153459,7 +153543,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 2, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111114",
                             Username = "lejlakovacevic04"
                         },
@@ -153473,7 +153557,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111115",
                             Username = "benjaminmehic05"
                         },
@@ -153487,7 +153571,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111116",
                             Username = "saradelic06"
                         },
@@ -153501,7 +153585,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111117",
                             Username = "adnankaric07"
                         },
@@ -153515,7 +153599,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111118",
                             Username = "eminaselimovic08"
                         },
@@ -153529,7 +153613,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 2, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111119",
                             Username = "harismujic09"
                         },
@@ -153543,7 +153627,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061111120",
                             Username = "jasminalic10"
                         },
@@ -153557,7 +153641,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Music",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061555555",
                             UserImage = "https://picsum.photos/seed/grooveon-user-3/500/500",
                             Username = "fahrudinmusic11"
@@ -153572,7 +153656,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061950320",
                             UserImage = "https://picsum.photos/seed/grooveon-user-12/500/500",
                             Username = "benjaminalic12"
@@ -153587,7 +153671,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061121685",
                             UserImage = "https://picsum.photos/seed/grooveon-user-13/500/500",
                             Username = "emirzukic13"
@@ -153602,7 +153686,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061319621",
                             UserImage = "https://picsum.photos/seed/grooveon-user-14/500/500",
                             Username = "nejraosmanovic14"
@@ -153617,7 +153701,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061684237",
                             UserImage = "https://picsum.photos/seed/grooveon-user-15/500/500",
                             Username = "kerimkovacevic15"
@@ -153632,7 +153716,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061235712",
                             UserImage = "https://picsum.photos/seed/grooveon-user-16/500/500",
                             Username = "hanabrkic16"
@@ -153647,7 +153731,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061162127",
                             UserImage = "https://picsum.photos/seed/grooveon-user-17/500/500",
                             Username = "emirbajric17"
@@ -153662,7 +153746,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061170828",
                             UserImage = "https://picsum.photos/seed/grooveon-user-18/500/500",
                             Username = "eminadelic18"
@@ -153677,7 +153761,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061483253",
                             UserImage = "https://picsum.photos/seed/grooveon-user-19/500/500",
                             Username = "ajlaimamovic19"
@@ -153692,7 +153776,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061747125",
                             UserImage = "https://picsum.photos/seed/grooveon-user-20/500/500",
                             Username = "harishalilovic20"
@@ -153707,7 +153791,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061293496",
                             UserImage = "https://picsum.photos/seed/grooveon-user-21/500/500",
                             Username = "damirdelic21"
@@ -153716,16 +153800,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 22,
                             DateOfBirth = new DateTime(1997, 7, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "amarbesic22@grooveon.com",
+                            Email = "amarbecic22@grooveon.com",
                             FirstName = "Amar",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061522332",
                             UserImage = "https://picsum.photos/seed/grooveon-user-22/500/500",
-                            Username = "amarbesic22"
+                            Username = "amarbecic22"
                         },
                         new
                         {
@@ -153735,9 +153819,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Damir",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061967803",
                             UserImage = "https://picsum.photos/seed/grooveon-user-23/500/500",
                             Username = "damirsaric23"
@@ -153752,7 +153836,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061331595",
                             UserImage = "https://picsum.photos/seed/grooveon-user-24/500/500",
                             Username = "lamijalulic24"
@@ -153767,7 +153851,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061300470",
                             UserImage = "https://picsum.photos/seed/grooveon-user-25/500/500",
                             Username = "damirosmanovic25"
@@ -153782,7 +153866,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061782671",
                             UserImage = "https://picsum.photos/seed/grooveon-user-26/500/500",
                             Username = "ildamujanovic26"
@@ -153797,7 +153881,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061334567",
                             UserImage = "https://picsum.photos/seed/grooveon-user-27/500/500",
                             Username = "milakaric27"
@@ -153812,7 +153896,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061642382",
                             UserImage = "https://picsum.photos/seed/grooveon-user-28/500/500",
                             Username = "jasminosmanovic28"
@@ -153827,7 +153911,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061173168",
                             UserImage = "https://picsum.photos/seed/grooveon-user-29/500/500",
                             Username = "eminademirovic29"
@@ -153836,31 +153920,31 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 30,
                             DateOfBirth = new DateTime(2002, 10, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "kenanbesic30@grooveon.com",
+                            Email = "kenanbecic30@grooveon.com",
                             FirstName = "Kenan",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061967862",
                             UserImage = "https://picsum.photos/seed/grooveon-user-30/500/500",
-                            Username = "kenanbesic30"
+                            Username = "kenanbecic30"
                         },
                         new
                         {
                             Id = 31,
                             DateOfBirth = new DateTime(2002, 9, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "damirhodsic31@grooveon.com",
+                            Email = "damirhodzic31@grooveon.com",
                             FirstName = "Damir",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061830455",
                             UserImage = "https://picsum.photos/seed/grooveon-user-31/500/500",
-                            Username = "damirhodsic31"
+                            Username = "damirhodzic31"
                         },
                         new
                         {
@@ -153872,7 +153956,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061737824",
                             UserImage = "https://picsum.photos/seed/grooveon-user-32/500/500",
                             Username = "arminmujanovic32"
@@ -153887,7 +153971,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061809434",
                             UserImage = "https://picsum.photos/seed/grooveon-user-33/500/500",
                             Username = "ildapjanic33"
@@ -153902,7 +153986,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061242692",
                             UserImage = "https://picsum.photos/seed/grooveon-user-34/500/500",
                             Username = "milaosmanovic34"
@@ -153917,7 +154001,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061357265",
                             UserImage = "https://picsum.photos/seed/grooveon-user-35/500/500",
                             Username = "harismujic35"
@@ -153932,7 +154016,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061471503",
                             UserImage = "https://picsum.photos/seed/grooveon-user-36/500/500",
                             Username = "jasminpjanic36"
@@ -153947,7 +154031,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061459797",
                             UserImage = "https://picsum.photos/seed/grooveon-user-37/500/500",
                             Username = "emirdemirovic37"
@@ -153962,7 +154046,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061453120",
                             UserImage = "https://picsum.photos/seed/grooveon-user-38/500/500",
                             Username = "emirimamovic38"
@@ -153977,7 +154061,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061615801",
                             UserImage = "https://picsum.photos/seed/grooveon-user-39/500/500",
                             Username = "ajlavelagic39"
@@ -153992,7 +154076,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061758173",
                             UserImage = "https://picsum.photos/seed/grooveon-user-40/500/500",
                             Username = "harismujanovic40"
@@ -154007,7 +154091,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061196294",
                             UserImage = "https://picsum.photos/seed/grooveon-user-41/500/500",
                             Username = "ildabajric41"
@@ -154022,7 +154106,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061773707",
                             UserImage = "https://picsum.photos/seed/grooveon-user-42/500/500",
                             Username = "samirbrkic42"
@@ -154037,7 +154121,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061511092",
                             UserImage = "https://picsum.photos/seed/grooveon-user-43/500/500",
                             Username = "arminselimovic43"
@@ -154052,7 +154136,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061327036",
                             UserImage = "https://picsum.photos/seed/grooveon-user-44/500/500",
                             Username = "hanasoftic44"
@@ -154067,7 +154151,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061516561",
                             UserImage = "https://picsum.photos/seed/grooveon-user-45/500/500",
                             Username = "naidamuratovic45"
@@ -154082,7 +154166,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061177016",
                             UserImage = "https://picsum.photos/seed/grooveon-user-46/500/500",
                             Username = "norapjanic46"
@@ -154097,7 +154181,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061494683",
                             UserImage = "https://picsum.photos/seed/grooveon-user-47/500/500",
                             Username = "damirsoftic47"
@@ -154112,7 +154196,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061343435",
                             UserImage = "https://picsum.photos/seed/grooveon-user-48/500/500",
                             Username = "jasminalic48"
@@ -154127,7 +154211,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061338309",
                             UserImage = "https://picsum.photos/seed/grooveon-user-49/500/500",
                             Username = "jasminbrkic49"
@@ -154142,7 +154226,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061844014",
                             UserImage = "https://picsum.photos/seed/grooveon-user-50/500/500",
                             Username = "eminahalilovic50"
@@ -154151,31 +154235,31 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 51,
                             DateOfBirth = new DateTime(1998, 8, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "nejrahadsic51@grooveon.com",
+                            Email = "nejrahad�ic51@grooveon.com",
                             FirstName = "Nejra",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061782063",
                             UserImage = "https://picsum.photos/seed/grooveon-user-51/500/500",
-                            Username = "nejrahadsic51"
+                            Username = "nejrahad�ic51"
                         },
                         new
                         {
                             Id = 52,
                             DateOfBirth = new DateTime(1997, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "jasminhadsic52@grooveon.com",
+                            Email = "jasminhad�ic52@grooveon.com",
                             FirstName = "Jasmin",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 10, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061712503",
                             UserImage = "https://picsum.photos/seed/grooveon-user-52/500/500",
-                            Username = "jasminhadsic52"
+                            Username = "jasminhad�ic52"
                         },
                         new
                         {
@@ -154187,7 +154271,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061838705",
                             UserImage = "https://picsum.photos/seed/grooveon-user-53/500/500",
                             Username = "samirmuratovic53"
@@ -154202,7 +154286,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061719528",
                             UserImage = "https://picsum.photos/seed/grooveon-user-54/500/500",
                             Username = "daliazukic54"
@@ -154217,7 +154301,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061502702",
                             UserImage = "https://picsum.photos/seed/grooveon-user-55/500/500",
                             Username = "norademirovic55"
@@ -154232,7 +154316,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061206208",
                             UserImage = "https://picsum.photos/seed/grooveon-user-56/500/500",
                             Username = "hanaalic56"
@@ -154247,7 +154331,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061935002",
                             UserImage = "https://picsum.photos/seed/grooveon-user-57/500/500",
                             Username = "lejlakaric57"
@@ -154262,7 +154346,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061711754",
                             UserImage = "https://picsum.photos/seed/grooveon-user-58/500/500",
                             Username = "ilmaselimovic58"
@@ -154277,7 +154361,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 12, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061250584",
                             UserImage = "https://picsum.photos/seed/grooveon-user-59/500/500",
                             Username = "nejraspahic59"
@@ -154292,7 +154376,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061417635",
                             UserImage = "https://picsum.photos/seed/grooveon-user-60/500/500",
                             Username = "selmaosmanovic60"
@@ -154301,16 +154385,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 61,
                             DateOfBirth = new DateTime(2004, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "aminahadsic61@grooveon.com",
+                            Email = "aminahad�ic61@grooveon.com",
                             FirstName = "Amina",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061666983",
                             UserImage = "https://picsum.photos/seed/grooveon-user-61/500/500",
-                            Username = "aminahadsic61"
+                            Username = "aminahad�ic61"
                         },
                         new
                         {
@@ -154322,7 +154406,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061809084",
                             UserImage = "https://picsum.photos/seed/grooveon-user-62/500/500",
                             Username = "naidahalilovic62"
@@ -154331,16 +154415,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 63,
                             DateOfBirth = new DateTime(1995, 10, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "dinohadsic63@grooveon.com",
+                            Email = "dinohad�ic63@grooveon.com",
                             FirstName = "Dino",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 11, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061293474",
                             UserImage = "https://picsum.photos/seed/grooveon-user-63/500/500",
-                            Username = "dinohadsic63"
+                            Username = "dinohad�ic63"
                         },
                         new
                         {
@@ -154352,7 +154436,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 2, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061360029",
                             UserImage = "https://picsum.photos/seed/grooveon-user-64/500/500",
                             Username = "farukbrkic64"
@@ -154367,7 +154451,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061988344",
                             UserImage = "https://picsum.photos/seed/grooveon-user-65/500/500",
                             Username = "selmademirovic65"
@@ -154382,7 +154466,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 7, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061217993",
                             UserImage = "https://picsum.photos/seed/grooveon-user-66/500/500",
                             Username = "nejramehic66"
@@ -154397,7 +154481,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061378539",
                             UserImage = "https://picsum.photos/seed/grooveon-user-67/500/500",
                             Username = "lamijamuratovic67"
@@ -154412,7 +154496,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061999071",
                             UserImage = "https://picsum.photos/seed/grooveon-user-68/500/500",
                             Username = "faruksoftic68"
@@ -154427,7 +154511,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 5, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061639969",
                             UserImage = "https://picsum.photos/seed/grooveon-user-69/500/500",
                             Username = "eminabegic69"
@@ -154442,7 +154526,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061293525",
                             UserImage = "https://picsum.photos/seed/grooveon-user-70/500/500",
                             Username = "ildamuratovic70"
@@ -154457,7 +154541,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061133986",
                             UserImage = "https://picsum.photos/seed/grooveon-user-71/500/500",
                             Username = "hanademirovic71"
@@ -154472,7 +154556,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061316937",
                             UserImage = "https://picsum.photos/seed/grooveon-user-72/500/500",
                             Username = "lejlavelagic72"
@@ -154487,7 +154571,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061377864",
                             UserImage = "https://picsum.photos/seed/grooveon-user-73/500/500",
                             Username = "dinokovacevic73"
@@ -154502,7 +154586,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061636759",
                             UserImage = "https://picsum.photos/seed/grooveon-user-74/500/500",
                             Username = "nedimmuratovic74"
@@ -154517,7 +154601,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061594118",
                             UserImage = "https://picsum.photos/seed/grooveon-user-75/500/500",
                             Username = "sarabegic75"
@@ -154532,7 +154616,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061641638",
                             UserImage = "https://picsum.photos/seed/grooveon-user-76/500/500",
                             Username = "kenanspahic76"
@@ -154547,7 +154631,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061910429",
                             UserImage = "https://picsum.photos/seed/grooveon-user-77/500/500",
                             Username = "norakovacevic77"
@@ -154562,7 +154646,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061242032",
                             UserImage = "https://picsum.photos/seed/grooveon-user-78/500/500",
                             Username = "ajlaalic78"
@@ -154577,7 +154661,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 4, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061533226",
                             UserImage = "https://picsum.photos/seed/grooveon-user-79/500/500",
                             Username = "amarzukic79"
@@ -154592,7 +154676,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061761565",
                             UserImage = "https://picsum.photos/seed/grooveon-user-80/500/500",
                             Username = "tarikmuratovic80"
@@ -154607,7 +154691,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061262626",
                             UserImage = "https://picsum.photos/seed/grooveon-user-81/500/500",
                             Username = "lamijakovacevic81"
@@ -154622,7 +154706,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061987059",
                             UserImage = "https://picsum.photos/seed/grooveon-user-82/500/500",
                             Username = "lamijamehic82"
@@ -154637,7 +154721,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061193619",
                             UserImage = "https://picsum.photos/seed/grooveon-user-83/500/500",
                             Username = "naidaselimovic83"
@@ -154652,7 +154736,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061468625",
                             UserImage = "https://picsum.photos/seed/grooveon-user-84/500/500",
                             Username = "aminaspahic84"
@@ -154667,7 +154751,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061414434",
                             UserImage = "https://picsum.photos/seed/grooveon-user-85/500/500",
                             Username = "jasminlulic85"
@@ -154682,7 +154766,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061656310",
                             UserImage = "https://picsum.photos/seed/grooveon-user-86/500/500",
                             Username = "naidadelic86"
@@ -154697,7 +154781,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061525520",
                             UserImage = "https://picsum.photos/seed/grooveon-user-87/500/500",
                             Username = "erminosmanovic87"
@@ -154712,7 +154796,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061500387",
                             UserImage = "https://picsum.photos/seed/grooveon-user-88/500/500",
                             Username = "anesbajric88"
@@ -154727,7 +154811,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061974424",
                             UserImage = "https://picsum.photos/seed/grooveon-user-89/500/500",
                             Username = "farukmuratovic89"
@@ -154742,7 +154826,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 11, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061800538",
                             UserImage = "https://picsum.photos/seed/grooveon-user-90/500/500",
                             Username = "adnanimamovic90"
@@ -154757,7 +154841,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061234725",
                             UserImage = "https://picsum.photos/seed/grooveon-user-91/500/500",
                             Username = "arminhalilovic91"
@@ -154772,7 +154856,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061142797",
                             UserImage = "https://picsum.photos/seed/grooveon-user-92/500/500",
                             Username = "hanamehic92"
@@ -154781,16 +154865,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 93,
                             DateOfBirth = new DateTime(1995, 12, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "naidabesic93@grooveon.com",
+                            Email = "naidabecic93@grooveon.com",
                             FirstName = "Naida",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 10, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061184408",
                             UserImage = "https://picsum.photos/seed/grooveon-user-93/500/500",
-                            Username = "naidabesic93"
+                            Username = "naidabecic93"
                         },
                         new
                         {
@@ -154802,7 +154886,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061820947",
                             UserImage = "https://picsum.photos/seed/grooveon-user-94/500/500",
                             Username = "sarademirovic94"
@@ -154817,7 +154901,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061945395",
                             UserImage = "https://picsum.photos/seed/grooveon-user-95/500/500",
                             Username = "damirzukic95"
@@ -154830,9 +154914,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Hana",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061892336",
                             UserImage = "https://picsum.photos/seed/grooveon-user-96/500/500",
                             Username = "hanasaric96"
@@ -154847,7 +154931,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 11, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061707734",
                             UserImage = "https://picsum.photos/seed/grooveon-user-97/500/500",
                             Username = "tarikbajric97"
@@ -154862,7 +154946,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061808445",
                             UserImage = "https://picsum.photos/seed/grooveon-user-98/500/500",
                             Username = "saradelic98"
@@ -154877,7 +154961,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061345988",
                             UserImage = "https://picsum.photos/seed/grooveon-user-99/500/500",
                             Username = "milamujic99"
@@ -154892,7 +154976,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061651633",
                             UserImage = "https://picsum.photos/seed/grooveon-user-100/500/500",
                             Username = "jasminmehic100"
@@ -154901,16 +154985,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 101,
                             DateOfBirth = new DateTime(1998, 1, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "erminhodsic101@grooveon.com",
+                            Email = "erminhodzic101@grooveon.com",
                             FirstName = "Ermin",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061890883",
                             UserImage = "https://picsum.photos/seed/grooveon-user-101/500/500",
-                            Username = "erminhodsic101"
+                            Username = "erminhodzic101"
                         },
                         new
                         {
@@ -154922,7 +155006,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 7, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061151315",
                             UserImage = "https://picsum.photos/seed/grooveon-user-102/500/500",
                             Username = "benjaminvelagic102"
@@ -154937,7 +155021,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061693099",
                             UserImage = "https://picsum.photos/seed/grooveon-user-103/500/500",
                             Username = "aminabajric103"
@@ -154950,9 +155034,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Ilma",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 11, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061989746",
                             UserImage = "https://picsum.photos/seed/grooveon-user-104/500/500",
                             Username = "ilmasaric104"
@@ -154967,7 +155051,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 2, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061846012",
                             UserImage = "https://picsum.photos/seed/grooveon-user-105/500/500",
                             Username = "ilmaosmanovic105"
@@ -154982,7 +155066,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061185577",
                             UserImage = "https://picsum.photos/seed/grooveon-user-106/500/500",
                             Username = "selmamehic106"
@@ -154997,7 +155081,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061314863",
                             UserImage = "https://picsum.photos/seed/grooveon-user-107/500/500",
                             Username = "nedimosmanovic107"
@@ -155012,7 +155096,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061970503",
                             UserImage = "https://picsum.photos/seed/grooveon-user-108/500/500",
                             Username = "farukvelagic108"
@@ -155027,7 +155111,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061823264",
                             UserImage = "https://picsum.photos/seed/grooveon-user-109/500/500",
                             Username = "lejlalulic109"
@@ -155042,7 +155126,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061949957",
                             UserImage = "https://picsum.photos/seed/grooveon-user-110/500/500",
                             Username = "aminakovacevic110"
@@ -155057,7 +155141,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061350421",
                             UserImage = "https://picsum.photos/seed/grooveon-user-111/500/500",
                             Username = "kenankovacevic111"
@@ -155070,9 +155154,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Benjamin",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 7, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061586910",
                             UserImage = "https://picsum.photos/seed/grooveon-user-112/500/500",
                             Username = "benjaminsaric112"
@@ -155087,7 +155171,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Colic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061357339",
                             UserImage = "https://picsum.photos/seed/grooveon-user-113/500/500",
                             Username = "samircolic113"
@@ -155102,7 +155186,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061753386",
                             UserImage = "https://picsum.photos/seed/grooveon-user-114/500/500",
                             Username = "milazukic114"
@@ -155117,7 +155201,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061914220",
                             UserImage = "https://picsum.photos/seed/grooveon-user-115/500/500",
                             Username = "samirmehic115"
@@ -155132,7 +155216,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061865537",
                             UserImage = "https://picsum.photos/seed/grooveon-user-116/500/500",
                             Username = "selmalulic116"
@@ -155147,7 +155231,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061488067",
                             UserImage = "https://picsum.photos/seed/grooveon-user-117/500/500",
                             Username = "jasminmujanovic117"
@@ -155162,7 +155246,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061478281",
                             UserImage = "https://picsum.photos/seed/grooveon-user-118/500/500",
                             Username = "nejramujic118"
@@ -155177,7 +155261,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061315225",
                             UserImage = "https://picsum.photos/seed/grooveon-user-119/500/500",
                             Username = "amarmuratovic119"
@@ -155192,7 +155276,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061651760",
                             UserImage = "https://picsum.photos/seed/grooveon-user-120/500/500",
                             Username = "naidabegic120"
@@ -155201,16 +155285,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 121,
                             DateOfBirth = new DateTime(2003, 5, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "naidahodsic121@grooveon.com",
+                            Email = "naidahodzic121@grooveon.com",
                             FirstName = "Naida",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061591912",
                             UserImage = "https://picsum.photos/seed/grooveon-user-121/500/500",
-                            Username = "naidahodsic121"
+                            Username = "naidahodzic121"
                         },
                         new
                         {
@@ -155222,7 +155306,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061635495",
                             UserImage = "https://picsum.photos/seed/grooveon-user-122/500/500",
                             Username = "tarikalic122"
@@ -155237,7 +155321,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061303705",
                             UserImage = "https://picsum.photos/seed/grooveon-user-123/500/500",
                             Username = "selmamujanovic123"
@@ -155252,7 +155336,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061105653",
                             UserImage = "https://picsum.photos/seed/grooveon-user-124/500/500",
                             Username = "nedimselimovic124"
@@ -155267,7 +155351,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061956315",
                             UserImage = "https://picsum.photos/seed/grooveon-user-125/500/500",
                             Username = "jasminmujic125"
@@ -155276,16 +155360,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 126,
                             DateOfBirth = new DateTime(2004, 10, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "milahadsic126@grooveon.com",
+                            Email = "milahad�ic126@grooveon.com",
                             FirstName = "Mila",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061395434",
                             UserImage = "https://picsum.photos/seed/grooveon-user-126/500/500",
-                            Username = "milahadsic126"
+                            Username = "milahad�ic126"
                         },
                         new
                         {
@@ -155297,7 +155381,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061479038",
                             UserImage = "https://picsum.photos/seed/grooveon-user-127/500/500",
                             Username = "kerimosmanovic127"
@@ -155312,7 +155396,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061952557",
                             UserImage = "https://picsum.photos/seed/grooveon-user-128/500/500",
                             Username = "arminsoftic128"
@@ -155327,7 +155411,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061826849",
                             UserImage = "https://picsum.photos/seed/grooveon-user-129/500/500",
                             Username = "kenanselimovic129"
@@ -155342,7 +155426,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061952900",
                             UserImage = "https://picsum.photos/seed/grooveon-user-130/500/500",
                             Username = "kerimdemirovic130"
@@ -155357,7 +155441,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061686027",
                             UserImage = "https://picsum.photos/seed/grooveon-user-131/500/500",
                             Username = "tariklulic131"
@@ -155372,7 +155456,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Colic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061805251",
                             UserImage = "https://picsum.photos/seed/grooveon-user-132/500/500",
                             Username = "ilmacolic132"
@@ -155387,7 +155471,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061589334",
                             UserImage = "https://picsum.photos/seed/grooveon-user-133/500/500",
                             Username = "erminpjanic133"
@@ -155402,7 +155486,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061835236",
                             UserImage = "https://picsum.photos/seed/grooveon-user-134/500/500",
                             Username = "dinospahic134"
@@ -155417,7 +155501,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061225913",
                             UserImage = "https://picsum.photos/seed/grooveon-user-135/500/500",
                             Username = "erminselimovic135"
@@ -155432,7 +155516,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061253281",
                             UserImage = "https://picsum.photos/seed/grooveon-user-136/500/500",
                             Username = "lejlademirovic136"
@@ -155447,7 +155531,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Colic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061626210",
                             UserImage = "https://picsum.photos/seed/grooveon-user-137/500/500",
                             Username = "kenancolic137"
@@ -155456,16 +155540,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 138,
                             DateOfBirth = new DateTime(2003, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "nejrabesic138@grooveon.com",
+                            Email = "nejrabecic138@grooveon.com",
                             FirstName = "Nejra",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061426680",
                             UserImage = "https://picsum.photos/seed/grooveon-user-138/500/500",
-                            Username = "nejrabesic138"
+                            Username = "nejrabecic138"
                         },
                         new
                         {
@@ -155477,7 +155561,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 7, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061255550",
                             UserImage = "https://picsum.photos/seed/grooveon-user-139/500/500",
                             Username = "farukselimovic139"
@@ -155492,7 +155576,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061107233",
                             UserImage = "https://picsum.photos/seed/grooveon-user-140/500/500",
                             Username = "selmahalilovic140"
@@ -155507,7 +155591,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061771632",
                             UserImage = "https://picsum.photos/seed/grooveon-user-141/500/500",
                             Username = "ildabegic141"
@@ -155522,7 +155606,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061984011",
                             UserImage = "https://picsum.photos/seed/grooveon-user-142/500/500",
                             Username = "arminvelagic142"
@@ -155537,7 +155621,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061387533",
                             UserImage = "https://picsum.photos/seed/grooveon-user-143/500/500",
                             Username = "daliaspahic143"
@@ -155552,7 +155636,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061852144",
                             UserImage = "https://picsum.photos/seed/grooveon-user-144/500/500",
                             Username = "adnanosmanovic144"
@@ -155567,7 +155651,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061711058",
                             UserImage = "https://picsum.photos/seed/grooveon-user-145/500/500",
                             Username = "ilmamehic145"
@@ -155582,7 +155666,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 2, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061242241",
                             UserImage = "https://picsum.photos/seed/grooveon-user-146/500/500",
                             Username = "dinoalic146"
@@ -155597,7 +155681,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061867668",
                             UserImage = "https://picsum.photos/seed/grooveon-user-147/500/500",
                             Username = "ildazukic147"
@@ -155612,7 +155696,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061475592",
                             UserImage = "https://picsum.photos/seed/grooveon-user-148/500/500",
                             Username = "farukimamovic148"
@@ -155627,7 +155711,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 7, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061343691",
                             UserImage = "https://picsum.photos/seed/grooveon-user-149/500/500",
                             Username = "adnanbajric149"
@@ -155642,7 +155726,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061315075",
                             UserImage = "https://picsum.photos/seed/grooveon-user-150/500/500",
                             Username = "benjamindelic150"
@@ -155657,7 +155741,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 2, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061784782",
                             UserImage = "https://picsum.photos/seed/grooveon-user-151/500/500",
                             Username = "aminasoftic151"
@@ -155672,7 +155756,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061594477",
                             UserImage = "https://picsum.photos/seed/grooveon-user-152/500/500",
                             Username = "nedimsoftic152"
@@ -155687,7 +155771,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 11, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061574445",
                             UserImage = "https://picsum.photos/seed/grooveon-user-153/500/500",
                             Username = "selmabegic153"
@@ -155696,16 +155780,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 154,
                             DateOfBirth = new DateTime(2004, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "emirhadsic154@grooveon.com",
+                            Email = "emirhad�ic154@grooveon.com",
                             FirstName = "Emir",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061759916",
                             UserImage = "https://picsum.photos/seed/grooveon-user-154/500/500",
-                            Username = "emirhadsic154"
+                            Username = "emirhad�ic154"
                         },
                         new
                         {
@@ -155717,7 +155801,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061338903",
                             UserImage = "https://picsum.photos/seed/grooveon-user-155/500/500",
                             Username = "dinozukic155"
@@ -155732,7 +155816,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061133149",
                             UserImage = "https://picsum.photos/seed/grooveon-user-156/500/500",
                             Username = "harissoftic156"
@@ -155747,7 +155831,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 1, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061232530",
                             UserImage = "https://picsum.photos/seed/grooveon-user-157/500/500",
                             Username = "eminaimamovic157"
@@ -155762,7 +155846,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 5, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061873121",
                             UserImage = "https://picsum.photos/seed/grooveon-user-158/500/500",
                             Username = "eminakaric158"
@@ -155777,7 +155861,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061924726",
                             UserImage = "https://picsum.photos/seed/grooveon-user-159/500/500",
                             Username = "eminamuratovic159"
@@ -155792,7 +155876,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061685632",
                             UserImage = "https://picsum.photos/seed/grooveon-user-160/500/500",
                             Username = "kenanalic160"
@@ -155807,7 +155891,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061713251",
                             UserImage = "https://picsum.photos/seed/grooveon-user-161/500/500",
                             Username = "anesvelagic161"
@@ -155822,7 +155906,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 11, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061693551",
                             UserImage = "https://picsum.photos/seed/grooveon-user-162/500/500",
                             Username = "ilmakovacevic162"
@@ -155837,7 +155921,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 5, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061657522",
                             UserImage = "https://picsum.photos/seed/grooveon-user-163/500/500",
                             Username = "ilmamuratovic163"
@@ -155852,7 +155936,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061824979",
                             UserImage = "https://picsum.photos/seed/grooveon-user-164/500/500",
                             Username = "ildakovacevic164"
@@ -155867,7 +155951,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061262156",
                             UserImage = "https://picsum.photos/seed/grooveon-user-165/500/500",
                             Username = "amarvelagic165"
@@ -155882,7 +155966,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061450436",
                             UserImage = "https://picsum.photos/seed/grooveon-user-166/500/500",
                             Username = "nejraimamovic166"
@@ -155897,7 +155981,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061927579",
                             UserImage = "https://picsum.photos/seed/grooveon-user-167/500/500",
                             Username = "amarosmanovic167"
@@ -155906,16 +155990,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 168,
                             DateOfBirth = new DateTime(2003, 4, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "lamijabesic168@grooveon.com",
+                            Email = "lamijabecic168@grooveon.com",
                             FirstName = "Lamija",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 10, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061754488",
                             UserImage = "https://picsum.photos/seed/grooveon-user-168/500/500",
-                            Username = "lamijabesic168"
+                            Username = "lamijabecic168"
                         },
                         new
                         {
@@ -155927,7 +156011,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061173330",
                             UserImage = "https://picsum.photos/seed/grooveon-user-169/500/500",
                             Username = "nejraalic169"
@@ -155942,7 +156026,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061950994",
                             UserImage = "https://picsum.photos/seed/grooveon-user-170/500/500",
                             Username = "emirmujic170"
@@ -155957,7 +156041,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061714840",
                             UserImage = "https://picsum.photos/seed/grooveon-user-171/500/500",
                             Username = "aminakaric171"
@@ -155972,7 +156056,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061528854",
                             UserImage = "https://picsum.photos/seed/grooveon-user-172/500/500",
                             Username = "benjaminbrkic172"
@@ -155987,7 +156071,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061416915",
                             UserImage = "https://picsum.photos/seed/grooveon-user-173/500/500",
                             Username = "harisspahic173"
@@ -156002,7 +156086,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061944728",
                             UserImage = "https://picsum.photos/seed/grooveon-user-174/500/500",
                             Username = "ajladelic174"
@@ -156017,7 +156101,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061256604",
                             UserImage = "https://picsum.photos/seed/grooveon-user-175/500/500",
                             Username = "naidabajric175"
@@ -156032,7 +156116,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061116672",
                             UserImage = "https://picsum.photos/seed/grooveon-user-176/500/500",
                             Username = "amarpjanic176"
@@ -156047,7 +156131,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061429321",
                             UserImage = "https://picsum.photos/seed/grooveon-user-177/500/500",
                             Username = "lamijaalic177"
@@ -156062,7 +156146,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061108707",
                             UserImage = "https://picsum.photos/seed/grooveon-user-178/500/500",
                             Username = "ajlaselimovic178"
@@ -156071,16 +156155,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 179,
                             DateOfBirth = new DateTime(1998, 5, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "farukhodsic179@grooveon.com",
+                            Email = "farukhodzic179@grooveon.com",
                             FirstName = "Faruk",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 10, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061200628",
                             UserImage = "https://picsum.photos/seed/grooveon-user-179/500/500",
-                            Username = "farukhodsic179"
+                            Username = "farukhodzic179"
                         },
                         new
                         {
@@ -156092,7 +156176,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 4, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061932420",
                             UserImage = "https://picsum.photos/seed/grooveon-user-180/500/500",
                             Username = "armindemirovic180"
@@ -156105,9 +156189,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Jasmin",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061224292",
                             UserImage = "https://picsum.photos/seed/grooveon-user-181/500/500",
                             Username = "jasminsaric181"
@@ -156116,16 +156200,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 182,
                             DateOfBirth = new DateTime(1997, 8, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "arminhodsic182@grooveon.com",
+                            Email = "arminhodzic182@grooveon.com",
                             FirstName = "Armin",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 2, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061778523",
                             UserImage = "https://picsum.photos/seed/grooveon-user-182/500/500",
-                            Username = "arminhodsic182"
+                            Username = "arminhodzic182"
                         },
                         new
                         {
@@ -156137,7 +156221,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061150056",
                             UserImage = "https://picsum.photos/seed/grooveon-user-183/500/500",
                             Username = "saraosmanovic183"
@@ -156152,7 +156236,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061571621",
                             UserImage = "https://picsum.photos/seed/grooveon-user-184/500/500",
                             Username = "harisosmanovic184"
@@ -156167,7 +156251,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061512682",
                             UserImage = "https://picsum.photos/seed/grooveon-user-185/500/500",
                             Username = "nejrakaric185"
@@ -156182,7 +156266,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061828325",
                             UserImage = "https://picsum.photos/seed/grooveon-user-186/500/500",
                             Username = "damirmujic186"
@@ -156197,7 +156281,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061803407",
                             UserImage = "https://picsum.photos/seed/grooveon-user-187/500/500",
                             Username = "erminkovacevic187"
@@ -156212,7 +156296,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061332751",
                             UserImage = "https://picsum.photos/seed/grooveon-user-188/500/500",
                             Username = "hanapjanic188"
@@ -156227,7 +156311,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 7, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061921481",
                             UserImage = "https://picsum.photos/seed/grooveon-user-189/500/500",
                             Username = "saramuratovic189"
@@ -156242,7 +156326,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Muratovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061290410",
                             UserImage = "https://picsum.photos/seed/grooveon-user-190/500/500",
                             Username = "lejlamuratovic190"
@@ -156257,7 +156341,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061548646",
                             UserImage = "https://picsum.photos/seed/grooveon-user-191/500/500",
                             Username = "lamijabajric191"
@@ -156272,7 +156356,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061885092",
                             UserImage = "https://picsum.photos/seed/grooveon-user-192/500/500",
                             Username = "anesmehic192"
@@ -156287,7 +156371,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061988568",
                             UserImage = "https://picsum.photos/seed/grooveon-user-193/500/500",
                             Username = "noraosmanovic193"
@@ -156302,7 +156386,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061745944",
                             UserImage = "https://picsum.photos/seed/grooveon-user-194/500/500",
                             Username = "kenankaric194"
@@ -156317,7 +156401,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061699709",
                             UserImage = "https://picsum.photos/seed/grooveon-user-195/500/500",
                             Username = "naidamujic195"
@@ -156332,7 +156416,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061614155",
                             UserImage = "https://picsum.photos/seed/grooveon-user-196/500/500",
                             Username = "damirdemirovic196"
@@ -156345,9 +156429,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Mila",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 11, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061541972",
                             UserImage = "https://picsum.photos/seed/grooveon-user-197/500/500",
                             Username = "milasaric197"
@@ -156362,7 +156446,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 6, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Demirovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061801569",
                             UserImage = "https://picsum.photos/seed/grooveon-user-198/500/500",
                             Username = "daliademirovic198"
@@ -156377,7 +156461,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061493148",
                             UserImage = "https://picsum.photos/seed/grooveon-user-199/500/500",
                             Username = "damirmehic199"
@@ -156392,7 +156476,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061510023",
                             UserImage = "https://picsum.photos/seed/grooveon-user-200/500/500",
                             Username = "anesmujic200"
@@ -156407,7 +156491,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061830121",
                             UserImage = "https://picsum.photos/seed/grooveon-user-201/500/500",
                             Username = "kenansoftic201"
@@ -156422,7 +156506,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061921750",
                             UserImage = "https://picsum.photos/seed/grooveon-user-202/500/500",
                             Username = "naidazukic202"
@@ -156437,7 +156521,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061706954",
                             UserImage = "https://picsum.photos/seed/grooveon-user-203/500/500",
                             Username = "aminamujanovic203"
@@ -156450,9 +156534,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Tarik",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 5, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061981801",
                             UserImage = "https://picsum.photos/seed/grooveon-user-204/500/500",
                             Username = "tariksaric204"
@@ -156467,7 +156551,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061783694",
                             UserImage = "https://picsum.photos/seed/grooveon-user-205/500/500",
                             Username = "norakaric205"
@@ -156482,7 +156566,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061486964",
                             UserImage = "https://picsum.photos/seed/grooveon-user-206/500/500",
                             Username = "lejlabrkic206"
@@ -156497,7 +156581,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 6, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061923336",
                             UserImage = "https://picsum.photos/seed/grooveon-user-207/500/500",
                             Username = "milapjanic207"
@@ -156512,7 +156596,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061263709",
                             UserImage = "https://picsum.photos/seed/grooveon-user-208/500/500",
                             Username = "hariszukic208"
@@ -156527,7 +156611,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061230320",
                             UserImage = "https://picsum.photos/seed/grooveon-user-209/500/500",
                             Username = "jasminsoftic209"
@@ -156542,7 +156626,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061341137",
                             UserImage = "https://picsum.photos/seed/grooveon-user-210/500/500",
                             Username = "noralulic210"
@@ -156551,16 +156635,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 211,
                             DateOfBirth = new DateTime(2002, 2, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "harishodsic211@grooveon.com",
+                            Email = "harishodzic211@grooveon.com",
                             FirstName = "Haris",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061940649",
                             UserImage = "https://picsum.photos/seed/grooveon-user-211/500/500",
-                            Username = "harishodsic211"
+                            Username = "harishodzic211"
                         },
                         new
                         {
@@ -156572,7 +156656,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061898178",
                             UserImage = "https://picsum.photos/seed/grooveon-user-212/500/500",
                             Username = "jasminbegic212"
@@ -156587,7 +156671,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061533204",
                             UserImage = "https://picsum.photos/seed/grooveon-user-213/500/500",
                             Username = "nejrazukic213"
@@ -156602,7 +156686,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061959501",
                             UserImage = "https://picsum.photos/seed/grooveon-user-214/500/500",
                             Username = "arminlulic214"
@@ -156611,16 +156695,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 215,
                             DateOfBirth = new DateTime(2004, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "ajlahadsic215@grooveon.com",
+                            Email = "ajlahad�ic215@grooveon.com",
                             FirstName = "Ajla",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061160655",
                             UserImage = "https://picsum.photos/seed/grooveon-user-215/500/500",
-                            Username = "ajlahadsic215"
+                            Username = "ajlahad�ic215"
                         },
                         new
                         {
@@ -156632,7 +156716,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 2, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061259320",
                             UserImage = "https://picsum.photos/seed/grooveon-user-216/500/500",
                             Username = "naidamujanovic216"
@@ -156641,16 +156725,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 217,
                             DateOfBirth = new DateTime(1998, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "ildabesic217@grooveon.com",
+                            Email = "ildabecic217@grooveon.com",
                             FirstName = "Ilda",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061752016",
                             UserImage = "https://picsum.photos/seed/grooveon-user-217/500/500",
-                            Username = "ildabesic217"
+                            Username = "ildabecic217"
                         },
                         new
                         {
@@ -156662,7 +156746,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061722841",
                             UserImage = "https://picsum.photos/seed/grooveon-user-218/500/500",
                             Username = "milaalic218"
@@ -156677,7 +156761,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061389071",
                             UserImage = "https://picsum.photos/seed/grooveon-user-219/500/500",
                             Username = "norabajric219"
@@ -156692,7 +156776,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061411863",
                             UserImage = "https://picsum.photos/seed/grooveon-user-220/500/500",
                             Username = "samirkovacevic220"
@@ -156707,7 +156791,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Osmanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061229853",
                             UserImage = "https://picsum.photos/seed/grooveon-user-221/500/500",
                             Username = "ildaosmanovic221"
@@ -156722,7 +156806,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061179195",
                             UserImage = "https://picsum.photos/seed/grooveon-user-222/500/500",
                             Username = "benjaminsoftic222"
@@ -156731,16 +156815,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 223,
                             DateOfBirth = new DateTime(2004, 5, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "benjaminhodsic223@grooveon.com",
+                            Email = "benjaminhodzic223@grooveon.com",
                             FirstName = "Benjamin",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 10, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061722240",
                             UserImage = "https://picsum.photos/seed/grooveon-user-223/500/500",
-                            Username = "benjaminhodsic223"
+                            Username = "benjaminhodzic223"
                         },
                         new
                         {
@@ -156752,7 +156836,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061116434",
                             UserImage = "https://picsum.photos/seed/grooveon-user-224/500/500",
                             Username = "farukkaric224"
@@ -156761,16 +156845,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 225,
                             DateOfBirth = new DateTime(1998, 12, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "norabesic225@grooveon.com",
+                            Email = "norabecic225@grooveon.com",
                             FirstName = "Nora",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061315708",
                             UserImage = "https://picsum.photos/seed/grooveon-user-225/500/500",
-                            Username = "norabesic225"
+                            Username = "norabecic225"
                         },
                         new
                         {
@@ -156782,7 +156866,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061323561",
                             UserImage = "https://picsum.photos/seed/grooveon-user-226/500/500",
                             Username = "aminazukic226"
@@ -156797,7 +156881,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 12, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061539789",
                             UserImage = "https://picsum.photos/seed/grooveon-user-227/500/500",
                             Username = "jasminkovacevic227"
@@ -156812,7 +156896,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061761137",
                             UserImage = "https://picsum.photos/seed/grooveon-user-228/500/500",
                             Username = "ajlakovacevic228"
@@ -156827,7 +156911,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 2, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061661335",
                             UserImage = "https://picsum.photos/seed/grooveon-user-229/500/500",
                             Username = "samirkaric229"
@@ -156842,7 +156926,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061568159",
                             UserImage = "https://picsum.photos/seed/grooveon-user-230/500/500",
                             Username = "ajlabrkic230"
@@ -156857,7 +156941,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061355530",
                             UserImage = "https://picsum.photos/seed/grooveon-user-231/500/500",
                             Username = "aneszukic231"
@@ -156872,7 +156956,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061128028",
                             UserImage = "https://picsum.photos/seed/grooveon-user-232/500/500",
                             Username = "armindelic232"
@@ -156887,7 +156971,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061252880",
                             UserImage = "https://picsum.photos/seed/grooveon-user-233/500/500",
                             Username = "kerimmujanovic233"
@@ -156896,16 +156980,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 234,
                             DateOfBirth = new DateTime(2000, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "farukbesic234@grooveon.com",
+                            Email = "farukbecic234@grooveon.com",
                             FirstName = "Faruk",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061646624",
                             UserImage = "https://picsum.photos/seed/grooveon-user-234/500/500",
-                            Username = "farukbesic234"
+                            Username = "farukbecic234"
                         },
                         new
                         {
@@ -156917,7 +157001,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061239748",
                             UserImage = "https://picsum.photos/seed/grooveon-user-235/500/500",
                             Username = "samirmujic235"
@@ -156932,7 +157016,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061268298",
                             UserImage = "https://picsum.photos/seed/grooveon-user-236/500/500",
                             Username = "selmasoftic236"
@@ -156947,7 +157031,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061219706",
                             UserImage = "https://picsum.photos/seed/grooveon-user-237/500/500",
                             Username = "erminbegic237"
@@ -156962,7 +157046,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061487178",
                             UserImage = "https://picsum.photos/seed/grooveon-user-238/500/500",
                             Username = "hanabegic238"
@@ -156971,16 +157055,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 239,
                             DateOfBirth = new DateTime(2001, 2, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "sarabesic239@grooveon.com",
+                            Email = "sarabecic239@grooveon.com",
                             FirstName = "Sara",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Be�ic",
+                            LastName = "Becic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061560362",
                             UserImage = "https://picsum.photos/seed/grooveon-user-239/500/500",
-                            Username = "sarabesic239"
+                            Username = "sarabecic239"
                         },
                         new
                         {
@@ -156992,7 +157076,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061493889",
                             UserImage = "https://picsum.photos/seed/grooveon-user-240/500/500",
                             Username = "erminmehic240"
@@ -157007,7 +157091,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061966932",
                             UserImage = "https://picsum.photos/seed/grooveon-user-241/500/500",
                             Username = "noraselimovic241"
@@ -157022,7 +157106,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061306990",
                             UserImage = "https://picsum.photos/seed/grooveon-user-242/500/500",
                             Username = "hanakaric242"
@@ -157035,9 +157119,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Emir",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 8, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061905268",
                             UserImage = "https://picsum.photos/seed/grooveon-user-243/500/500",
                             Username = "emirsaric243"
@@ -157052,7 +157136,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 6, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061812095",
                             UserImage = "https://picsum.photos/seed/grooveon-user-244/500/500",
                             Username = "faruklulic244"
@@ -157067,7 +157151,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061509361",
                             UserImage = "https://picsum.photos/seed/grooveon-user-245/500/500",
                             Username = "kerimlulic245"
@@ -157082,7 +157166,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061399225",
                             UserImage = "https://picsum.photos/seed/grooveon-user-246/500/500",
                             Username = "lejlaselimovic246"
@@ -157097,7 +157181,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 7, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061823523",
                             UserImage = "https://picsum.photos/seed/grooveon-user-247/500/500",
                             Username = "nedimbajric247"
@@ -157112,7 +157196,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061440911",
                             UserImage = "https://picsum.photos/seed/grooveon-user-248/500/500",
                             Username = "samirzukic248"
@@ -157121,16 +157205,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 249,
                             DateOfBirth = new DateTime(1998, 8, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "norahodsic249@grooveon.com",
+                            Email = "norahodzic249@grooveon.com",
                             FirstName = "Nora",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061319927",
                             UserImage = "https://picsum.photos/seed/grooveon-user-249/500/500",
-                            Username = "norahodsic249"
+                            Username = "norahodzic249"
                         },
                         new
                         {
@@ -157142,7 +157226,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 2, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061519065",
                             UserImage = "https://picsum.photos/seed/grooveon-user-250/500/500",
                             Username = "dalialulic250"
@@ -157157,7 +157241,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061231522",
                             UserImage = "https://picsum.photos/seed/grooveon-user-251/500/500",
                             Username = "eminaalic251"
@@ -157172,7 +157256,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Lulic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061968581",
                             UserImage = "https://picsum.photos/seed/grooveon-user-252/500/500",
                             Username = "eminalulic252"
@@ -157187,7 +157271,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 6, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061511647",
                             UserImage = "https://picsum.photos/seed/grooveon-user-253/500/500",
                             Username = "emirspahic253"
@@ -157202,7 +157286,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061578556",
                             UserImage = "https://picsum.photos/seed/grooveon-user-254/500/500",
                             Username = "kenanimamovic254"
@@ -157217,7 +157301,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061574919",
                             UserImage = "https://picsum.photos/seed/grooveon-user-255/500/500",
                             Username = "ajlaspahic255"
@@ -157232,7 +157316,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061748730",
                             UserImage = "https://picsum.photos/seed/grooveon-user-256/500/500",
                             Username = "erminalic256"
@@ -157247,7 +157331,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061759405",
                             UserImage = "https://picsum.photos/seed/grooveon-user-257/500/500",
                             Username = "daliaalic257"
@@ -157262,7 +157346,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061543615",
                             UserImage = "https://picsum.photos/seed/grooveon-user-258/500/500",
                             Username = "hanaspahic258"
@@ -157277,7 +157361,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 11, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061777136",
                             UserImage = "https://picsum.photos/seed/grooveon-user-259/500/500",
                             Username = "adnandelic259"
@@ -157292,7 +157376,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061669182",
                             UserImage = "https://picsum.photos/seed/grooveon-user-260/500/500",
                             Username = "selmamujic260"
@@ -157307,7 +157391,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061911623",
                             UserImage = "https://picsum.photos/seed/grooveon-user-261/500/500",
                             Username = "selmazukic261"
@@ -157322,7 +157406,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061518594",
                             UserImage = "https://picsum.photos/seed/grooveon-user-262/500/500",
                             Username = "aminavelagic262"
@@ -157337,7 +157421,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Colic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061865823",
                             UserImage = "https://picsum.photos/seed/grooveon-user-263/500/500",
                             Username = "tarikcolic263"
@@ -157350,9 +157434,9 @@ namespace GrooveOn.Services.Migrations
                             FirstName = "Nejra",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "�aric",
+                            LastName = "saric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061725862",
                             UserImage = "https://picsum.photos/seed/grooveon-user-264/500/500",
                             Username = "nejrasaric264"
@@ -157367,7 +157451,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 8, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061646510",
                             UserImage = "https://picsum.photos/seed/grooveon-user-265/500/500",
                             Username = "lamijakaric265"
@@ -157382,7 +157466,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Imamovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061530862",
                             UserImage = "https://picsum.photos/seed/grooveon-user-266/500/500",
                             Username = "selmaimamovic266"
@@ -157397,7 +157481,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061453970",
                             UserImage = "https://picsum.photos/seed/grooveon-user-267/500/500",
                             Username = "samirhalilovic267"
@@ -157412,7 +157496,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061786030",
                             UserImage = "https://picsum.photos/seed/grooveon-user-268/500/500",
                             Username = "eminamujanovic268"
@@ -157427,7 +157511,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061673642",
                             UserImage = "https://picsum.photos/seed/grooveon-user-269/500/500",
                             Username = "lejlasoftic269"
@@ -157442,7 +157526,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 12, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061684022",
                             UserImage = "https://picsum.photos/seed/grooveon-user-270/500/500",
                             Username = "benjaminselimovic270"
@@ -157457,7 +157541,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 10, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061307827",
                             UserImage = "https://picsum.photos/seed/grooveon-user-271/500/500",
                             Username = "ilmabegic271"
@@ -157472,7 +157556,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061459298",
                             UserImage = "https://picsum.photos/seed/grooveon-user-272/500/500",
                             Username = "ildadelic272"
@@ -157487,7 +157571,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061753846",
                             UserImage = "https://picsum.photos/seed/grooveon-user-273/500/500",
                             Username = "ajlakaric273"
@@ -157502,7 +157586,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Colic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061868475",
                             UserImage = "https://picsum.photos/seed/grooveon-user-274/500/500",
                             Username = "jasmincolic274"
@@ -157517,7 +157601,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061962091",
                             UserImage = "https://picsum.photos/seed/grooveon-user-275/500/500",
                             Username = "selmadelic275"
@@ -157532,7 +157616,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061565618",
                             UserImage = "https://picsum.photos/seed/grooveon-user-276/500/500",
                             Username = "nejrakovacevic276"
@@ -157547,7 +157631,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 11, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061569814",
                             UserImage = "https://picsum.photos/seed/grooveon-user-277/500/500",
                             Username = "aminabegic277"
@@ -157562,7 +157646,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Spahic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061497609",
                             UserImage = "https://picsum.photos/seed/grooveon-user-278/500/500",
                             Username = "adnanspahic278"
@@ -157577,7 +157661,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061863558",
                             UserImage = "https://picsum.photos/seed/grooveon-user-279/500/500",
                             Username = "kenanmehic279"
@@ -157592,7 +157676,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061346407",
                             UserImage = "https://picsum.photos/seed/grooveon-user-280/500/500",
                             Username = "saraselimovic280"
@@ -157607,7 +157691,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061155793",
                             UserImage = "https://picsum.photos/seed/grooveon-user-281/500/500",
                             Username = "amaralic281"
@@ -157622,7 +157706,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 11, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061765085",
                             UserImage = "https://picsum.photos/seed/grooveon-user-282/500/500",
                             Username = "tarikpjanic282"
@@ -157637,7 +157721,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061620521",
                             UserImage = "https://picsum.photos/seed/grooveon-user-283/500/500",
                             Username = "kenanbrkic283"
@@ -157646,16 +157730,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 284,
                             DateOfBirth = new DateTime(2002, 2, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "kenanhodsic284@grooveon.com",
+                            Email = "kenanhodzic284@grooveon.com",
                             FirstName = "Kenan",
                             IsActive = true,
                             JoinDate = new DateTime(2025, 6, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            LastName = "Hod�ic",
+                            LastName = "Hodzic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061729494",
                             UserImage = "https://picsum.photos/seed/grooveon-user-284/500/500",
-                            Username = "kenanhodsic284"
+                            Username = "kenanhodzic284"
                         },
                         new
                         {
@@ -157667,7 +157751,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061283106",
                             UserImage = "https://picsum.photos/seed/grooveon-user-285/500/500",
                             Username = "damirbajric285"
@@ -157682,7 +157766,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Delic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061528302",
                             UserImage = "https://picsum.photos/seed/grooveon-user-286/500/500",
                             Username = "lamijadelic286"
@@ -157697,7 +157781,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 10, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061371702",
                             UserImage = "https://picsum.photos/seed/grooveon-user-287/500/500",
                             Username = "emirbrkic287"
@@ -157712,7 +157796,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 7, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061631485",
                             UserImage = "https://picsum.photos/seed/grooveon-user-288/500/500",
                             Username = "saramujic288"
@@ -157727,7 +157811,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061640901",
                             UserImage = "https://picsum.photos/seed/grooveon-user-289/500/500",
                             Username = "emiralic289"
@@ -157742,7 +157826,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 9, 27, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Pjanic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061534849",
                             UserImage = "https://picsum.photos/seed/grooveon-user-290/500/500",
                             Username = "selmapjanic290"
@@ -157757,7 +157841,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Softic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061193600",
                             UserImage = "https://picsum.photos/seed/grooveon-user-291/500/500",
                             Username = "samirsoftic291"
@@ -157772,7 +157856,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061575363",
                             UserImage = "https://picsum.photos/seed/grooveon-user-292/500/500",
                             Username = "amarkovacevic292"
@@ -157787,7 +157871,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061780704",
                             UserImage = "https://picsum.photos/seed/grooveon-user-293/500/500",
                             Username = "ajlahalilovic293"
@@ -157802,7 +157886,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061346677",
                             UserImage = "https://picsum.photos/seed/grooveon-user-294/500/500",
                             Username = "tarikbrkic294"
@@ -157817,7 +157901,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 2, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Alic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061707144",
                             UserImage = "https://picsum.photos/seed/grooveon-user-295/500/500",
                             Username = "naidaalic295"
@@ -157832,7 +157916,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061173122",
                             UserImage = "https://picsum.photos/seed/grooveon-user-296/500/500",
                             Username = "kerimmehic296"
@@ -157847,7 +157931,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Velagic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061883854",
                             UserImage = "https://picsum.photos/seed/grooveon-user-297/500/500",
                             Username = "saravelagic297"
@@ -157862,7 +157946,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 1, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061184348",
                             UserImage = "https://picsum.photos/seed/grooveon-user-298/500/500",
                             Username = "kerimbegic298"
@@ -157877,7 +157961,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 6, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Kovacevic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061471146",
                             UserImage = "https://picsum.photos/seed/grooveon-user-299/500/500",
                             Username = "damirkovacevic299"
@@ -157892,7 +157976,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 11, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061554986",
                             UserImage = "https://picsum.photos/seed/grooveon-user-300/500/500",
                             Username = "ildaselimovic300"
@@ -157907,7 +157991,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 9, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Bajric",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061667837",
                             UserImage = "https://picsum.photos/seed/grooveon-user-301/500/500",
                             Username = "kerimbajric301"
@@ -157922,7 +158006,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Selimovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061599133",
                             UserImage = "https://picsum.photos/seed/grooveon-user-302/500/500",
                             Username = "anesselimovic302"
@@ -157937,7 +158021,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Karic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061533682",
                             UserImage = "https://picsum.photos/seed/grooveon-user-303/500/500",
                             Username = "aneskaric303"
@@ -157946,16 +158030,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 304,
                             DateOfBirth = new DateTime(1995, 9, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "kenanhadsic304@grooveon.com",
+                            Email = "kenanhad�ic304@grooveon.com",
                             FirstName = "Kenan",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 10, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061570469",
                             UserImage = "https://picsum.photos/seed/grooveon-user-304/500/500",
-                            Username = "kenanhadsic304"
+                            Username = "kenanhad�ic304"
                         },
                         new
                         {
@@ -157967,7 +158051,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Begic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061180057",
                             UserImage = "https://picsum.photos/seed/grooveon-user-305/500/500",
                             Username = "farukbegic305"
@@ -157982,7 +158066,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2025, 8, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Brkic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061965579",
                             UserImage = "https://picsum.photos/seed/grooveon-user-306/500/500",
                             Username = "aminabrkic306"
@@ -157997,7 +158081,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Zukic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061415018",
                             UserImage = "https://picsum.photos/seed/grooveon-user-307/500/500",
                             Username = "farukzukic307"
@@ -158012,7 +158096,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mehic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061279423",
                             UserImage = "https://picsum.photos/seed/grooveon-user-308/500/500",
                             Username = "noramehic308"
@@ -158027,7 +158111,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 4, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Halilovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061768169",
                             UserImage = "https://picsum.photos/seed/grooveon-user-309/500/500",
                             Username = "jasminhalilovic309"
@@ -158042,7 +158126,7 @@ namespace GrooveOn.Services.Migrations
                             JoinDate = new DateTime(2026, 3, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Mujanovic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061871388",
                             UserImage = "https://picsum.photos/seed/grooveon-user-310/500/500",
                             Username = "noramujanovic310"
@@ -158051,16 +158135,16 @@ namespace GrooveOn.Services.Migrations
                         {
                             Id = 311,
                             DateOfBirth = new DateTime(1996, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "harishadsic311@grooveon.com",
+                            Email = "harishad�ic311@grooveon.com",
                             FirstName = "Haris",
                             IsActive = true,
                             JoinDate = new DateTime(2026, 4, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "Had�ic",
                             Password = "",
-                            PasswordHash = "CK7wVqNxAdmkQD25r6aSAA==.4.65536.4.xmqHRH4MYL5X800ufLZF4tTK9DtjNy6gkk3pdUhfKXA=",
+                            PasswordHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=",
                             PhoneNumber = "061971530",
                             UserImage = "https://picsum.photos/seed/grooveon-user-311/500/500",
-                            Username = "harishadsic311"
+                            Username = "harishad�ic311"
                         });
                 });
 

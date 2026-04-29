@@ -54,6 +54,24 @@ class ImageHelper {
   return "$baseFolder/$path";
 }
 
+static String httpCheck(String? imagePath, String folder) {
+  final basePath = ApiConfig.imageFolders[folder];
+
+  if (basePath == null) {
+    throw Exception('Nepoznat image folder: $folder');
+  }
+
+  if (imagePath == null || imagePath.trim().isEmpty) {
+    return '$basePath/default.jpg';
+  }
+
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+
+  return '$basePath/$imagePath';
+}
+
   static String? userImageUrl(String? userImage) {
     return imageUrl(userImage, usersFolder);
   }

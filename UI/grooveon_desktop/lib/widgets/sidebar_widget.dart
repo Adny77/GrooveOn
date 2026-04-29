@@ -735,13 +735,6 @@ class _SidebarWidgetState extends State<SidebarWidget> {
             selected: false,
             onTap: () => _showUserSettingsDialog(),
           ),
-          SidebarItemWidget(
-            icon: Icons.logout,
-            title: "Log out",
-            selected: false,
-            onTap: () => _logout(),
-          ),
-          const SizedBox(height: 12),
         ],
       ),
     );

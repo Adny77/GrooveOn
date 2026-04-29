@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
     build:
       context: .
-      dockerfile: GrooveOn.WebAPI/DockerFile.api
+      dockerfile: GrooveOn.WebAPI/DockerFile.WebAPI
 
     env_file:
       - .env

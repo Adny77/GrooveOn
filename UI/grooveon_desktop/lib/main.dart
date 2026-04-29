@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:grooveon_desktop/providers/album_provider.dart';
 import 'package:grooveon_desktop/providers/auth_provider.dart';
 import 'package:grooveon_desktop/providers/report_provider.dart';
@@ -8,8 +9,9 @@ import 'package:grooveon_desktop/routes/app_routes.dart';
 import 'package:grooveon_desktop/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
   runApp(
     MultiProvider(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
@@ -22,10 +24,12 @@ class _PublicPlaylistsScreenState extends State<PublicPlaylistsScreen> {
   static const Color textMuted = Color(0xFF7A7A85);
 
   final PlaylistProvider _playlistProvider = PlaylistProvider();
+  final TextEditingController _searchController = TextEditingController();
   late final UniversalPagingProvider<PlaylistResponse> _paging;
 
   bool _loading = true;
   String? _error;
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -91,12 +95,35 @@ class _PublicPlaylistsScreenState extends State<PublicPlaylistsScreen> {
     }
   }
 
+  void _onSearchChanged(String value) {
+    setState(() {});
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () async {
+      try {
+        await _paging.search(value.trim());
+        if (mounted) setState(() {});
+      } catch (e) {
+        if (!mounted) return;
+        SnackbarHelper.showError(context, e.toString());
+      }
+    });
+  }
+
+  void _clearSearch() {
+    if (_searchController.text.isEmpty) return;
+
+    _searchController.clear();
+    setState(() {});
+    _onSearchChanged("");
+  }
+
   void _openPlaylist(PlaylistResponse playlist) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => UniversalPlaylistPreviewScreen(
           playlist: playlist,
+          canRemoveSongs: false,
         ),
       ),
     );
@@ -104,6 +131,8 @@ class _PublicPlaylistsScreenState extends State<PublicPlaylistsScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
     _paging.dispose();
     super.dispose();
   }
@@ -136,6 +165,8 @@ class _PublicPlaylistsScreenState extends State<PublicPlaylistsScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+              _searchBar(),
+              const SizedBox(height: 16),
               Expanded(
                 child: _loading
                     ? const Center(
@@ -154,21 +185,69 @@ class _PublicPlaylistsScreenState extends State<PublicPlaylistsScreen> {
                                       _emptyCard(),
                                     ],
                                   )
-                                :  SingleChildScrollView(
-    physics: const AlwaysScrollableScrollPhysics(),
-    child: SwipePagedList<PlaylistResponse>(
-      provider: _paging,
-      separatorHeight: 14,
-      itemBuilder: (context, playlist) {
-        return _playlistCard(playlist);
-      },
-    ),
-  ),
+                                : SingleChildScrollView(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    child: SwipePagedList<PlaylistResponse>(
+                                      provider: _paging,
+                                      separatorHeight: 14,
+                                      itemBuilder: (context, playlist) {
+                                        return _playlistCard(playlist);
+                                      },
+                                    ),
+                                  ),
                           ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _searchBar() {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.search_rounded, color: primary, size: 23),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              textInputAction: TextInputAction.search,
+              decoration: const InputDecoration(
+                hintText: "Search public playlists",
+                border: InputBorder.none,
+                isCollapsed: true,
+              ),
+              style: const TextStyle(
+                color: textDark,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          if (_searchController.text.isNotEmpty)
+            IconButton(
+              onPressed: _clearSearch,
+              icon: const Icon(Icons.close_rounded, color: textMuted),
+              tooltip: "Clear search",
+            ),
+        ],
       ),
     );
   }

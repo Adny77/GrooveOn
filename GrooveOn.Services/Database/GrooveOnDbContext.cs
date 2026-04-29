@@ -14,29 +14,29 @@ namespace GrooveOn.Services.Database
     "Armin", "Ajla", "Nedim", "Dalia", "Ermin", "Nora", "Damir", "Ilda"
 };
 
-    private static readonly string[] LastNames =
-    {
+        private static readonly string[] LastNames =
+        {
     "Had�ic", "Kovacevic", "Mehic", "Delic", "Karic", "Selimovic", "Mujic",
-    "Alic", "Begic", "Softic", "Hod�ic", "�aric", "Mujanovic", "Imamovic",
+    "Alic", "Begic", "Softic", "Hodzic", "saric", "Mujanovic", "Imamovic",
     "Pjanic", "Bajric", "Osmanovic", "Halilovic", "Muratovic", "Colic",
-    "Spahic", "Zukic", "Velagic", "Brkic", "Demirovic", "Lulic", "Be�ic"
+    "Spahic", "Zukic", "Velagic", "Brkic", "Demirovic", "Lulic", "Becic"
 };
 
-    private static string NormalizeForUsername(string value)
-    {
-        return value
-            .ToLower()
-            .Replace("c", "c")
-            .Replace("c", "c")
-            .Replace("d", "d")
-            .Replace("�", "s")
-            .Replace("�", "z");
-    }
+        private static string NormalizeForUsername(string value)
+        {
+            return value
+                .ToLower()
+                .Replace("c", "c")
+                .Replace("c", "c")
+                .Replace("d", "d")
+                .Replace("s", "s")
+                .Replace("z", "z");
+        }
 
-    private static string GetLoremPicsumImage(string type, int id)
-    {
-        return $"https://picsum.photos/seed/grooveon-{type}-{id}/500/500";
-    }
+        private static string GetLoremPicsumImage(string type, int id)
+        {
+            return $"https://picsum.photos/seed/grooveon-{type}-{id}/500/500";
+        }
         public GrooveOnDbContext(DbContextOptions<GrooveOnDbContext> options)
             : base(options)
         {
@@ -1462,6 +1462,78 @@ namespace GrooveOn.Services.Database
         Answer = null,
         CreatedAt = new DateTime(2026, 3, 23, 18, 20, 0),
         AnsweredAt = null
+    },
+
+    new Question
+    {
+        Id = 5,
+        UserId = 11,
+        Title = "Can I make my playlist private again?",
+        Content = "I published one of my playlists by mistake and want to hide it from public playlists.",
+        Status = "Answered",
+        Answer = "Open your playlist settings, turn off Public playlist, and save the changes.",
+        CreatedAt = new DateTime(2026, 4, 2, 12, 10, 0),
+        AnsweredAt = new DateTime(2026, 4, 2, 12, 42, 0)
+    },
+
+    new Question
+    {
+        Id = 6,
+        UserId = 11,
+        Title = "Why does random play repeat songs?",
+        Content = "Sometimes random play gives me a song I already listened to in the same session.",
+        Status = "Pending",
+        Answer = null,
+        CreatedAt = new DateTime(2026, 4, 5, 20, 18, 0),
+        AnsweredAt = null
+    },
+
+    new Question
+    {
+        Id = 7,
+        UserId = 11,
+        Title = "Premium playlist limit question",
+        Content = "If I activate premium, will my existing playlists stay available after the subscription ends?",
+        Status = "Answered",
+        Answer = "Your existing playlists stay saved, but Basic account limits apply again after premium expires.",
+        CreatedAt = new DateTime(2026, 4, 9, 9, 35, 0),
+        AnsweredAt = new DateTime(2026, 4, 9, 10, 5, 0)
+    },
+
+    new Question
+    {
+        Id = 8,
+        UserId = 11,
+        Title = "Add songs from artist page",
+        Content = "Can I add a song directly from the artist page into one of my playlists?",
+        Status = "Pending",
+        Answer = null,
+        CreatedAt = new DateTime(2026, 4, 12, 17, 25, 0),
+        AnsweredAt = null
+    },
+
+    new Question
+    {
+        Id = 9,
+        UserId = 11,
+        Title = "Profile image is not updating",
+        Content = "I uploaded a new profile image but the old one still appears on my account.",
+        Status = "Answered",
+        Answer = "Refresh the app after uploading. If the old image remains, sign out and sign back in.",
+        CreatedAt = new DateTime(2026, 4, 17, 14, 55, 0),
+        AnsweredAt = new DateTime(2026, 4, 17, 15, 18, 0)
+    },
+
+    new Question
+    {
+        Id = 10,
+        UserId = 11,
+        Title = "Search inside my playlists",
+        Content = "I would like to quickly search my own playlists by name or description.",
+        Status = "Pending",
+        Answer = null,
+        CreatedAt = new DateTime(2026, 4, 23, 11, 40, 0),
+        AnsweredAt = null
     }
 );
 
@@ -1492,6 +1564,33 @@ namespace GrooveOn.Services.Database
                     AdminId = 1,
                     Message = "Ako i dalje ne radi, probaj restartovati aplikaciju.",
                     CreatedAt = new DateTime(2026, 3, 20, 11, 5, 0)
+                },
+
+                new Answer
+                {
+                    Id = 4,
+                    QuestionId = 5,
+                    AdminId = 1,
+                    Message = "Open your playlist settings, turn off Public playlist, and save the changes.",
+                    CreatedAt = new DateTime(2026, 4, 2, 12, 42, 0)
+                },
+
+                new Answer
+                {
+                    Id = 5,
+                    QuestionId = 7,
+                    AdminId = 1,
+                    Message = "Your existing playlists stay saved, but Basic account limits apply again after premium expires.",
+                    CreatedAt = new DateTime(2026, 4, 9, 10, 5, 0)
+                },
+
+                new Answer
+                {
+                    Id = 6,
+                    QuestionId = 9,
+                    AdminId = 1,
+                    Message = "Refresh the app after uploading. If the old image remains, sign out and sign back in.",
+                    CreatedAt = new DateTime(2026, 4, 17, 15, 18, 0)
                 }
             );
 

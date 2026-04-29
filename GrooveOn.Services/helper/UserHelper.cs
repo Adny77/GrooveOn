@@ -14,21 +14,29 @@ namespace GrooveOn.Services.Helpers
 {
     public static class UserHelper
     {
+        private const int SaltSize = 16;
+        private const int HashSize = 32;
+        private const int Argon2Iterations = 4;
+        private const int Argon2MemorySize = 65536;
+        private const int Argon2DegreeOfParallelism = 4;
+        private const string TemporaryPasswordChars =
+            "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@$?";
+
         public static string CreatePasswordHash(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
                 throw new ArgumentException("Password is required.", nameof(password));
 
-            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
             using var argon2 = new Argon2id(passwordBytes);
             argon2.Salt = salt;
-            argon2.Iterations = 4;
-            argon2.MemorySize = 65536;
-            argon2.DegreeOfParallelism = 4;
+            argon2.Iterations = Argon2Iterations;
+            argon2.MemorySize = Argon2MemorySize;
+            argon2.DegreeOfParallelism = Argon2DegreeOfParallelism;
 
-            byte[] hash = argon2.GetBytes(32);
+            byte[] hash = argon2.GetBytes(HashSize);
 
             return string.Join('.',
                 Convert.ToBase64String(salt),
@@ -63,27 +71,54 @@ namespace GrooveOn.Services.Helpers
             if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(storedHash))
                 return false;
 
-            var parts = storedHash.Split('.');
-            if (parts.Length != 5)
+            try
+            {
+                var parts = storedHash.Split('.');
+                if (parts.Length != 5)
+                    return false;
+
+                byte[] salt = Convert.FromBase64String(parts[0]);
+                int iterations = int.Parse(parts[1]);
+                int memorySize = int.Parse(parts[2]);
+                int degreeOfParallelism = int.Parse(parts[3]);
+                byte[] expectedHash = Convert.FromBase64String(parts[4]);
+
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
+                using var argon2 = new Argon2id(passwordBytes);
+                argon2.Salt = salt;
+                argon2.Iterations = iterations;
+                argon2.MemorySize = memorySize;
+                argon2.DegreeOfParallelism = degreeOfParallelism;
+
+                byte[] computedHash = argon2.GetBytes(expectedHash.Length);
+
+                return CryptographicOperations.FixedTimeEquals(computedHash, expectedHash);
+            }
+            catch (FormatException)
+            {
                 return false;
+            }
+            catch (OverflowException)
+            {
+                return false;
+            }
+        }
 
-            byte[] salt = Convert.FromBase64String(parts[0]);
-            int iterations = int.Parse(parts[1]);
-            int memorySize = int.Parse(parts[2]);
-            int degreeOfParallelism = int.Parse(parts[3]);
-            byte[] expectedHash = Convert.FromBase64String(parts[4]);
+        public static string GenerateTemporaryPassword(int length = 12)
+        {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException(nameof(length), "Password length must be greater than zero.");
 
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            var result = new char[length];
 
-            using var argon2 = new Argon2id(passwordBytes);
-            argon2.Salt = salt;
-            argon2.Iterations = iterations;
-            argon2.MemorySize = memorySize;
-            argon2.DegreeOfParallelism = degreeOfParallelism;
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = TemporaryPasswordChars[
+                    RandomNumberGenerator.GetInt32(TemporaryPasswordChars.Length)];
+            }
 
-            byte[] computedHash = argon2.GetBytes(expectedHash.Length);
-
-            return CryptographicOperations.FixedTimeEquals(computedHash, expectedHash);
+            return new string(result);
         }
 
         public static string CreateJwt(User user, IConfiguration configuration)

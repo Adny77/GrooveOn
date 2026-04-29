@@ -103,18 +103,17 @@ class PlayerProvider with ChangeNotifier {
         throw Exception("ExternalTrackId is not available.");
       }
 
-      _setCurrentSongFromResponse(result, request);
+      await _loadAndPlay(result, request);
 
       _isLoading = false;
       notifyListeners();
-
-      await _loadAndPlay(result.externalTrackId!);
     } catch (e) {
       debugPrint("PLAY ERROR: $e");
       _repeatTimer?.cancel();
       _isLoading = false;
       _isChangingSong = false;
       notifyListeners();
+      rethrow;
     }
   }
 
@@ -139,12 +138,10 @@ class PlayerProvider with ChangeNotifier {
         throw Exception("ExternalTrackId is not available.");
       }
 
-      _setCurrentSongFromResponse(result, request);
+      await _loadAndPlay(result, request);
 
       _isLoading = false;
       notifyListeners();
-
-      await _loadAndPlay(result.externalTrackId!);
     } catch (e) {
       debugPrint("NEXT ERROR: $e");
       _repeatTimer?.cancel();
@@ -177,12 +174,10 @@ class PlayerProvider with ChangeNotifier {
         throw Exception("ExternalTrackId is not available.");
       }
 
-      _setCurrentSongFromResponse(result, request);
+      await _loadAndPlay(result, request);
 
       _isLoading = false;
       notifyListeners();
-
-      await _loadAndPlay(result.externalTrackId!);
     } catch (e) {
       debugPrint("PREVIOUS ERROR: $e");
       _repeatTimer?.cancel();
@@ -290,12 +285,17 @@ class PlayerProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _loadAndPlay(String externalTrackId) async {
-    final previewUrl = await DeezerTrackProvider.getPreviewUrl(externalTrackId);
+  Future<void> _loadAndPlay(
+    PlayerResponse result,
+    Map<String, dynamic> request,
+  ) async {
+    final previewUrl = await _resolvePreviewUrl(result);
 
     if (previewUrl == null || previewUrl.trim().isEmpty) {
       throw Exception("Preview is not available.");
     }
+
+    _setCurrentSongFromResponse(result, request, previewUrl);
 
     _repeatTimer?.cancel();
     _isChangingSong = true;
@@ -312,6 +312,14 @@ class PlayerProvider with ChangeNotifier {
     _startRepeatTimerFromCurrentPosition();
 
     notifyListeners();
+  }
+
+  Future<String?> _resolvePreviewUrl(PlayerResponse result) async {
+    if (result.previewUrl != null && result.previewUrl!.trim().isNotEmpty) {
+      return result.previewUrl;
+    }
+
+    return DeezerTrackProvider.getPreviewUrl(result.externalTrackId);
   }
 
   void _startRepeatTimerFromCurrentPosition() {
@@ -341,14 +349,16 @@ class PlayerProvider with ChangeNotifier {
   void _setCurrentSongFromResponse(
     PlayerResponse result,
     Map<String, dynamic> request,
+    String previewUrl,
   ) {
     _currentSong = PlayerSong(
       id: result.songId,
-      title: result.title ?? "",
+      title: result.title,
       artistName: result.artistName,
       duration: result.duration,
       coverUrl: result.coverUrl,
-      externalTrackId: result.externalTrackId!,
+      previewUrl: previewUrl,
+      externalTrackId: result.externalTrackId,
     );
 
     _currentRequest = {

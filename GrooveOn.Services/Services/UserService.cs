@@ -15,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -71,6 +70,7 @@ namespace GrooveOn.Services.Services
                 entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
 
+            entity.Password = string.Empty;
             entity.JoinDate = DateTime.UtcNow;
             return entity;
         }
@@ -87,6 +87,8 @@ namespace GrooveOn.Services.Services
             {
                 entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
+
+            entity.Password = string.Empty;
         }
 
         public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
@@ -202,7 +204,7 @@ namespace GrooveOn.Services.Services
             if (user == null)
                 throw new UserException("Email is not linked to any account.");
 
-            var newPassword = GenerateRandomPassword();
+            var newPassword = UserHelper.GenerateTemporaryPassword();
 
             user.PasswordHash = UserHelper.CreatePasswordHash(newPassword);
 
@@ -239,22 +241,5 @@ namespace GrooveOn.Services.Services
             );
         }
 
-        private string GenerateRandomPassword(int length = 10)
-        {
-            const string chars =
-                "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@$?";
-
-            var bytes = new byte[length];
-            RandomNumberGenerator.Fill(bytes);
-
-            var result = new char[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                result[i] = chars[bytes[i] % chars.Length];
-            }
-
-            return new string(result);
-        }
     }
 }

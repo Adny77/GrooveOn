@@ -10,6 +10,7 @@ namespace GrooveOn.Model.ResponseObjects
     public String ArtistName {get; set;}
     public int Duration {get; set;}
     public string CoverUrl { get; set; }
+    public string? PreviewUrl { get; set; }
     public string ExternalTrackId { get; set; }
     public bool HasPrevious { get; set; }
     public bool HasNext { get; set; }

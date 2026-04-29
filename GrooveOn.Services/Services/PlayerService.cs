@@ -398,6 +398,7 @@ namespace GrooveOn.Services.Services
                 CoverUrl = s.CoverUrl,
                 ArtistName = s.Artist.Name,
                 Duration = s.DurationSeconds.Value,
+                PreviewUrl = s.PreviewUrl,
                 ExternalTrackId = s.ExternalTrackId,
                 HasPrevious = prev,
                 HasNext = next

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
+import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/user.dart';
 import 'package:grooveon_mobile/providers/image_provider.dart';
@@ -38,6 +39,14 @@ class UserScreenState extends State<UserScreen> {
   bool _isImageChanged = false;
 
   User? _user;
+  bool _syncingFields = false;
+  String _savedFirstName = "";
+  String _savedLastName = "";
+  String _savedUsername = "";
+  String _savedEmail = "";
+  String _savedPhone = "";
+  String _savedBirthDate = "";
+
   bool _loading = true;
   bool _saving = false;
   String? _error;
@@ -55,12 +64,18 @@ class UserScreenState extends State<UserScreen> {
       _phone,
       _birthDate,
     ]) {
-      c.addListener(() {
-        if (_errors.isNotEmpty) {
-          setState(() => _errors.clear());
-        }
-      });
+      c.addListener(_onFieldChanged);
     }
+  }
+
+  void _onFieldChanged() {
+    if (_syncingFields || !mounted) return;
+
+    setState(() {
+      if (_errors.isNotEmpty) {
+        _errors.clear();
+      }
+    });
   }
 
   @override
@@ -75,8 +90,8 @@ class UserScreenState extends State<UserScreen> {
   }
 
   Future<bool> confirmLeaveScreen() async {
-  return await _confirmExitIfChanged();
-}
+    return await _confirmExitIfChanged();
+  }
 
   Future<bool> _confirmExitIfChanged() async {
     if (!_hasChanges()) return true;
@@ -107,16 +122,36 @@ class UserScreenState extends State<UserScreen> {
   bool _hasChanges() {
     if (_user == null) return false;
 
-    return _firstName.text.trim() != (_user?.firstName ?? "") ||
-        _lastName.text.trim() != (_user?.lastName ?? "") ||
-        _username.text.trim() != (_user?.username ?? "") ||
-        _email.text.trim() != (_user?.email ?? "") ||
-        _phone.text.trim() != (_user?.phoneNumber ?? "") ||
-        _birthDate.text.trim() !=
-            (_user?.dateOfBirth == null
-                ? ""
-                : _formatDate(_user!.dateOfBirth!)) ||
+    return _firstName.text.trim() != _savedFirstName ||
+        _lastName.text.trim() != _savedLastName ||
+        _username.text.trim() != _savedUsername ||
+        _email.text.trim() != _savedEmail ||
+        _phone.text.trim() != _savedPhone ||
+        _birthDate.text.trim() != _savedBirthDate ||
         _isImageChanged;
+  }
+
+  void _setSavedSnapshot(User user) {
+    _savedFirstName = user.firstName;
+    _savedLastName = user.lastName;
+    _savedUsername = user.username;
+    _savedEmail = user.email;
+    _savedPhone = user.phoneNumber ?? "";
+    _savedBirthDate = user.dateOfBirth == null
+        ? ""
+        : _formatDate(user.dateOfBirth!);
+  }
+
+  void _markCurrentValuesSaved() {
+    _savedFirstName = _firstName.text.trim();
+    _savedLastName = _lastName.text.trim();
+    _savedUsername = _username.text.trim();
+    _savedEmail = _email.text.trim();
+    _savedPhone = _phone.text.trim();
+    _savedBirthDate = _birthDate.text.trim();
+    _pickedImage = null;
+    _isImageChanged = false;
+    _errors.clear();
   }
 
   Future<void> _pickImage() async {
@@ -147,15 +182,18 @@ class UserScreenState extends State<UserScreen> {
 
       final user = await context.read<UserProvider>().getById(userId);
 
+      _syncingFields = true;
       _user = user;
-      _firstName.text = user.firstName ?? "";
-      _lastName.text = user.lastName ?? "";
-      _username.text = user.username ?? "";
-      _email.text = user.email ?? "";
-      _phone.text = user.phoneNumber ?? "";
-      _birthDate.text = user.dateOfBirth == null
-          ? ""
-          : _formatDate(user.dateOfBirth!);
+      _setSavedSnapshot(user);
+      _firstName.text = _savedFirstName;
+      _lastName.text = _savedLastName;
+      _username.text = _savedUsername;
+      _email.text = _savedEmail;
+      _phone.text = _savedPhone;
+      _birthDate.text = _savedBirthDate;
+      _pickedImage = null;
+      _isImageChanged = false;
+      _syncingFields = false;
 
       if (!mounted) return;
       setState(() => _loading = false);
@@ -177,11 +215,7 @@ class UserScreenState extends State<UserScreen> {
         _firstName.text,
         "First name is required.",
       ),
-      Rules.requiredText(
-        "lastName",
-        _lastName.text,
-        "Last name is required.",
-      ),
+      Rules.requiredText("lastName", _lastName.text, "Last name is required."),
       Rules.username("username", _username.text),
       Rules.email("email", _email.text),
       Rules.phone("phoneNumber", _phone.text, required: true),
@@ -197,6 +231,7 @@ class UserScreenState extends State<UserScreen> {
   }
 
   Future<void> _save() async {
+    if (!_hasChanges()) return;
     if (!_validateProfile()) return;
 
     final userId = Session.userId;
@@ -204,18 +239,18 @@ class UserScreenState extends State<UserScreen> {
 
     setState(() => _saving = true);
 
-    String? finalImage = _user?.userImage;
-
-    if (_pickedImage != null) {
-      final uploadedFileName = await ImageAppProvider.upload(
-        file: _pickedImage!,
-        folder: "users",
-      );
-
-      finalImage = uploadedFileName;
-    }
-
     try {
+      String? finalImage = _user?.userImage;
+
+      if (_pickedImage != null) {
+        final uploadedFileName = await ImageAppProvider.upload(
+          file: _pickedImage!,
+          folder: "users",
+        );
+
+        finalImage = uploadedFileName;
+      }
+
       await context.read<UserProvider>().update(userId, {
         "firstName": _firstName.text.trim(),
         "lastName": _lastName.text.trim(),
@@ -228,6 +263,8 @@ class UserScreenState extends State<UserScreen> {
       });
 
       if (!mounted) return;
+
+      setState(_markCurrentValuesSaved);
 
       SnackbarHelper.showUpdate(context, "Profile updated successfully.");
 
@@ -448,6 +485,8 @@ class UserScreenState extends State<UserScreen> {
   }
 
   Widget _profileForm() {
+    final hasChanges = _hasChanges();
+
     return _card(
       icon: Icons.person_outline_rounded,
       title: "Profile",
@@ -505,7 +544,7 @@ class UserScreenState extends State<UserScreen> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: _saving ? null : _save,
+              onPressed: _saving || !hasChanges ? null : _save,
               style: ElevatedButton.styleFrom(
                 backgroundColor: primary,
                 foregroundColor: Colors.white,

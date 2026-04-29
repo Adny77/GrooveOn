@@ -118,24 +118,12 @@ class _MiniContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: song?.coverUrl != null && song!.coverUrl!.trim().isNotEmpty
-                ? Image.network(
-                    song.coverUrl!,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.white24,
-                    child: const Icon(
-                      Icons.music_note_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
+          _CoverArt(
+            url: song?.coverUrl,
+            width: 50,
+            height: 50,
+            borderRadius: 12,
+            iconSize: 24,
           ),
           const SizedBox(width: 12),
 
@@ -162,63 +150,143 @@ class _MiniContent extends StatelessWidget {
             ),
           ),
 
-          IconButton(
-            onPressed: player.hasPrevious ? player.playPrevious : null,
-            icon: Icon(
-              Icons.skip_previous_rounded,
-              color: player.hasPrevious ? Colors.white : Colors.white30,
-              size: 28,
-            ),
-          ),
-
-          IconButton(
-            onPressed: player.isLoading
-                ? null
-                : () {
-                    if (player.isCompleted) {
-                      player.repeatCurrentSong();
-                    } else {
-                      player.togglePlayPause();
-                    }
-                  },
-            icon: player.isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Icon(
-                    player.isCompleted
-                        ? Icons.repeat_rounded
-                        : player.isPlaying
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 32,
+          SizedBox(
+            width: 168,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 40,
+                    height: 40,
                   ),
-          ),
-
-          IconButton(
-            onPressed: player.hasNext ? player.playNext : null,
-            icon: Icon(
-              Icons.skip_next_rounded,
-              color: player.hasNext ? Colors.white : Colors.white30,
-              size: 28,
-            ),
-          ),
-
-          IconButton(
-            onPressed: player.stopPlayer,
-            icon: const Icon(
-              Icons.close_rounded,
-              color: Colors.white,
-              size: 24,
+                  onPressed: player.hasPrevious ? player.playPrevious : null,
+                  icon: Icon(
+                    Icons.skip_previous_rounded,
+                    color: player.hasPrevious ? Colors.white : Colors.white30,
+                    size: 28,
+                  ),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 40,
+                    height: 40,
+                  ),
+                  onPressed: player.isLoading
+                      ? null
+                      : () {
+                          if (player.isCompleted) {
+                            player.repeatCurrentSong();
+                          } else {
+                            player.togglePlayPause();
+                          }
+                        },
+                  icon: player.isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Icon(
+                          player.isCompleted
+                              ? Icons.repeat_rounded
+                              : player.isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 40,
+                    height: 40,
+                  ),
+                  onPressed: player.hasNext ? player.playNext : null,
+                  icon: Icon(
+                    Icons.skip_next_rounded,
+                    color: player.hasNext ? Colors.white : Colors.white30,
+                    size: 28,
+                  ),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 40,
+                    height: 40,
+                  ),
+                  onPressed: player.stopPlayer,
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CoverArt extends StatelessWidget {
+  final String? url;
+  final double width;
+  final double height;
+  final double borderRadius;
+  final double iconSize;
+
+  const _CoverArt({
+    required this.url,
+    required this.width,
+    required this.height,
+    required this.borderRadius,
+    required this.iconSize,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = url?.trim();
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: imageUrl != null && imageUrl.isNotEmpty
+            ? Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _CoverFallback(iconSize: iconSize),
+              )
+            : _CoverFallback(iconSize: iconSize),
+      ),
+    );
+  }
+}
+
+class _CoverFallback extends StatelessWidget {
+  final double iconSize;
+
+  const _CoverFallback({required this.iconSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white24,
+      child: Icon(
+        Icons.music_note_rounded,
+        size: iconSize,
+        color: Colors.white,
       ),
     );
   }
@@ -252,12 +320,16 @@ class _FullContentState extends State<_FullContent> {
     try {
       setState(() => _isDownloading = true);
 
-      final previewUrl = await DeezerTrackProvider.getPreviewUrl(
-        song.externalTrackId!,
-      );
+      var previewUrl = song.previewUrl;
 
       if (previewUrl == null || previewUrl.trim().isEmpty) {
-        throw Exception("Song on available for download.");
+        previewUrl = await DeezerTrackProvider.getPreviewUrl(
+          song.externalTrackId!,
+        );
+      }
+
+      if (previewUrl == null || previewUrl.trim().isEmpty) {
+        throw Exception("Song is not available for download.");
       }
 
       final response = await http.get(Uri.parse(previewUrl));
@@ -266,7 +338,7 @@ class _FullContentState extends State<_FullContent> {
         throw Exception("Download failed.");
       }
 
-      final safeArtist = _safeFileName(song.artistName ?? "GrooveOn");
+      final safeArtist = _safeFileName(song.artistName);
       final safeTitle = _safeFileName(song.title);
       final fileName = "$safeArtist - $safeTitle song.mp3";
 
@@ -313,25 +385,12 @@ class _FullContentState extends State<_FullContent> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: song?.coverUrl != null && song!.coverUrl!.trim().isNotEmpty
-                ? Image.network(
-                    song.coverUrl!,
-                    height: 260,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    height: 260,
-                    width: double.infinity,
-                    color: Colors.white24,
-                    child: const Icon(
-                      Icons.music_note_rounded,
-                      size: 80,
-                      color: Colors.white,
-                    ),
-                  ),
+          _CoverArt(
+            url: song?.coverUrl,
+            width: double.infinity,
+            height: 260,
+            borderRadius: 24,
+            iconSize: 80,
           ),
 
           const SizedBox(height: 22),

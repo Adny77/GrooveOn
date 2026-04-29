@@ -481,9 +481,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   List<String> _featuresForPlan(SubscriptionPlanResponse plan) {
     if (plan.id == 1) {
       return const [
-        "30 sec song previews",
-        "Browse artists and albums",
-        "Create playlists",
+        "Limited playlists",
+        "No access to album or artist",
+        "Random feature",
       ];
     }
 
@@ -491,7 +491,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       return const [
         "Premium listening access",
         "Unlimited playlist usage",
-        "Better music experience",
+        "Access to artists and albums",
       ];
     }
 
