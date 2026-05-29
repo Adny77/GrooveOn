@@ -382,7 +382,7 @@ class _UniversalPlaylistPreviewScreenState
                                     border: Border.all(color: divider),
                                   ),
                                   child: Text(
-                                    "${widget.playlist.songCount} songs",
+                                    "$_songCount songs",
                                     style: const TextStyle(
                                       color: textSecondary,
                                       fontSize: 12,
@@ -666,7 +666,7 @@ class _UniversalPlaylistPreviewScreenState
 
   String _metaText() {
     final visibility = widget.playlist.isPublic ? "Public" : "Private";
-    return "$visibility • ${widget.playlist.songCount} songs";
+    return "$visibility • $_songCount songs";
   }
 
   Widget _loadingState() {

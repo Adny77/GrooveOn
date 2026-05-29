@@ -1,5 +1,6 @@
 using GrooveOn.MailingService.Configuration;
 using GrooveOn.MailingService.Messages;
+using GrooveOn.Models;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObject;
 using GrooveOn.Model.ResponseObjects;
@@ -70,7 +71,6 @@ namespace GrooveOn.Services.Services
                 entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
 
-            entity.Password = string.Empty;
             entity.JoinDate = DateTime.UtcNow;
             return entity;
         }
@@ -88,7 +88,6 @@ namespace GrooveOn.Services.Services
                 entity.PasswordHash = UserHelper.CreatePasswordHash(request.Password);
             }
 
-            entity.Password = string.Empty;
         }
 
         public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
@@ -118,7 +117,58 @@ namespace GrooveOn.Services.Services
 
             user.PasswordHash = UserHelper.CreatePasswordHash(request.NewPassword);
 
+            _context.Set<Notification>().Add(new Notification
+            {
+                UserId = user.Id,
+                Title = "Lozinka promijenjena",
+                Content = $"Vaša lozinka je uspješno promijenjena dana {DateTime.UtcNow:dd.MM.yyyy} u {DateTime.UtcNow:HH:mm} UTC.",
+                Type = "password_changed",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
+
+            await _PublishPasswordChangedAsync(user);
+        }
+
+        private async Task _PublishPasswordChangedAsync(User user)
+        {
+            try
+            {
+                await using var channel = await _rabbitConnection.CreateChannelAsync();
+
+                string queueName = "email.password-changed";
+
+                await channel.QueueDeclareAsync(
+                    queue: queueName,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null
+                );
+
+                var message = new GrooveOn.MailingService.Messages.PasswordChangedEmailMessage
+                {
+                    To = user.Email!,
+                    Name = user.FirstName ?? "User",
+                    UserName = user.Username,
+                    ChangedAt = DateTime.UtcNow
+                };
+
+                var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+
+                await channel.BasicPublishAsync(
+                    exchange: "",
+                    routingKey: queueName,
+                    body: body
+                );
+            }
+            catch (Exception ex)
+            {
+                // Non-critical — log but don't surface to the caller
+                System.Diagnostics.Debug.WriteLine($"[PasswordChanged] RabbitMQ publish failed: {ex.Message}");
+            }
         }
 
         protected override async Task BeforeInsert(User entity, UserInsertRequest request)
@@ -129,7 +179,7 @@ namespace GrooveOn.Services.Services
             if (exists)
                 throw new InvalidOperationException("User with the same username/email already exists");
 
-            await UserHelper.AssignRoleByFlagsAsync(entity, request, _context);
+            await UserHelper.AssignDefaultRoleAsync(entity, _context);
         }
 
         protected override async Task BeforeUpdate(User entity, UserUpdateRequest request)
@@ -186,9 +236,37 @@ namespace GrooveOn.Services.Services
                     x.UserId == userId &&
                     x.IsActive &&
                     x.SubscriptionPlan != null &&
-                    x.SubscriptionPlan.Name != "Basic Account" &&
-                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.Now)
+                    x.SubscriptionPlan.PlanCode != SubscriptionPlanCodes.Basic &&
+                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.UtcNow)
                 );
+        }
+
+        public async Task AssignRolesAsync(int userId, List<int> roleIds)
+        {
+            var user = await _context.Users
+                .Include(u => u.UserRoles)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null || !user.IsActive)
+                throw new NotFoundException("User was not found.");
+
+            var validRoleIds = await _context.Roles
+                .Where(r => roleIds.Contains(r.Id))
+                .Select(r => r.Id)
+                .ToListAsync();
+
+            if (validRoleIds.Count != roleIds.Count)
+                throw new UserException("One or more role IDs are invalid.");
+
+            _context.RemoveRange(user.UserRoles);
+
+            user.UserRoles = roleIds.Select(roleId => new UserRole
+            {
+                UserId = userId,
+                RoleId = roleId
+            }).ToList();
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task ForgotPasswordAsync(string email)
@@ -202,11 +280,11 @@ namespace GrooveOn.Services.Services
                 .FirstOrDefaultAsync(x => x.Email == normalizedEmail);
 
             if (user == null)
-                throw new UserException("Email is not linked to any account.");
+                return;
 
-            var newPassword = UserHelper.GenerateTemporaryPassword();
-
-            user.PasswordHash = UserHelper.CreatePasswordHash(newPassword);
+            var token = Guid.NewGuid().ToString("N");
+            user.PasswordResetToken = token;
+            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
 
             await _context.SaveChangesAsync();
 
@@ -227,7 +305,7 @@ namespace GrooveOn.Services.Services
                 To = user.Email!,
                 Name = user.FirstName ?? "User",
                 UserName = user.Username,
-                NewPassword = newPassword
+                ResetToken = token
             };
 
             var body = Encoding.UTF8.GetBytes(
@@ -239,6 +317,29 @@ namespace GrooveOn.Services.Services
                 routingKey: queueName,
                 body: body
             );
+        }
+
+        public async Task ResetPasswordWithTokenAsync(string token, string newPassword)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                throw new UserException("Reset token is required.");
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+                throw new UserException("New password must be at least 8 characters long.");
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x =>
+                    x.PasswordResetToken == token &&
+                    x.PasswordResetTokenExpiry > DateTime.UtcNow);
+
+            if (user == null)
+                throw new UserException("Invalid or expired reset token.");
+
+            user.PasswordHash = UserHelper.CreatePasswordHash(newPassword);
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+
+            await _context.SaveChangesAsync();
         }
 
     }

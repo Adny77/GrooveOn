@@ -1,4 +1,4 @@
-using GrooveOn.Model.RequestObjects;
+﻿using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -17,51 +17,51 @@ namespace GrooveOn.API.Controllers
             _reportService = subscriptionService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet]
-        public ActionResult<SubscriptionAnalyticsResponse> Get([FromQuery] int year, [FromQuery] int? month)
+        public async Task<ActionResult<SubscriptionAnalyticsResponse>> Get([FromQuery] int year, [FromQuery] int? month)
         {
-            var result = _reportService.GetSubscriptionAnalytics(year, month);
+            var result = await _reportService.GetSubscriptionAnalyticsAsync(year, month);
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("user-growth-by-month")]
-        public ActionResult<List<UserGrowthPointResponse>> GetUserGrowthByMonth([FromQuery] int year)
+        public async Task<ActionResult<List<UserGrowthPointResponse>>> GetUserGrowthByMonth([FromQuery] int year)
         {
-            var result = _reportService.GetUserGrowthByMonth(year);
+            var result = await _reportService.GetUserGrowthByMonthAsync(year);
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("income-by-month")]
-        public ActionResult<List<IncomeByMonthResponse>> GetIncomeByMonth([FromQuery] int year)
+        public async Task<ActionResult<List<IncomeByMonthResponse>>> GetIncomeByMonth([FromQuery] int year)
         {
-            return Ok(_reportService.GetIncomeByMonth(year));
+            return Ok(await _reportService.GetIncomeByMonthAsync(year));
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("music-overview")]
-        public ActionResult<MusicOverviewResponse> GetMusicOverview([FromQuery] MusicOverviewRequest request)
+        public async Task<ActionResult<MusicOverviewResponse>> GetMusicOverview([FromQuery] MusicOverviewRequest request)
         {
-            var result = _reportService.GetMusicOverview(request);
+            var result = await _reportService.GetMusicOverviewAsync(request);
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("new-users-subscription-analytics")]
-        public SubscriptionAnalyticsResponse GetNewUsersSubscriptionAnalytics([FromQuery] int year, [FromQuery] int? month)
+        public async Task<SubscriptionAnalyticsResponse> GetNewUsersSubscriptionAnalytics([FromQuery] int year, [FromQuery] int? month)
         {
-            return _reportService.GetNewUsersSubscriptionAnalytics(year, month);
+            return await _reportService.GetNewUsersSubscriptionAnalyticsAsync(year, month);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("mobile-home")]
-        public ActionResult<MobileHomeResponse> GetMobileHome(
+        public async Task<ActionResult<MobileHomeResponse>> GetMobileHome(
         [FromQuery] int takeTracks = 4,
         [FromQuery] int takeArtists = 8)
         {
-            return Ok(_reportService.GetMobileHome(takeTracks, takeArtists));
+            return Ok(await _reportService.GetMobileHomeAsync(takeTracks, takeArtists));
         }
     }
 }

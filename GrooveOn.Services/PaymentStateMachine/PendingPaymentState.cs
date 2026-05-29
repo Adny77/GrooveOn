@@ -1,41 +1,45 @@
 using GrooveOn.Services.Database;
+using GrooveOn.Services.Interfaces;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GrooveOn.Services.PaymentStateMachine
 {
-    public class PendingPaymentState : BasePaymentState
+    public class PendingPaymentState(
+        IServiceProvider serviceProvider,
+        GrooveOnDbContext context,
+        IMapper mapper) : BasePaymentState(serviceProvider, context, mapper)
     {
-        public PendingPaymentState(
-            GrooveOnDbContext context,
-            IServiceProvider serviceProvider)
-            : base(context, serviceProvider)
+        public override async Task ToProcessingAsync(Payment payment, string stripeIntentId)
         {
-        }
-
-        public override async Task ToProcessingAsync(int paymentId)
-        {
-            var payment = await GetPaymentAsync(paymentId);
-
+            payment.StripePaymentIntentId = stripeIntentId;
             payment.PaymentStatus = "Processing";
-
             await _context.SaveChangesAsync();
         }
 
-        public override async Task ToCancelledAsync(int paymentId)
+        public override async Task ToCanceledAsync(Payment payment)
         {
-            var payment = await GetPaymentAsync(paymentId);
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(x => x.Id == payment.SubscriptionId);
+
+            if (subscription != null)
+            {
+                subscription.IsActive = false;
+
+                _serviceProvider.GetRequiredService<INotificationService>().AddForUser(
+                    subscription.UserId,
+                    "Uplata otkazana",
+                    "Vaša uplata je otkazana i članarina nije aktivirana.",
+                    "payment_canceled");
+            }
 
             payment.PaymentStatus = "Canceled";
-
+            payment.FailureReason = "Payment was canceled.";
             await _context.SaveChangesAsync();
         }
 
-        public override List<string> AllowedActions()
-        {
-            return new List<string>
-    {
-        nameof(ToProcessingAsync),
-        nameof(ToCancelledAsync)
-    };
-        }
+        public override List<string> AllowedActions() =>
+            [nameof(ToProcessingAsync), nameof(ToCanceledAsync)];
     }
 }

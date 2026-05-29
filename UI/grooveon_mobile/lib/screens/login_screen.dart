@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:grooveon_mobile/dialogs/forgot_passowrd_dialog.dart';
+import 'package:grooveon_mobile/dialogs/forgot_password_dialog.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/login_request.dart';
 import 'package:grooveon_mobile/providers/auth_provider.dart';

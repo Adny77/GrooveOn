@@ -28,6 +28,7 @@ SongResponse _$SongResponseFromJson(Map<String, dynamic> json) => SongResponse(
       ? null
       : DateTime.parse(json['lastSyncedAt'] as String),
   createdAt: DateTime.parse(json['createdAt'] as String),
+  whyRecommended: json['whyRecommended'] as String?,
 );
 
 Map<String, dynamic> _$SongResponseToJson(SongResponse instance) =>
@@ -49,4 +50,5 @@ Map<String, dynamic> _$SongResponseToJson(SongResponse instance) =>
       'isActive': instance.isActive,
       'lastSyncedAt': instance.lastSyncedAt?.toIso8601String(),
       'createdAt': instance.createdAt.toIso8601String(),
+      'whyRecommended': instance.whyRecommended,
     };

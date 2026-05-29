@@ -1,5 +1,6 @@
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
+using GrooveOn.Models;
 using GrooveOn.Services.Database;
 using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
@@ -16,7 +17,7 @@ namespace GrooveOn.Services.Services
             _context = context;
         }
 
-        public SubscriptionAnalyticsResponse GetNewUsersSubscriptionAnalytics(int year, int? month)
+        public async Task<SubscriptionAnalyticsResponse> GetNewUsersSubscriptionAnalyticsAsync(int year, int? month)
         {
             if (year <= 0)
                 throw new UserException("Year is required.");
@@ -31,15 +32,20 @@ namespace GrooveOn.Services.Services
                 newUsersQuery = newUsersQuery.Where(x => x.JoinDate.Month == month.Value);
             }
 
-            var newUserIds = newUsersQuery
+            var newUserIds = await newUsersQuery
                 .Select(x => x.Id)
-                .ToList();
+                .ToListAsync();
+
+            var basicPlanId = await _context.SubscriptionPlans
+                .Where(x => x.PlanCode == SubscriptionPlanCodes.Basic)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
 
             var query = _context.Subscriptions
                 .Where(x => newUserIds.Contains(x.UserId));
 
-            var basicCount = query.Count(x => x.SubscriptionPlanId == 1);
-            var premiumCount = query.Count(x => x.SubscriptionPlanId == 2 || x.SubscriptionPlanId == 3);
+            var basicCount = await query.CountAsync(x => x.SubscriptionPlanId == basicPlanId);
+            var premiumCount = await query.CountAsync(x => x.SubscriptionPlanId != basicPlanId);
 
             var total = basicCount + premiumCount;
 
@@ -59,9 +65,9 @@ namespace GrooveOn.Services.Services
             };
         }
 
-        public MobileHomeResponse GetMobileHome(int takeTracks = 4, int takeArtists = 8)
+        public async Task<MobileHomeResponse> GetMobileHomeAsync(int takeTracks = 4, int takeArtists = 8)
         {
-            var topTracks = _context.PlayHistories
+            var topTracks = await _context.PlayHistories
                 .GroupBy(ph => ph.SongId)
                 .Select(g => new
                 {
@@ -69,14 +75,14 @@ namespace GrooveOn.Services.Services
                     PlayCount = g.Count()
                 })
                 .OrderByDescending(x => x.PlayCount)
-                .Take(10) 
-                .ToList();
+                .Take(10)
+                .ToListAsync();
 
             var songIds = topTracks.Select(x => x.SongId).ToList();
 
-            var songs = _context.Songs
+            var songs = await _context.Songs
                 .Where(s => songIds.Contains(s.Id))
-                .ToList();
+                .ToListAsync();
 
             var topTracksResponse = topTracks
                 .Take(takeTracks)
@@ -112,7 +118,7 @@ namespace GrooveOn.Services.Services
                 };
             }
 
-            var topArtists = _context.PlayHistories
+            var topArtists = await _context.PlayHistories
                 .Where(ph => ph.Song != null)
                 .GroupBy(ph => ph.Song!.ArtistId)
                 .Select(g => new
@@ -122,13 +128,13 @@ namespace GrooveOn.Services.Services
                 })
                 .OrderByDescending(x => x.PlayCount)
                 .Take(takeArtists)
-                .ToList();
+                .ToListAsync();
 
             var artistIds = topArtists.Select(x => x.ArtistId).ToList();
 
-            var artists = _context.Artists
+            var artists = await _context.Artists
                 .Where(a => artistIds.Contains(a.Id))
-                .ToList();
+                .ToListAsync();
 
             var topArtistsResponse = topArtists
                 .Select(x =>
@@ -153,8 +159,13 @@ namespace GrooveOn.Services.Services
             };
         }
 
-        public SubscriptionAnalyticsResponse GetSubscriptionAnalytics(int year, int? month = null)
+        public async Task<SubscriptionAnalyticsResponse> GetSubscriptionAnalyticsAsync(int year, int? month = null)
         {
+            var basicPlanId = await _context.SubscriptionPlans
+                .Where(x => x.PlanCode == SubscriptionPlanCodes.Basic)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
             var query = _context.Subscriptions.AsQueryable();
 
             query = query.Where(x => x.StartDate.Year == year);
@@ -164,8 +175,8 @@ namespace GrooveOn.Services.Services
                 query = query.Where(x => x.StartDate.Month == month.Value);
             }
 
-            var basicCount = query.Count(x => x.SubscriptionPlanId == 1);
-            var premiumCount = query.Count(x => x.SubscriptionPlanId == 2 || x.SubscriptionPlanId == 3);
+            var basicCount = await query.CountAsync(x => x.SubscriptionPlanId == basicPlanId);
+            var premiumCount = await query.CountAsync(x => x.SubscriptionPlanId != basicPlanId);
 
             var total = basicCount + premiumCount;
 
@@ -183,7 +194,7 @@ namespace GrooveOn.Services.Services
             };
         }
 
-        public List<UserGrowthPointResponse> GetUserGrowthByMonth(int year)
+        public async Task<List<UserGrowthPointResponse>> GetUserGrowthByMonthAsync(int year)
         {
             var today = DateTime.Today;
             int currentYear = today.Year;
@@ -209,7 +220,7 @@ namespace GrooveOn.Services.Services
                 return new List<UserGrowthPointResponse>();
             }
 
-            var result = _context.Users
+            var result = await _context.Users
                 .Where(x => x.JoinDate.Year == year && x.JoinDate.Month <= maxMonth)
                 .GroupBy(x => x.JoinDate.Month)
                 .Select(g => new UserGrowthPointResponse
@@ -218,7 +229,7 @@ namespace GrooveOn.Services.Services
                     Count = g.Count()
                 })
                 .OrderBy(x => x.Month)
-                .ToList();
+                .ToListAsync();
 
             var monthLabels = new[]
             {
@@ -238,24 +249,29 @@ namespace GrooveOn.Services.Services
             return completed;
         }
 
-        public List<IncomeByMonthResponse> GetIncomeByMonth(int year)
+        public async Task<List<IncomeByMonthResponse>> GetIncomeByMonthAsync(int year)
         {
-            var result = _context.Payments
+            var basicPlanId = await _context.SubscriptionPlans
+                .Where(x => x.PlanCode == SubscriptionPlanCodes.Basic)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            var result = await _context.Payments
                 .Include(x => x.Subscription)
                 .Where(x =>
                     x.PaymentStatus == "Paid" &&
                     x.PaymentDate.HasValue &&
                     x.PaymentDate.Value.Year == year &&
                     x.Subscription != null &&
-                    x.Subscription.SubscriptionPlanId == 2)
+                    x.Subscription.SubscriptionPlanId != basicPlanId)
                 .GroupBy(x => x.PaymentDate!.Value.Month)
                 .Select(g => new IncomeByMonthResponse
                 {
                     Month = g.Key,
-                    TotalIncome = g.Sum(x => x.PaymentAmount)
+                    TotalIncome = (float)g.Sum(x => x.PaymentAmount)
                 })
                 .OrderBy(x => x.Month)
-                .ToList();
+                .ToListAsync();
 
             return Enumerable.Range(1, 12)
                 .Select(month => new IncomeByMonthResponse
@@ -266,7 +282,7 @@ namespace GrooveOn.Services.Services
                 .ToList();
         }
 
-        public MusicOverviewResponse GetMusicOverview(MusicOverviewRequest request)
+        public async Task<MusicOverviewResponse> GetMusicOverviewAsync(MusicOverviewRequest request)
         {
             ValidateMusicOverviewRequest(request);
 
@@ -293,15 +309,15 @@ namespace GrooveOn.Services.Services
                 Year = request.Year,
                 Month = mode == "month" ? request.Month : null,
 
-                MostPlayedAlbums = GetMostPlayedAlbums(baseQuery, request.Take),
-                MostPlayedSongs = GetMostPlayedSongs(baseQuery, request.Take),
-                MostPlayedArtists = GetMostPlayedArtists(baseQuery, request.Take),
+                MostPlayedAlbums = await GetMostPlayedAlbumsAsync(baseQuery, request.Take),
+                MostPlayedSongs = await GetMostPlayedSongsAsync(baseQuery, request.Take),
+                MostPlayedArtists = await GetMostPlayedArtistsAsync(baseQuery, request.Take),
 
-                LeastPlayedAlbums = GetLeastPlayedAlbums(baseQuery, request.Take),
-                LeastPlayedSongs = GetLeastPlayedSongs(baseQuery, request.Take),
-                LeastPlayedArtists = GetLeastPlayedArtists(baseQuery, request.Take),
+                LeastPlayedAlbums = await GetLeastPlayedAlbumsAsync(baseQuery, request.Take),
+                LeastPlayedSongs = await GetLeastPlayedSongsAsync(baseQuery, request.Take),
+                LeastPlayedArtists = await GetLeastPlayedArtistsAsync(baseQuery, request.Take),
 
-                TrendingGenres = GetTrendingGenres(baseQuery, request.Take)
+                TrendingGenres = await GetTrendingGenresAsync(baseQuery, request.Take)
             };
         }
 
@@ -338,7 +354,7 @@ namespace GrooveOn.Services.Services
             }
         }
 
-        private List<MusicStatItemResponse> GetMostPlayedSongs(IQueryable<PlayHistory> query, int take)
+        private Task<List<MusicStatItemResponse>> GetMostPlayedSongsAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .GroupBy(x => new
@@ -357,10 +373,10 @@ namespace GrooveOn.Services.Services
                 .OrderByDescending(x => x.PlayCount)
                 .ThenBy(x => x.Title)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
 
-        private List<MusicStatItemResponse> GetLeastPlayedSongs(IQueryable<PlayHistory> query, int take)
+        private Task<List<MusicStatItemResponse>> GetLeastPlayedSongsAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .GroupBy(x => new
@@ -379,10 +395,10 @@ namespace GrooveOn.Services.Services
                 .OrderBy(x => x.PlayCount)
                 .ThenBy(x => x.Title)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
 
-        private List<MusicStatItemResponse> GetMostPlayedAlbums(IQueryable<PlayHistory> query, int take)
+        private Task<List<MusicStatItemResponse>> GetMostPlayedAlbumsAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .Where(x => x.Song.Album != null)
@@ -402,10 +418,10 @@ namespace GrooveOn.Services.Services
                 .OrderByDescending(x => x.PlayCount)
                 .ThenBy(x => x.Title)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
 
-        private List<MusicStatItemResponse> GetLeastPlayedAlbums(IQueryable<PlayHistory> query, int take)
+        private Task<List<MusicStatItemResponse>> GetLeastPlayedAlbumsAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .Where(x => x.Song.Album != null)
@@ -425,10 +441,10 @@ namespace GrooveOn.Services.Services
                 .OrderBy(x => x.PlayCount)
                 .ThenBy(x => x.Title)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
 
-        private List<MusicStatItemResponse> GetMostPlayedArtists(IQueryable<PlayHistory> query, int take)
+        private Task<List<MusicStatItemResponse>> GetMostPlayedArtistsAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .Where(x => x.Song.Artist != null)
@@ -448,10 +464,10 @@ namespace GrooveOn.Services.Services
                 .OrderByDescending(x => x.PlayCount)
                 .ThenBy(x => x.Title)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
 
-        private List<MusicStatItemResponse> GetLeastPlayedArtists(IQueryable<PlayHistory> query, int take)
+        private Task<List<MusicStatItemResponse>> GetLeastPlayedArtistsAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .Where(x => x.Song.Artist != null)
@@ -471,10 +487,10 @@ namespace GrooveOn.Services.Services
                 .OrderBy(x => x.PlayCount)
                 .ThenBy(x => x.Title)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
 
-        private List<GenreStatItemResponse> GetTrendingGenres(IQueryable<PlayHistory> query, int take)
+        private Task<List<GenreStatItemResponse>> GetTrendingGenresAsync(IQueryable<PlayHistory> query, int take)
         {
             return query
                 .Where(x => x.Song.Album != null)
@@ -493,7 +509,7 @@ namespace GrooveOn.Services.Services
                 .OrderByDescending(x => x.PlayCount)
                 .ThenBy(x => x.Genre)
                 .Take(take)
-                .ToList();
+                .ToListAsync();
         }
     }
 }

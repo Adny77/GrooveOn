@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:grooveon_desktop/helper/http_helper.dart';
 import 'package:grooveon_desktop/providers/album_provider.dart';
 import 'package:grooveon_desktop/providers/auth_provider.dart';
 import 'package:grooveon_desktop/providers/report_provider.dart';
@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
 
   runApp(
     MultiProvider(
@@ -33,6 +32,7 @@ class GrooveOnApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: HttpHelper.navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'GrooveOn',
       initialRoute: AppRoutes.login,

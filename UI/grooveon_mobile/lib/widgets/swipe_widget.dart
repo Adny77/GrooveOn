@@ -10,11 +10,13 @@ class SwipePagedList<T> extends StatefulWidget {
     required this.provider,
     required this.itemBuilder,
     this.separatorHeight = 10,
+    this.showHint = true,
   });
 
   final UniversalPagingProvider<T> provider;
   final ItemCardBuilder<T> itemBuilder;
   final double separatorHeight;
+  final bool showHint;
 
   @override
   State<SwipePagedList<T>> createState() => _SwipePagedListState<T>();
@@ -86,26 +88,27 @@ class _SwipePagedListState<T> extends State<SwipePagedList<T>> {
                   child: _buildContent(context, paging), 
                 ),
 
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "Prevuci lijevo/desno za promjenu stranice",
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF7A7A7A),
+                if (widget.showHint) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "Prevuci lijevo/desno za promjenu stranice",
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF7A7A7A),
+                          ),
                         ),
                       ),
-                    ),
-                    Text(
-                      "${paging.page + 1} / ${paging.totalPages}",
-                      style: const TextStyle(fontWeight: FontWeight.w900),
-                    ),
-                  ],
-                ),
+                      Text(
+                        "${paging.page + 1} / ${paging.totalPages}",
+                        style: const TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
+                ],
 
                 if (paging.isLoading && paging.items.isNotEmpty)
                   const Padding(

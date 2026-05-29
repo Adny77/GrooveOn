@@ -42,8 +42,6 @@ namespace GrooveOn.Services.Database
 
         public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
 
-        public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
-
         public ICollection<PlayHistory> ListeningHistories { get; set; } = new List<PlayHistory>();
     }
 }

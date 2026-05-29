@@ -44,7 +44,7 @@ stripe --version
 Ulogujte se na Stripe dashboard:
 https://dashboard.stripe.com/login
 
-Email: testnimuzicar@gmail.com
+Email: testniadminmuzicar@gmail.com
 Password: TestniMuzicar123!
 
 U terminalu pokrenite:

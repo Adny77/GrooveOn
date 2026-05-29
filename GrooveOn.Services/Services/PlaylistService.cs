@@ -7,6 +7,7 @@ using GrooveOn.Services.Interfaces;
 using GrooveOn.Services.Services;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using GrooveOn.Models;
 
 namespace GrooveOn.Services.Services
 {
@@ -42,8 +43,8 @@ namespace GrooveOn.Services.Services
                     x.UserId == userId &&
                     x.IsActive &&
                     x.SubscriptionPlan != null &&
-                    x.SubscriptionPlan.Name != "Basic Account" &&
-                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.Now)
+                    x.SubscriptionPlan.PlanCode != SubscriptionPlanCodes.Basic &&
+                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.UtcNow)
                 );
 
             if (!hasPremium)

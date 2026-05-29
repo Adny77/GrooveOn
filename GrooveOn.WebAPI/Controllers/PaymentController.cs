@@ -1,4 +1,4 @@
-using GrooveOn.API.Controllers;
+﻿using GrooveOn.API.Controllers;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
@@ -27,42 +27,42 @@ namespace GrooveOn.WebAPI.Controllers
             _stripeSettings = stripeSettings;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("")]
         public override Task<PagedResult<PaymentResponse>> Get([FromQuery] PaymentSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("{id}")]
         public override Task<PaymentResponse?> GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         public override Task<PaymentResponse> Create([FromBody] PaymentUpsertRequest request)
         {
             return base.Create(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id}")]
         public override Task<PaymentResponse?> Update(int id, [FromBody] PaymentUpsertRequest request)
         {
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {
-            return base.Delete(id);
+            throw new UserException("Payments cannot be deleted. Use payment status transitions to manage payment records.");
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpPost("create-new-intent")]
         public async Task<IActionResult> CreateNewPaymentIntent(
             [FromBody] CreatePaymentIntentRequest request)
@@ -74,10 +74,7 @@ namespace GrooveOn.WebAPI.Controllers
                 if (!int.TryParse(userIdClaim, out var loggedInUserId))
                     return Unauthorized("Invalid token.");
 
-                var isAdmin = User.IsInRole("Admin");
-
-                if (!isAdmin && request.UserId != loggedInUserId)
-                    return Forbid();
+                request.UserId = loggedInUserId;
 
                 var result = await (_service as IPaymentService)!
                     .CreateNewPaymentIntentAsync(request);

@@ -1,4 +1,4 @@
-using GrooveOn.Model.RequestObjects;
+﻿using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Interfaces;
@@ -13,35 +13,35 @@ namespace GrooveOn.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("")]
         public override Task<PagedResult<RoleResponse>> Get([FromQuery] BaseSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("{id}")]
         public override Task<RoleResponse?> GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         public override Task<RoleResponse> Create([FromBody] RoleUpsertRequest request)
         {
             return base.Create(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id}")]
         public override Task<RoleResponse?> Update(int id, [FromBody] RoleUpsertRequest request)
         {
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {

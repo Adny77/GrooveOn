@@ -93,11 +93,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _openForgotPasswordDialog() async {
-    await showDialog(
+    final resetSuccess = await showDialog<bool>(
       context: context,
-      barrierDismissible: ! _loading,
+      barrierDismissible: false,
       builder: (_) => const ForgotPasswordDialog(),
     );
+
+    if (resetSuccess == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Password has been reset successfully. You can now log in."),
+          backgroundColor: Color(0xFF4A148C),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   InputDecoration _inputDecoration({

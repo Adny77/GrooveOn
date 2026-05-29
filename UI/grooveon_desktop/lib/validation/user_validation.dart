@@ -25,21 +25,17 @@ class Validators {
   if (!required && v.isEmpty) return null;
   if (v.isEmpty) return "Phone number is required";
 
-  // Dozvoljeni karakteri
   final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
   if (!allowedChars.hasMatch(v)) {
     return "Enter a valid phone number";
   }
 
-  // + može biti samo na početku
   if (v.contains('+') && !v.startsWith('+')) {
     return "The + sign can only be at the beginning";
   }
 
-  // Izvuci samo cifre
   final digits = v.replaceAll(RegExp(r'\D'), '');
 
-  // Lokalni brojevi
   if (digits.startsWith('060')) {
     if (digits.length != 10) {
       return "060 must have 7 digits after prefix";
@@ -54,7 +50,6 @@ class Validators {
     return null;
   }
 
-  // Internacionalni format
   if (digits.startsWith('38760')) {
     if (digits.length != 12) {
       return "38760 must have 7 digits after prefix";
@@ -130,6 +125,40 @@ class Validators {
 
     if (value != password) {
       return "Passwords do not match";
+    }
+
+    return null;
+  }
+
+  static String? positiveDecimal(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return "$fieldName is required";
+    }
+
+    final parsed = double.tryParse(value.trim().replaceAll(',', '.'));
+    if (parsed == null) {
+      return "Enter a valid number for $fieldName";
+    }
+
+    if (parsed <= 0) {
+      return "$fieldName must be greater than 0";
+    }
+
+    return null;
+  }
+
+  static String? positiveInteger(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return "$fieldName is required";
+    }
+
+    final parsed = int.tryParse(value.trim());
+    if (parsed == null) {
+      return "$fieldName must be a whole number";
+    }
+
+    if (parsed <= 0) {
+      return "$fieldName must be greater than 0";
     }
 
     return null;

@@ -1,4 +1,4 @@
-using GrooveOn.Model.Requests;
+﻿using GrooveOn.Model.Requests;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.Responses;
 using GrooveOn.Model.SearchObjects;
@@ -18,42 +18,42 @@ namespace GrooveOn.API.Controllers
             _songService = service;
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("")]
         public override Task<PagedResult<SongResponse>> Get([FromQuery] SongSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("{id}")]
         public override Task<SongResponse?> GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         public override Task<SongResponse> Create([FromBody] SongUpsertRequest request)
         {
             return base.Create(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id}")]
         public override Task<SongResponse?> Update(int id, [FromBody] SongUpsertRequest request)
         {
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {
             return base.Delete(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("check-duplicates")]
         public async Task<SongDuplicateCheckResponse> CheckDuplicates(
             [FromBody] SongDuplicateCheckRequest request)
@@ -61,7 +61,7 @@ namespace GrooveOn.API.Controllers
             return await _songService.CheckDuplicatesAsync(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("bulk-save-deezer")]
         public async Task<SongBulkInsertResponse> BulkSaveDeezerSongs(
             [FromBody] SongBulkInsertRequest request)
@@ -69,7 +69,7 @@ namespace GrooveOn.API.Controllers
             return await _songService.BulkInsertDeezerSongsAsync(request);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("recommended")]
         public async Task<ActionResult<List<SongResponse>>> GetRecommended([FromQuery] int take = 4)
         {

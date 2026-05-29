@@ -7,8 +7,11 @@ namespace GrooveOn.Model.RequestObjects
         [Required]
         public string Name { get; set; } = string.Empty;
 
+        [Required]
+        public string PlanCode { get; set; } = string.Empty;
+
         [Range(0, double.MaxValue)]
-        public float Price { get; set; }
+        public decimal Price { get; set; }
 
         [Range(0, int.MaxValue)]
         public int DurationDays { get; set; }

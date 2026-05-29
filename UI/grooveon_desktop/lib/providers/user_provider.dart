@@ -18,8 +18,21 @@ class UserProvider extends BaseProvider<User> {
     final response = await http.post(
       url,
       headers: HttpHelper.getHeaders(withToken: false),
+      body: jsonEncode({"email": email.trim()}),
+    );
+
+    HttpHelper.checkResponse(response);
+  }
+
+  Future<void> resetPassword(String token, String newPassword) async {
+    final url = Uri.parse("${ApiConfig.apiBase}/api/User/reset-password");
+
+    final response = await http.post(
+      url,
+      headers: HttpHelper.getHeaders(withToken: false),
       body: jsonEncode({
-        "email": email.trim(),
+        "token": token.trim(),
+        "newPassword": newPassword,
       }),
     );
 

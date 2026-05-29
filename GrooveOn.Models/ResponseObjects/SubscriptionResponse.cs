@@ -16,7 +16,9 @@ namespace GrooveOn.Model.ResponseObjects
 
         public string? SubscriptionPlanName { get; set; }
 
-        public float SubscriptionPlanPrice { get; set; }
+        public string? SubscriptionPlanCode { get; set; }
+
+        public decimal SubscriptionPlanPrice { get; set; }
 
         public int SubscriptionPlanDurationDays { get; set; }
 

@@ -1,19 +1,12 @@
 using GrooveOn.Services.Database;
+using MapsterMapper;
 
 namespace GrooveOn.Services.PaymentStateMachine
 {
-    public class PaidPaymentState : BasePaymentState
+    public class PaidPaymentState(
+        IServiceProvider serviceProvider,
+        GrooveOnDbContext context,
+        IMapper mapper) : BasePaymentState(serviceProvider, context, mapper)
     {
-        public PaidPaymentState(
-            GrooveOnDbContext context,
-            IServiceProvider serviceProvider)
-            : base(context, serviceProvider)
-        {
-        }
-
-        public override List<string> AllowedActions()
-        {
-            return new List<string>();
-        }
     }
 }

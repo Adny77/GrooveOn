@@ -6,6 +6,7 @@ part 'subscription_plan_response.g.dart';
 class SubscriptionPlanResponse {
   final int id;
   final String name;
+  final String? planCode;
   final double price;
   final int durationDays;
   final String? description;
@@ -14,6 +15,7 @@ class SubscriptionPlanResponse {
   SubscriptionPlanResponse({
     required this.id,
     required this.name,
+    this.planCode,
     required this.price,
     required this.durationDays,
     this.description,

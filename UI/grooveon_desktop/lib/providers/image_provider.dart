@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:grooveon_desktop/config/api_config.dart';
 import 'package:grooveon_desktop/helper/http_helper.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as p;
 
 class ImageAppProvider {
@@ -26,6 +27,7 @@ class ImageAppProvider {
         'file',
         file.path,
         filename: p.basename(file.path),
+        contentType: _contentTypeFor(file.path),
       ),
     );
 
@@ -53,5 +55,16 @@ class ImageAppProvider {
     );
 
     HttpHelper.checkResponse(res);
+  }
+
+  static MediaType _contentTypeFor(String path) {
+    final ext = p.extension(path).toLowerCase();
+
+    return switch (ext) {
+      '.jpg' || '.jpeg' => MediaType('image', 'jpeg'),
+      '.png' => MediaType('image', 'png'),
+      '.webp' => MediaType('image', 'webp'),
+      _ => MediaType('application', 'octet-stream'),
+    };
   }
 }

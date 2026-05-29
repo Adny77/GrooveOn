@@ -178,11 +178,18 @@ namespace GrooveOn.Services.Services
                 .Take(50)
                 .ToListAsync();
 
+            var artistMatchIds = recommendedCandidates
+                .Where(x => listenedArtistIds.Contains(x.ArtistId))
+                .Select(x => x.Id)
+                .ToHashSet();
+
             var recommended = recommendedCandidates
                 .GroupBy(x => x.ArtistId)
                 .Select(g => g.First())
                 .Take(take)
                 .ToList();
+
+            var popularIds = new HashSet<int>();
 
             if (recommended.Count < take)
             {
@@ -220,8 +227,11 @@ namespace GrooveOn.Services.Services
                     .Take(take - recommended.Count)
                     .ToList();
 
+                foreach (var s in fallback) popularIds.Add(s.Id);
                 recommended.AddRange(fallback);
             }
+
+            var extraIds = new HashSet<int>();
 
             if (recommended.Count < take)
             {
@@ -240,12 +250,24 @@ namespace GrooveOn.Services.Services
                     .Take(take - recommended.Count)
                     .ToListAsync();
 
+                foreach (var s in extraSongs) extraIds.Add(s.Id);
                 recommended.AddRange(extraSongs);
             }
 
             return recommended
                 .Take(take)
-                .Select(MapToResponse)
+                .Select(s =>
+                {
+                    var r = MapToResponse(s);
+                    r.WhyRecommended = artistMatchIds.Contains(s.Id)
+                        ? "Because you listen to this artist"
+                        : popularIds.Contains(s.Id)
+                            ? "Popular right now"
+                            : extraIds.Contains(s.Id)
+                                ? "Discover new music"
+                                : "Based on genres you enjoy";
+                    return r;
+                })
                 .ToList();
         }
 
@@ -319,7 +341,7 @@ namespace GrooveOn.Services.Services
                 .Where(x => !existingSet.Contains(x.ExternalTrackId))
                 .ToList();
 
-            var savedSongIds = new List<int>();
+            var insertedEntities = new List<Song>();
 
             foreach (var item in toInsert)
             {
@@ -364,15 +386,15 @@ namespace GrooveOn.Services.Services
                 };
 
                 _context.Songs.Add(entity);
-                savedSongIds.Add(entity.Id);
+                insertedEntities.Add(entity);
             }
 
             await _context.SaveChangesAsync();
 
             return new SongBulkInsertResponse
             {
-                SavedCount = savedSongIds.Count,
-                SavedSongIds = savedSongIds
+                SavedCount = insertedEntities.Count,
+                SavedSongIds = insertedEntities.Select(x => x.Id).ToList()
             };
         }
 

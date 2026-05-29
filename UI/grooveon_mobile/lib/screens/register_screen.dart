@@ -672,7 +672,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'password': fields.text('password'),
         'dateOfBirth': DateHelper.toUtcIsoNullable(_dob),
         'isActive': true,
-        'isUser': true,
         if (uploadedImageName != null) 'userImage': uploadedImageName,
       };
 

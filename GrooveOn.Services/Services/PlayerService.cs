@@ -94,6 +94,7 @@ namespace GrooveOn.Services.Services
             };
 
             _context.Set<Player>().Add(playerItem);
+            _context.Set<PlayHistory>().Add(new PlayHistory { UserId = request.UserId, SongId = clickedSong.Id, PlayedAt = DateTime.UtcNow });
             await _context.SaveChangesAsync();
 
             return MapToPlayerResponse(playerItem, clickedSong, false, true);
@@ -146,6 +147,7 @@ namespace GrooveOn.Services.Services
                 }).ToList();
 
             _context.AddRange(queue);
+            _context.Set<PlayHistory>().Add(new PlayHistory { UserId = request.UserId, SongId = request.SongId, PlayedAt = DateTime.UtcNow });
             await _context.SaveChangesAsync();
 
             var current = queue.First(x => x.SongId == request.SongId);
@@ -182,7 +184,7 @@ namespace GrooveOn.Services.Services
 
             var playlistSongs = await _context.Set<PlaylistSong>()
                 .Where(x => x.PlaylistId == request.PlaylistId)
-                .OrderBy(x => x.Id) // you can change this if you have a custom order
+                .OrderBy(x => x.Id)
                 .ToListAsync();
 
             var songIds = playlistSongs.Select(x => x.SongId).ToList();
@@ -210,6 +212,7 @@ namespace GrooveOn.Services.Services
                 .ToList();
 
             _context.AddRange(queue);
+            _context.Set<PlayHistory>().Add(new PlayHistory { UserId = request.UserId, SongId = request.SongId, PlayedAt = DateTime.UtcNow });
             await _context.SaveChangesAsync();
 
             var current = queue.First(x => x.SongId == request.SongId);
@@ -238,7 +241,10 @@ namespace GrooveOn.Services.Services
                     x.OrderIndex == nextIndex);
 
             if (next != null)
+            {
+                await RecordPlayHistoryAsync(request.UserId, next.Song.Id);
                 return MapToPlayerResponse(next, next.Song, next.OrderIndex > 1, true);
+            }
 
             var randomSong = await GetRandomSongAsync(request);
 
@@ -251,6 +257,7 @@ namespace GrooveOn.Services.Services
             };
 
             _context.Add(newItem);
+            _context.Set<PlayHistory>().Add(new PlayHistory { UserId = request.UserId, SongId = randomSong.Id, PlayedAt = DateTime.UtcNow });
             await _context.SaveChangesAsync();
 
             return MapToPlayerResponse(newItem, randomSong, true, true);
@@ -273,6 +280,7 @@ namespace GrooveOn.Services.Services
                     x.Purpose == request.Purpose &&
                     x.OrderIndex == current.OrderIndex + 1);
 
+            await RecordPlayHistoryAsync(request.UserId, next.Song.Id);
             return MapToPlayerResponse(
                 next,
                 next.Song,
@@ -291,6 +299,7 @@ namespace GrooveOn.Services.Services
                     .Include(x => x.Artist)
                     .FirstAsync(x => x.Id == current.SongId);
 
+                await RecordPlayHistoryAsync(request.UserId, song.Id);
                 return MapToPlayerResponse(current, song, false, true);
             }
 
@@ -301,6 +310,7 @@ namespace GrooveOn.Services.Services
                     x.Purpose == request.Purpose &&
                     x.OrderIndex == current.OrderIndex - 1);
 
+            await RecordPlayHistoryAsync(request.UserId, previous.Song.Id);
             return MapToPlayerResponse(previous, previous.Song, previous.OrderIndex > 1, true);
         }
 
@@ -321,6 +331,7 @@ namespace GrooveOn.Services.Services
                     x.Purpose == request.Purpose &&
                     x.OrderIndex == current.OrderIndex - 1);
 
+            await RecordPlayHistoryAsync(request.UserId, previous.Song.Id);
             return MapToPlayerResponse(
                 previous,
                 previous.Song,
@@ -367,16 +378,23 @@ namespace GrooveOn.Services.Services
         private async Task<Song> GetRandomSongAsync(PlayerUpsertRequest request)
         {
             var query = _context.Set<Song>()
-                .Include(x => x.Artist)
                 .Where(x => x.ExternalTrackId != null);
 
             if (request.Purpose == "RandomMusicArtist")
                 query = query.Where(x => x.ArtistId == request.ArtistId);
 
-            var songs = await query.ToListAsync();
+            var count = await query.CountAsync();
+            if (count == 0)
+                throw new UserException("No songs available.");
 
-            var rnd = new Random();
-            return songs[rnd.Next(songs.Count)];
+            var skip = new Random().Next(count);
+
+            var song = await query
+                .Include(x => x.Artist)
+                .Skip(skip)
+                .FirstAsync();
+
+            return song;
         }
 
         private async Task ClearUserQueueAsync(int userId)
@@ -403,6 +421,17 @@ namespace GrooveOn.Services.Services
                 HasPrevious = prev,
                 HasNext = next
             };
+        }
+
+        private async Task RecordPlayHistoryAsync(int userId, int songId)
+        {
+            _context.Set<PlayHistory>().Add(new PlayHistory
+            {
+                UserId = userId,
+                SongId = songId,
+                PlayedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
         }
     }
 }

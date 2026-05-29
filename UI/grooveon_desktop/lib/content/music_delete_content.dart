@@ -224,34 +224,14 @@ class _MusicDeleteContentState extends State<MusicDeleteContent> {
     return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  String _resolveAlbumArtistName(AlbumResponse album) {
-    final dynamic a = album;
-    return (a.artistName ?? a.artist?.name ?? 'Unknown artist').toString();
-  }
+  String _resolveAlbumArtistName(AlbumResponse album) => album.artistName;
 
-  int _resolveAlbumTrackCount(AlbumResponse album) {
-    final dynamic a = album;
-    return (a.songCount as int?) ??
-        (a.numberOfTracks as int?) ??
-        0;
-  }
+  int _resolveAlbumTrackCount(AlbumResponse album) => album.songCount;
 
-  String? _resolveAlbumYear(AlbumResponse album) {
-    final dynamic a = album;
-    final releaseDate = a.releaseDate?.toString();
+  String? _resolveAlbumYear(AlbumResponse album) =>
+      album.releaseDate?.year.toString();
 
-    if (releaseDate == null || releaseDate.isEmpty) return null;
-    return releaseDate.length >= 4 ? releaseDate.substring(0, 4) : releaseDate;
-  }
-
-  String? _resolveAlbumCoverUrl(AlbumResponse album) {
-    final dynamic a = album;
-    return (a.coverUrl ??
-            a.imageUrl ??
-            a.coverMedium ??
-            a.coverBig)
-        ?.toString();
-  }
+  String? _resolveAlbumCoverUrl(AlbumResponse album) => album.coverUrl;
 
   @override
   Widget build(BuildContext context) {

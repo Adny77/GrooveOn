@@ -1,4 +1,4 @@
-using GrooveOn.Model.ResponseObjects;
+﻿using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -15,14 +15,14 @@ namespace GrooveOn.API.Controllers
         {
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpGet("")]
         public override Task<PagedResult<MusicSearchItemResponse>> Get([FromQuery] MusicSearchSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpGet("{id}")]
         public override Task<MusicSearchItemResponse?> GetById(int id)
         {

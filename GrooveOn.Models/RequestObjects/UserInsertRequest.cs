@@ -30,7 +30,5 @@ namespace GrooveOn.Model.RequestObjects
         public string? AboutMe {get; set;}
 
         public bool IsActive { get; set; } = true;
-        public bool? IsUser { get; set; }
-        public bool? IsAdmin { get; set; }
     }
 }

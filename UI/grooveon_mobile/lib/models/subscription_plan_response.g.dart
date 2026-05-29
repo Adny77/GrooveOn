@@ -11,6 +11,7 @@ SubscriptionPlanResponse _$SubscriptionPlanResponseFromJson(
 ) => SubscriptionPlanResponse(
   id: (json['id'] as num).toInt(),
   name: json['name'] as String,
+  planCode: json['planCode'] as String?,
   price: (json['price'] as num).toDouble(),
   durationDays: (json['durationDays'] as num).toInt(),
   description: json['description'] as String?,
@@ -22,6 +23,7 @@ Map<String, dynamic> _$SubscriptionPlanResponseToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'name': instance.name,
+  'planCode': instance.planCode,
   'price': instance.price,
   'durationDays': instance.durationDays,
   'description': instance.description,

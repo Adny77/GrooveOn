@@ -1,4 +1,4 @@
-using GrooveOn.Model.RequestObjects;
+﻿using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Interfaces;
@@ -17,35 +17,35 @@ namespace GrooveOn.API.Controllers
         {
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpGet("")]
         public override Task<PagedResult<PlaylistSongResponse>> Get([FromQuery] PlaylistSongSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpGet("{id}")]
         public override Task<PlaylistSongResponse?> GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpPost]
         public override Task<PlaylistSongResponse> Create([FromBody] PlaylistSongUpsertRequest request)
         {
             return base.Create(request);
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpPut("{id}")]
         public override Task<PlaylistSongResponse?> Update(int id, [FromBody] PlaylistSongUpsertRequest request)
         {
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = Roles.User)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {

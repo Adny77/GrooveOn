@@ -150,88 +150,85 @@ class _MiniContent extends StatelessWidget {
             ),
           ),
 
-          SizedBox(
-            width: 168,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 40,
-                    height: 40,
-                  ),
-                  onPressed: player.hasPrevious ? player.playPrevious : null,
-                  icon: Icon(
-                    Icons.skip_previous_rounded,
-                    color: player.hasPrevious ? Colors.white : Colors.white30,
-                    size: 28,
-                  ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 40,
-                    height: 40,
-                  ),
-                  onPressed: player.isLoading
-                      ? null
-                      : () {
-                          if (player.isCompleted) {
-                            player.repeatCurrentSong();
-                          } else {
-                            player.togglePlayPause();
-                          }
-                        },
-                  icon: player.isLoading
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Icon(
-                          player.isCompleted
-                              ? Icons.repeat_rounded
-                              : player.isPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 40,
-                    height: 40,
-                  ),
-                  onPressed: player.hasNext ? player.playNext : null,
-                  icon: Icon(
-                    Icons.skip_next_rounded,
-                    color: player.hasNext ? Colors.white : Colors.white30,
-                    size: 28,
-                  ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(
-                    width: 40,
-                    height: 40,
-                  ),
-                  onPressed: player.stopPlayer,
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _miniBtn(
+                icon: Icons.skip_previous_rounded,
+                size: 28,
+                color: player.hasPrevious ? Colors.white : Colors.white30,
+                onPressed: player.hasPrevious ? player.playPrevious : null,
+              ),
+              _miniPlayBtn(player),
+              _miniBtn(
+                icon: Icons.skip_next_rounded,
+                size: 28,
+                color: player.hasNext ? Colors.white : Colors.white30,
+                onPressed: player.hasNext ? player.playNext : null,
+              ),
+              _miniBtn(
+                icon: Icons.close_rounded,
+                size: 22,
+                color: Colors.white,
+                onPressed: player.stopPlayer,
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _miniBtn({
+    required IconData icon,
+    required double size,
+    required Color color,
+    required VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: onPressed,
+        icon: Icon(icon, color: color, size: size),
+      ),
+    );
+  }
+
+  Widget _miniPlayBtn(PlayerProvider player) {
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: player.isLoading
+            ? null
+            : () {
+                if (player.isCompleted) {
+                  player.repeatCurrentSong();
+                } else {
+                  player.togglePlayPause();
+                }
+              },
+        icon: player.isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Icon(
+                player.isCompleted
+                    ? Icons.repeat_rounded
+                    : player.isPlaying
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 30,
+              ),
       ),
     );
   }

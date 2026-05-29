@@ -313,7 +313,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
         const SizedBox(width: 10),
 
-        /// 🔥 SEE QUESTIONS BUTTON
         InkWell(
           onTap: () {
             Navigator.push(
@@ -583,6 +582,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                if (track.whyRecommended != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    track.whyRecommended!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

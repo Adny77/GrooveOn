@@ -61,15 +61,15 @@ namespace GrooveOn.Services.Services
                 var fts = search.FTS.Trim().ToLower();
 
                 query = query.Where(x =>
-                    x.User != null &&
+                    (x.User != null &&
                     (
                         x.User.Username.ToLower().Contains(fts) ||
                         x.User.FirstName.ToLower().Contains(fts) ||
                         x.User.LastName.ToLower().Contains(fts)
-                    )
+                    ))
                     ||
-                    x.SubscriptionPlan != null &&
-                    x.SubscriptionPlan.Name.ToLower().Contains(fts));
+                    (x.SubscriptionPlan != null &&
+                    x.SubscriptionPlan.Name.ToLower().Contains(fts)));
             }
 
             return base.ApplyFilter(query, search);
@@ -85,6 +85,7 @@ namespace GrooveOn.Services.Services
                 : $"{entity.User.FirstName} {entity.User.LastName}";
 
             response.SubscriptionPlanName = entity.SubscriptionPlan?.Name;
+            response.SubscriptionPlanCode = entity.SubscriptionPlan?.PlanCode;
             response.SubscriptionPlanPrice = entity.SubscriptionPlan?.Price ?? 0;
             response.SubscriptionPlanDurationDays = entity.SubscriptionPlan?.DurationDays ?? 0;
 

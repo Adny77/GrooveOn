@@ -9,12 +9,15 @@ ENV ASPNETCORE_URLS=http://+:8080
 # --------------------
 # BUILD STAGE
 # --------------------
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Kopiraj csproj i restore
+# Kopiraj sve csproj fajlove i restore (ukljucujuci project reference fajlove)
 COPY ["GrooveOn.WebAPI/GrooveOn.WebAPI.csproj", "GrooveOn.WebAPI/"]
+COPY ["GrooveOn.Models/GrooveOn.Models.csproj", "GrooveOn.Models/"]
+COPY ["GrooveOn.Services/GrooveOn.Services.csproj", "GrooveOn.Services/"]
+COPY ["GrooveOn.MailingService/GrooveOn.MailingService.csproj", "GrooveOn.MailingService/"]
 RUN dotnet restore "GrooveOn.WebAPI/GrooveOn.WebAPI.csproj"
 
 # Kopiraj sve i publish

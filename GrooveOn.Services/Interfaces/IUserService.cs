@@ -9,7 +9,9 @@ namespace GrooveOn.Services.Interfaces
     {
         Task<LoginResponse> LoginAsync(LoginRequest request);
         Task ForgotPasswordAsync(string email);
+        Task ResetPasswordWithTokenAsync(string token, string newPassword);
         Task ChangePasswordAsync(int userId, ChangePasswordRequest request);
         Task<bool> CurrentUserHasPremiumAsync();
+        Task AssignRolesAsync(int userId, List<int> roleIds);
     }
 }

@@ -1,8 +1,9 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObject;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
+using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +18,14 @@ namespace GrooveOn.API.Controllers
             _userService = service;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("")]
         public override Task<PagedResult<UserResponse>> Get([FromQuery] UserSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("{id}")]
         public override Task<UserResponse?> GetById(int id)
         {
@@ -45,17 +46,26 @@ namespace GrooveOn.API.Controllers
         {
             await _userService.ForgotPasswordAsync(request.Email);
 
-            return Ok("If the email exists, a password reset link has been sent.");
+            return Ok(new { message = "If the email exists, a reset code has been sent." });
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            await _userService.ResetPasswordWithTokenAsync(request.Token, request.NewPassword);
+
+            return Ok(new { message = "Password has been reset successfully." });
+        }
+
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("current-user/has-premium")]
         public async Task<bool> CurrentUserHasPremium()
         {
             return await _userService.CurrentUserHasPremiumAsync();
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
@@ -76,14 +86,30 @@ namespace GrooveOn.API.Controllers
             return base.Create(request);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpPut("{id}")]
-        public override Task<UserResponse?> Update(int id, [FromBody] UserUpdateRequest request)
+        public override async Task<UserResponse?> Update(int id, [FromBody] UserUpdateRequest request)
         {
-            return base.Update(id, request);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out var loggedInUserId))
+                throw new UnauthorizedAccessException("Invalid token.");
+
+            if (!User.IsInRole(Roles.Admin) && id != loggedInUserId)
+                throw new ForbiddenException("You can only update your own profile.");
+
+            return await base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPut("{id}/roles")]
+        public async Task<IActionResult> AssignRoles(int id, [FromBody] List<int> roleIds)
+        {
+            await _userService.AssignRolesAsync(id, roleIds);
+            return Ok(new { message = "Roles updated successfully." });
+        }
+
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {

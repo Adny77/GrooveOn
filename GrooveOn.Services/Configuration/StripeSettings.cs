@@ -4,6 +4,6 @@ namespace GrooveOn.WebAPI.Configuration
     {
         public string SecretKey { get; set; } = null!;
         public string WebhookSecret { get; set; } = null!;
-        public string PublishableKey {get; set;} = null;
+        public string? PublishableKey { get; set; }
     }
 }

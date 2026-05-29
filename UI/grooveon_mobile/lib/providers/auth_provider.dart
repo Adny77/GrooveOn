@@ -37,6 +37,7 @@ class AuthProvider with ChangeNotifier {
     Session.userId = loginResp.userId;
     Session.username = loginResp.userName;
     Session.roles = loginResp.roles;
+    await Session.save();
 
     notifyListeners();
 

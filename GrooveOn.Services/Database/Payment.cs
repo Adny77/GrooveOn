@@ -17,7 +17,7 @@ namespace GrooveOn.Services.Database
         public DateTime? PaidAt { get; set; }
         public string? FailureReason { get; set; }
         public string? PaymentMethod { get; set; }
-        public float PaymentAmount { get; set; }
+        public decimal PaymentAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
     }
 }

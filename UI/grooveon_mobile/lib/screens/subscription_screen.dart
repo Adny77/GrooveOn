@@ -30,7 +30,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool get _hasLockedSubscription {
     final sub = _activeSubscription;
     if (sub == null) return false;
-    return sub.subscriptionPlanId != 1;
+    final planCode = sub.subscriptionPlanCode ??
+        _codeFromPlanName(sub.subscriptionPlanName);
+    return planCode != 'basic';
   }
 
   @override
@@ -259,8 +261,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     required bool isCurrent,
     required VoidCallback onTap,
   }) {
-    final isPremium = plan.price > 0;
-    final isRecommended = plan.id == 2;
+    final planCode = _planCode(plan);
+    final isPremium = planCode != 'basic';
+    final isRecommended = isPremium;
 
     final isBlockedByActiveSubscription =
         _hasLockedSubscription && !isCurrent;
@@ -479,7 +482,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   List<String> _featuresForPlan(SubscriptionPlanResponse plan) {
-    if (plan.id == 1) {
+    final planCode = _planCode(plan);
+
+    if (planCode == 'basic') {
       return const [
         "Limited playlists",
         "No access to album or artist",
@@ -487,7 +492,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       ];
     }
 
-    if (plan.id == 2) {
+    if (planCode == 'premium') {
       return const [
         "Premium listening access",
         "Unlimited playlist usage",
@@ -500,5 +505,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       "Priority features",
       "Advanced account benefits",
     ];
+  }
+
+  String _planCode(SubscriptionPlanResponse plan) {
+    return plan.planCode ?? _codeFromPlanName(plan.name);
+  }
+
+  String _codeFromPlanName(String? name) {
+    final normalized = name?.trim().toLowerCase() ?? "";
+    if (normalized.contains("basic")) return "basic";
+    if (normalized.contains("premium")) return "premium";
+    return normalized;
   }
 }

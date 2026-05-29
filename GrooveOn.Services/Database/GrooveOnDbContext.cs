@@ -1,4 +1,5 @@
 using GrooveOn.Services.Helpers;
+using GrooveOn.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -52,7 +53,7 @@ namespace GrooveOn.Services.Database
 
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
-        public DbSet<Favorite> Favorites { get; set; }
+
         public DbSet<Player> Players { get; set; }
 
         public DbSet<Payment> Payments { get; set; }
@@ -64,6 +65,7 @@ namespace GrooveOn.Services.Database
         public DbSet<PlayHistory> PlayHistories { get; set; }
         public DbSet<AlbumGenre> AlbumGenres { get; set; }
         public DbSet<Answer> Answers { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -84,8 +86,21 @@ namespace GrooveOn.Services.Database
             .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Player>()
-    .HasIndex(x => new { x.UserId, x.SongId })
+    .HasIndex(x => new { x.UserId, x.Purpose, x.OrderIndex })
     .IsUnique();
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(x => new { x.UserId, x.IsRead, x.CreatedAt });
+
+            modelBuilder.Entity<SubscriptionPlan>()
+                .HasIndex(x => x.PlanCode)
+                .IsUnique();
 
             modelBuilder.Entity<Answer>()
                 .HasOne(x => x.Admin)
@@ -148,8 +163,8 @@ namespace GrooveOn.Services.Database
                 }
             );
 
-            string adminHash = UserHelper.CreatePasswordHash("Admin123!");
-            string userHash = UserHelper.CreatePasswordHash("User123!");
+            const string adminHash = "8S7aQWZ8O+VBYGKkFcjz9g==.4.65536.4.uz17XEm+RBz22hpNPlK5iWoUVELQIB8oRc8VlLaLOv4=";
+            const string userHash = "dyi4tJGhB478HHiD98Kg4Q==.4.65536.4.3P59iKch15iBXOL8mlIFf2Bv3TTgEiZ6hGSkNf3LyhU=";
 
             var baseUsers = new List<User>
     {
@@ -159,7 +174,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Dejan",
             LastName = "Music",
             Username = "dejanmusic01",
-            Password = string.Empty,
+
             PasswordHash = adminHash,
             Email = "testniadminmuzicar@gmail.com",
             UserImage = null,
@@ -175,7 +190,6 @@ namespace GrooveOn.Services.Database
             FirstName = "Milan",
             LastName = "Kostadinovic",
             Username = "milankostadinovic02",
-            Password = string.Empty,
             PasswordHash = adminHash,
             Email = "admin2@grooveon.com",
             UserImage = null,
@@ -191,7 +205,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Amar",
             LastName = "Hadzic",
             Username = "amarhadzic03",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user1@grooveon.com",
             UserImage = null,
@@ -207,7 +221,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Lejla",
             LastName = "Kovacevic",
             Username = "lejlakovacevic04",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user2@grooveon.com",
             UserImage = null,
@@ -223,7 +237,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Benjamin",
             LastName = "Mehic",
             Username = "benjaminmehic05",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user3@grooveon.com",
             UserImage = null,
@@ -239,7 +253,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Sara",
             LastName = "Delic",
             Username = "saradelic06",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user4@grooveon.com",
             UserImage = null,
@@ -255,7 +269,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Adnan",
             LastName = "Karic",
             Username = "adnankaric07",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user5@grooveon.com",
             UserImage = null,
@@ -271,7 +285,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Emina",
             LastName = "Selimovic",
             Username = "eminaselimovic08",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user6@grooveon.com",
             UserImage = null,
@@ -287,7 +301,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Haris",
             LastName = "Mujic",
             Username = "harismujic09",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user7@grooveon.com",
             UserImage = null,
@@ -303,7 +317,7 @@ namespace GrooveOn.Services.Database
             FirstName = "Jasmin",
             LastName = "Alic",
             Username = "jasminalic10",
-            Password = string.Empty,
+
             PasswordHash = userHash,
             Email = "user8@grooveon.com",
             UserImage = null,
@@ -320,7 +334,6 @@ namespace GrooveOn.Services.Database
     FirstName = "Fahrudin",
     LastName = "Music",
     Username = "fahrudinmusic11",
-    Password = string.Empty,
     PasswordHash = userHash,
     Email = "testnimuzicar@gmail.com",
     UserImage = GetLoremPicsumImage("user", 3),
@@ -1331,6 +1344,7 @@ namespace GrooveOn.Services.Database
                 {
                     Id = 1,
                     Name = "Basic account",
+                    PlanCode = SubscriptionPlanCodes.Basic,
                     Description = "Free account with limited features.",
                     Price = 0,
                     DurationDays = 0,
@@ -1340,8 +1354,9 @@ namespace GrooveOn.Services.Database
                 {
                     Id = 2,
                     Name = "Premium",
+                    PlanCode = SubscriptionPlanCodes.Premium,
                     Description = "Premium account with full access.",
-                    Price = 9.99f,
+                    Price = 9.99m,
                     DurationDays = 30,
                     IsActive = true,
                 }
@@ -1349,7 +1364,6 @@ namespace GrooveOn.Services.Database
 
             var allSeedUsers = allUsers;
 
-            // ======================= SUBSCRIPTIONS =======================
             var subscriptions = new List<Subscription>();
             int subscriptionId = 1;
 
@@ -1377,7 +1391,6 @@ namespace GrooveOn.Services.Database
             modelBuilder.Entity<Subscription>().HasData(subscriptions);
 
 
-            // ======================= PAYMENTS =======================
             var payments = new List<Payment>();
             int paymentId = 1;
 
@@ -1390,7 +1403,7 @@ namespace GrooveOn.Services.Database
                 {
                     Id = paymentId++,
                     SubscriptionId = sub.Id,
-                    PaymentAmount = 9.99f,
+                    PaymentAmount = 9.99m,
                     PaymentStatus = "Paid",
                     PaymentDate = sub.StartDate,
                     PaymentMethod = "Stripe",
@@ -1634,7 +1647,7 @@ namespace GrooveOn.Services.Database
                     FirstName = firstName,
                     LastName = lastName,
                     Username = username,
-                    Password = string.Empty,
+        
                     PasswordHash = userHash,
                     Email = $"{username}@grooveon.com",
                     UserImage = GetLoremPicsumImage("user", currentId),
@@ -1738,8 +1751,8 @@ namespace GrooveOn.Services.Database
                     userSubscription.SubscriptionPlanId == 1;
 
                 int playlistCount = isBasicAccount
-                    ? random.Next(1, 4)      // Basic: 1 do 3 playliste
-                    : random.Next(4, 9);     // Premium: 4 do 8 playlisti
+                    ? random.Next(1, 4)
+                    : random.Next(4, 9);
 
                 for (int i = 0; i < playlistCount; i++)
                 {
@@ -1771,8 +1784,6 @@ namespace GrooveOn.Services.Database
 
             const int minSongId = 1;
             const int maxSongId = 120;
-            // If you have fewer songs, reduce maxSongId.
-            // If you have more songs, feel free to increase it.
 
             foreach (var playlist in playlists)
             {
@@ -1903,7 +1914,7 @@ namespace GrooveOn.Services.Database
                     return RandomDateInYear(2025);
                 }
 
-                int month = random.Next(1, 6); // samo januar-maj 2026
+                int month = random.Next(1, 6);
                 return RandomDateInMonth(2026, month);
             }
 
@@ -1917,7 +1928,6 @@ namespace GrooveOn.Services.Database
                 return random.Next(1, totalSongs + 1);
             }
 
-            // Garantovani podaci samo za januar-maj 2026
             for (int month = 1; month <= 5; month++)
             {
                 const int guaranteedPlaysForMonth = 90;
@@ -1936,7 +1946,6 @@ namespace GrooveOn.Services.Database
                 }
             }
 
-            // Dodatni play-evi po useru, ali samo 2025 ili januar-maj 2026
             for (int userId = firstRegularUserId; userId <= totalUsers; userId++)
             {
                 int playsForUser = random.Next(12, 28);
@@ -1953,7 +1962,6 @@ namespace GrooveOn.Services.Database
                 }
             }
 
-            // Dopuna do totalPlayCount, opet samo dozvoljeni periodi
             while (playHistories.Count < totalPlayCount)
             {
                 int userId = random.Next(firstRegularUserId, totalUsers + 1);
@@ -2078,7 +2086,7 @@ namespace GrooveOn.Services.Database
                         PaidAt = paidAt,
                         FailureReason = failureReason,
                         PaymentMethod = methods[random.Next(methods.Length)],
-                        PaymentAmount = 9.99f,
+                        PaymentAmount = 9.99m,
                         PaymentDate = paymentDate
                     });
                 }

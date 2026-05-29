@@ -26,6 +26,7 @@ class SongResponse {
   final bool isActive;
   final DateTime? lastSyncedAt;
   final DateTime createdAt;
+  final String? whyRecommended;
 
   SongResponse({
     required this.id,
@@ -45,6 +46,7 @@ class SongResponse {
     required this.isActive,
     this.lastSyncedAt,
     required this.createdAt,
+    this.whyRecommended,
   });
 
   factory SongResponse.fromJson(Map<String, dynamic> json) =>

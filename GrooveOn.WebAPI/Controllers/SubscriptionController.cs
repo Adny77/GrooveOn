@@ -1,4 +1,4 @@
-using GrooveOn.API.Controllers;
+﻿using GrooveOn.API.Controllers;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
@@ -22,42 +22,42 @@ namespace GrooveOn.WebAPI.Controllers
             _subscriptionService = subscriptionService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("")]
         public override Task<PagedResult<SubscriptionResponse>> Get([FromQuery] SubscriptionSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("{id}")]
         public override Task<SubscriptionResponse?> GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         public override Task<SubscriptionResponse> Create([FromBody] SubscriptionUpsertRequest request)
         {
             return base.Create(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id}")]
         public override Task<SubscriptionResponse?> Update(int id, [FromBody] SubscriptionUpsertRequest request)
         {
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {
             return base.Delete(id);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("active/{userId}")]
         public async Task<ActionResult<SubscriptionResponse?>> GetActiveByUserId(int userId)
         {
@@ -66,7 +66,7 @@ namespace GrooveOn.WebAPI.Controllers
             if (!int.TryParse(userIdClaim, out var loggedInUserId))
                 return Unauthorized("Invalid token.");
 
-            var isAdmin = User.IsInRole("Admin");
+            var isAdmin = User.IsInRole(Roles.Admin);
 
             if (!isAdmin && userId != loggedInUserId)
                 return Forbid();
@@ -76,7 +76,7 @@ namespace GrooveOn.WebAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("my-active")]
         public async Task<ActionResult<SubscriptionResponse?>> GetMyActive()
         {

@@ -5,11 +5,11 @@ namespace GrooveOn.Services.Interfaces
 {
     public interface IReportService
     {
-        SubscriptionAnalyticsResponse GetSubscriptionAnalytics(int year, int? month = null);
-        List<UserGrowthPointResponse> GetUserGrowthByMonth(int year);
-        SubscriptionAnalyticsResponse GetNewUsersSubscriptionAnalytics(int year, int? month);
-        List<IncomeByMonthResponse> GetIncomeByMonth(int year);
-        MobileHomeResponse GetMobileHome(int takeTracks = 4, int takeArtists = 8);
-        MusicOverviewResponse GetMusicOverview(MusicOverviewRequest request);
+        Task<SubscriptionAnalyticsResponse> GetSubscriptionAnalyticsAsync(int year, int? month = null);
+        Task<List<UserGrowthPointResponse>> GetUserGrowthByMonthAsync(int year);
+        Task<SubscriptionAnalyticsResponse> GetNewUsersSubscriptionAnalyticsAsync(int year, int? month);
+        Task<List<IncomeByMonthResponse>> GetIncomeByMonthAsync(int year);
+        Task<MobileHomeResponse> GetMobileHomeAsync(int takeTracks = 4, int takeArtists = 8);
+        Task<MusicOverviewResponse> GetMusicOverviewAsync(MusicOverviewRequest request);
     }
 }

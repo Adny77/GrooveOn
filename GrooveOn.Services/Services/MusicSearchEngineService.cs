@@ -24,6 +24,9 @@ namespace GrooveOn.Services.Services
         {
             var fts = search.FTS?.Trim().ToLower();
 
+            // Cap per-type results at DB level to avoid loading entire tables into memory.
+            var perTypeCap = search.RetrieveAll ? 200 : Math.Max((search.PageSize ?? 20) * 4, 60);
+
             var songsQuery = _context.Songs
                 .Include(x => x.Artist)
                 .Include(x => x.Album)
@@ -55,6 +58,8 @@ namespace GrooveOn.Services.Services
             }
 
             var songItems = await songsQuery
+                .OrderBy(x => x.Id)
+                .Take(perTypeCap)
                 .Select(x => new MusicSearchItemResponse
                 {
                     Type = "song",
@@ -70,6 +75,8 @@ namespace GrooveOn.Services.Services
                 .ToListAsync();
 
             var albumItems = await albumsQuery
+                .OrderBy(x => x.Id)
+                .Take(perTypeCap)
                 .Select(x => new MusicSearchItemResponse
                 {
                     Type = "album",
@@ -84,6 +91,8 @@ namespace GrooveOn.Services.Services
                 .ToListAsync();
 
             var artistItems = await artistsQuery
+                .OrderBy(x => x.Id)
+                .Take(perTypeCap)
                 .Select(x => new MusicSearchItemResponse
                 {
                     Type = "artist",
@@ -100,6 +109,9 @@ namespace GrooveOn.Services.Services
             var combined = songItems
                 .Concat(albumItems)
                 .Concat(artistItems)
+                .OrderBy(x => x.Type == "song" ? 0 : x.Type == "album" ? 1 : 2)
+                .ThenBy(x => x.Title)
+                .ThenBy(x => x.Id)
                 .ToList();
 
             int? totalCount = null;
@@ -110,19 +122,13 @@ namespace GrooveOn.Services.Services
 
             if (!search.RetrieveAll)
             {
-                if (search.Page.HasValue)
-                {
-                    combined = combined
-                        .Skip(search.Page.Value * search.PageSize.Value)
-                        .ToList();
-                }
+                var pageSize = search.PageSize ?? 20;
+                var page = search.Page ?? 0;
 
-                if (search.PageSize.HasValue)
-                {
-                    combined = combined
-                        .Take(search.PageSize.Value)
-                        .ToList();
-                }
+                combined = combined
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .ToList();
             }
 
             return new PagedResult<MusicSearchItemResponse>

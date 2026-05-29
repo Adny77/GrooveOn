@@ -67,6 +67,9 @@ artifacts/
 #build
 build
 
+#claude
+.claude
+
 # StyleCop
 StyleCopReport.xml
 

@@ -10,7 +10,6 @@ import 'package:grooveon_desktop/models/response/music_stat_item_response.dart';
 import 'package:grooveon_desktop/providers/report_provider.dart';
 import 'package:grooveon_desktop/utils/session.dart';
 import 'package:pdf/pdf.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:provider/provider.dart';
@@ -31,17 +30,15 @@ class MusicOverContent extends StatefulWidget {
 
 class _MusicOverContentState extends State<MusicOverContent> {
   bool _isYearMode = true;
-  int _selectedYear = 2025;
-  int _selectedMonth = 1;
+  int _selectedYear = DateTime.now().year;
+  int _selectedMonth = DateTime.now().month;
 
   bool _isLoading = false;
   bool _isPrinting = false;
   String? _error;
   MusicOverviewResponse? _data;
 
-  static const List<int> _years = [2025, 2026];
-
-  static const List<_MonthItem> _months = [
+  static const List<_MonthItem> _allMonths = [
     _MonthItem(1, "January"),
     _MonthItem(2, "February"),
     _MonthItem(3, "March"),
@@ -55,6 +52,15 @@ class _MusicOverContentState extends State<MusicOverContent> {
     _MonthItem(11, "November"),
     _MonthItem(12, "December"),
   ];
+
+  List<int> get _availableYears =>
+      List.generate(DateTime.now().year - 2025 + 1, (i) => 2025 + i);
+
+  List<_MonthItem> get _availableMonths {
+    final now = DateTime.now();
+    final maxMonth = _selectedYear < now.year ? 12 : now.month;
+    return _allMonths.take(maxMonth).toList();
+  }
 
   @override
   void initState() {
@@ -105,6 +111,8 @@ class _MusicOverContentState extends State<MusicOverContent> {
   Future<void> _changeYear(int year) async {
     setState(() {
       _selectedYear = year;
+      final maxMonth = year < DateTime.now().year ? 12 : DateTime.now().month;
+      if (_selectedMonth > maxMonth) _selectedMonth = maxMonth;
     });
     await _loadData();
   }
@@ -122,7 +130,7 @@ class _MusicOverContentState extends State<MusicOverContent> {
     }
 
     final monthName =
-        _months.firstWhere((m) => m.value == _selectedMonth).label;
+        _allMonths.firstWhere((m) => m.value == _selectedMonth).label;
     return "$monthName $_selectedYear";
   }
 
@@ -434,8 +442,8 @@ class _MusicOverContentState extends State<MusicOverContent> {
                   isYearMode: _isYearMode,
                   selectedYear: _selectedYear,
                   selectedMonth: _selectedMonth,
-                  years: _years,
-                  months: _months,
+                  years: _availableYears,
+                  months: _availableMonths,
                   onModeChanged: _changeMode,
                   onYearChanged: _changeYear,
                   onMonthChanged: _changeMonth,

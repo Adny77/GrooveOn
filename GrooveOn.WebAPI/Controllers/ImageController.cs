@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
@@ -15,7 +15,7 @@ namespace GrooveOn.WebAPI.Controllers
             _imageService = imageService;
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpPost("upload")]
         [RequestSizeLimit(10 * 1024 * 1024)]
         public async Task<IActionResult> Upload([FromQuery] string folder, IFormFile file, [FromQuery] string? fileName = null, CancellationToken ct = default)
@@ -32,7 +32,7 @@ namespace GrooveOn.WebAPI.Controllers
             });
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] string folder, [FromQuery] string fileName, CancellationToken ct = default)
         {

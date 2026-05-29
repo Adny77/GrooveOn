@@ -20,6 +20,8 @@ namespace GrooveOn.Model.ResponseObjects
 
         public string? FailureReason { get; set; }
 
+        public decimal PaymentAmount { get; set; }
+
         public int? UserId { get; set; }
         public string? Username { get; set; }
     }

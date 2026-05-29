@@ -18,7 +18,7 @@ public class EmailSender
     string to,
     string name,
     string username,
-    string newPassword)
+    string resetToken)
     {
         var message = new MimeMessage();
 
@@ -26,7 +26,7 @@ public class EmailSender
             new MailboxAddress(_settings.FromName, _settings.FromEmail)
         );
         message.To.Add(MailboxAddress.Parse(to));
-        message.Subject = "Nova lozinka – GrooveOn";
+        message.Subject = "Reset lozinke – GrooveOn";
 
         message.Body = new TextPart("html")
 {
@@ -34,16 +34,15 @@ public class EmailSender
         <div style="font-family: Arial, sans-serif;">
             <h2>Zdravo {name},</h2>
 
-            <p>Vaši podaci za prijavu:</p>
+            <p>Primili smo zahtjev za reset lozinke za Vaš GrooveOn nalog <strong>{username}</strong>.</p>
 
-            <p><strong>Username:</strong> {username}</p>
-            <p><strong>Nova lozinka:</strong></p>
+            <p>Unesite sljedeći kod u aplikaciju kako biste postavili novu lozinku:</p>
 
-            <div style="background:#f4f4f4;padding:10px;border-radius:5px;">
-                <h3 style="margin:0;">{newPassword}</h3>
+            <div style="background:#f4f4f4;padding:14px;border-radius:6px;margin:16px 0;text-align:center;">
+                <span style="font-size:18px;letter-spacing:3px;font-weight:bold;color:#1a1a1a;font-family:monospace;">{resetToken}</span>
             </div>
 
-            <p>Preporučujemo da se odmah prijavite i promijenite lozinku.</p>
+            <p>Kod je važeći <strong>1 sat</strong>. Ako niste tražili reset lozinke, ignorišite ovaj email.</p>
 
             <br/>
             <small>GrooveOn tim</small>
@@ -51,6 +50,44 @@ public class EmailSender
     """
 };
 
+        await SendAsync(message);
+    }
+
+    public async Task SendPasswordChangedEmailAsync(
+        string to,
+        string name,
+        string username,
+        DateTime changedAt)
+    {
+        var message = new MimeMessage();
+
+        message.From.Add(new MailboxAddress(_settings.FromName, _settings.FromEmail));
+        message.To.Add(MailboxAddress.Parse(to));
+        message.Subject = "Lozinka promijenjena – GrooveOn";
+
+        message.Body = new TextPart("html")
+        {
+            Text = $"""
+                <div style="font-family: Arial, sans-serif;">
+                    <h2>Zdravo {name},</h2>
+
+                    <p>Vaša lozinka na GrooveOn nalogu <strong>{username}</strong> je uspješno promijenjena.</p>
+
+                    <p><strong>Datum i vrijeme:</strong> {changedAt:dd.MM.yyyy HH:mm} UTC</p>
+
+                    <p>Ako niste Vi napravili ovu promjenu, odmah kontaktirajte podršku ili koristite opciju "Zaboravljena lozinka".</p>
+
+                    <br/>
+                    <small>GrooveOn tim</small>
+                </div>
+            """
+        };
+
+        await SendAsync(message);
+    }
+
+    private async Task SendAsync(MimeMessage message)
+    {
         using var client = new SmtpClient();
 
         await client.ConnectAsync(

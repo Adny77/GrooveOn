@@ -1,5 +1,6 @@
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Services.Database;
+using GrooveOn.Models;
 using GrooveOn.Services.Exceptions;
 using Konscious.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
@@ -47,17 +48,26 @@ namespace GrooveOn.Services.Helpers
             );
         }
 
-        public static async Task AssignRoleByFlagsAsync(User entity, UserInsertRequest request, GrooveOnDbContext context)
+        public static async Task AssignDefaultRoleAsync(User entity, GrooveOnDbContext context)
         {
-            int? roleId = null;
-
-            if (request.IsAdmin == true)
-                roleId = await GetRoleIdAsync("Admin", context);
-            else
-                roleId = await GetRoleIdAsync("User", context);
+            var roleId = await GetRoleIdAsync(Roles.User, context);
 
             if (roleId == null)
-                throw new NotFoundException("Valid role not found.");
+                throw new NotFoundException("User role not found.");
+
+            entity.UserRoles.Add(new UserRole
+            {
+                UserId = entity.Id,
+                RoleId = roleId.Value
+            });
+        }
+
+        public static async Task AssignAdminRoleAsync(User entity, GrooveOnDbContext context)
+        {
+            var roleId = await GetRoleIdAsync(Roles.Admin, context);
+
+            if (roleId == null)
+                throw new NotFoundException("Admin role not found.");
 
             entity.UserRoles.Add(new UserRole
             {

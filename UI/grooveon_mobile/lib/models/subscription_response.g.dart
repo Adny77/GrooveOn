@@ -15,6 +15,7 @@ SubscriptionResponse _$SubscriptionResponseFromJson(
   userFullName: json['userFullName'] as String?,
   subscriptionPlanId: (json['subscriptionPlanId'] as num).toInt(),
   subscriptionPlanName: json['subscriptionPlanName'] as String?,
+  subscriptionPlanCode: json['subscriptionPlanCode'] as String?,
   subscriptionPlanPrice: (json['subscriptionPlanPrice'] as num).toDouble(),
   subscriptionPlanDurationDays: (json['subscriptionPlanDurationDays'] as num)
       .toInt(),
@@ -35,6 +36,7 @@ Map<String, dynamic> _$SubscriptionResponseToJson(
   'userFullName': instance.userFullName,
   'subscriptionPlanId': instance.subscriptionPlanId,
   'subscriptionPlanName': instance.subscriptionPlanName,
+  'subscriptionPlanCode': instance.subscriptionPlanCode,
   'subscriptionPlanPrice': instance.subscriptionPlanPrice,
   'subscriptionPlanDurationDays': instance.subscriptionPlanDurationDays,
   'startDate': instance.startDate.toIso8601String(),

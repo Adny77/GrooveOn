@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/helper/universal_paging_helper.dart';
 import 'package:grooveon_desktop/models/response/search_result.dart';
+import 'package:grooveon_desktop/models/response/user.dart';
 import 'package:grooveon_desktop/providers/user_provider.dart';
 import 'package:grooveon_desktop/screens/users_screen.dart';
 
@@ -15,7 +16,7 @@ class _UsersDataContentState extends State<UsersDataContent> {
   final TextEditingController _searchController = TextEditingController();
 
   late final UserProvider _userProvider;
-  late final UniversalPagingProvider<dynamic> _paging;
+  late final UniversalPagingProvider<User> _paging;
 
   @override
   void initState() {
@@ -23,7 +24,7 @@ class _UsersDataContentState extends State<UsersDataContent> {
 
     _userProvider = UserProvider();
 
-    _paging = UniversalPagingProvider<dynamic>(
+    _paging = UniversalPagingProvider<User>(
       pageSize: 8,
       fetcher:
           ({
@@ -42,10 +43,10 @@ class _UsersDataContentState extends State<UsersDataContent> {
               map["FTS"] = filter.trim();
             }
 
-            final SearchResult result = await _userProvider.get(filter: map);
+            final SearchResult<User> result = await _userProvider.get(filter: map);
 
-            return SearchResult<dynamic>(
-              items: List<dynamic>.from(result.items),
+            return SearchResult<User>(
+              items: result.items,
               totalCount: result.totalCount,
             );
           },
@@ -185,92 +186,18 @@ class _UsersDataContentState extends State<UsersDataContent> {
 
     return ListView.separated(
       itemCount: _paging.items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
-        final user = _paging.items[index];
+        final User user = _paging.items[index];
 
         return _UserRow(
-          username: _readUsername(user),
-          email: _readEmail(user),
-          type: _readType(user),
-          status: _readStatus(user),
-          isActive: _readIsActive(user),
+          username: user.username ?? "Unknown",
+          email: user.email ?? "-",
+          status: user.isActive ? "Active" : "Inactive",
+          isActive: user.isActive,
         );
       },
     );
-  }
-
-  String _readUsername(dynamic user) {
-    try {
-      final value =
-          user.username ??
-          user.userName ??
-          user.name ??
-          user.fullName ??
-          user.displayName;
-      if (value != null && value.toString().trim().isNotEmpty) {
-        return value.toString();
-      }
-    } catch (_) {}
-    return "Unknown";
-  }
-
-  String _readEmail(dynamic user) {
-    try {
-      final value = user.email ?? user.mail;
-      if (value != null && value.toString().trim().isNotEmpty) {
-        return value.toString();
-      }
-    } catch (_) {}
-    return "-";
-  }
-
-  String _readType(dynamic user) {
-    try {
-      final value =
-          user.type ??
-          user.userType ??
-          user.subscriptionType ??
-          user.membershipType ??
-          user.roleName;
-      if (value != null && value.toString().trim().isNotEmpty) {
-        return value.toString();
-      }
-    } catch (_) {}
-
-    try {
-      final isPremium = user.isPremium;
-      if (isPremium == true) return "Premium";
-      if (isPremium == false) return "Basic";
-    } catch (_) {}
-
-    return "Basic";
-  }
-
-  String _readStatus(dynamic user) {
-    try {
-      final value = user.status;
-      if (value != null && value.toString().trim().isNotEmpty) {
-        return value.toString();
-      }
-    } catch (_) {}
-
-    return _readIsActive(user) ? "Active" : "Inactive";
-  }
-
-  bool _readIsActive(dynamic user) {
-    try {
-      final value = user.isActive;
-      if (value is bool) return value;
-    } catch (_) {}
-
-    try {
-      final status = user.status?.toString().toLowerCase();
-      if (status == "active") return true;
-      if (status == "inactive") return false;
-    } catch (_) {}
-
-    return false;
   }
 }
 
@@ -309,16 +236,6 @@ class _HeaderRow extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              "Type",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: UsersScreen.textColor,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
               "Status",
               style: TextStyle(
                 fontWeight: FontWeight.w700,
@@ -335,14 +252,12 @@ class _HeaderRow extends StatelessWidget {
 class _UserRow extends StatelessWidget {
   final String username;
   final String email;
-  final String type;
   final String status;
   final bool isActive;
 
   const _UserRow({
     required this.username,
     required this.email,
-    required this.type,
     required this.status,
     required this.isActive,
   });
@@ -373,13 +288,6 @@ class _UserRow extends StatelessWidget {
             child: Text(
               email,
               style: const TextStyle(color: UsersScreen.subTextColor),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              type,
-              style: const TextStyle(color: UsersScreen.textColor),
             ),
           ),
           Expanded(

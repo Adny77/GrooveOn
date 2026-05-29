@@ -82,16 +82,13 @@ class _IncomeOverContentState extends State<IncomeOverContent> {
                   value: widget.selectedYear,
                   underline: const SizedBox(),
                   borderRadius: BorderRadius.circular(12),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 2025,
-                      child: Text("2025"),
+                  items: List.generate(
+                    DateTime.now().year - 2025 + 1,
+                    (i) => DropdownMenuItem(
+                      value: 2025 + i,
+                      child: Text("${2025 + i}"),
                     ),
-                    DropdownMenuItem(
-                      value: 2026,
-                      child: Text("2026"),
-                    ),
-                  ],
+                  ),
                   onChanged: (value) {
                     if (value == null) return;
                     widget.onYearChanged(value);
@@ -301,7 +298,7 @@ class _IncomeChartCardState extends State<_IncomeChartCard> {
     final now = DateTime.now();
 
     if (year < now.year) return 12;
-    if (year == now.year) return now.month - 1;
+    if (year == now.year) return now.month;
     return 0;
   }
 
@@ -573,7 +570,7 @@ class _IncomeChartPainter extends CustomPainter {
     final now = DateTime.now();
 
     if (year < now.year) return 12;
-    if (year == now.year) return now.month - 1;
+    if (year == now.year) return now.month;
     return 0;
   }
 

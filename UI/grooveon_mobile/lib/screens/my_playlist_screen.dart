@@ -6,6 +6,7 @@ import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/playlist_response.dart';
 import 'package:grooveon_mobile/providers/playlist_provider.dart';
+import 'package:grooveon_mobile/providers/playlist_song_provider.dart';
 import 'package:grooveon_mobile/providers/user_provider.dart';
 import 'package:grooveon_mobile/screens/create_playlist_screen.dart';
 import 'package:grooveon_mobile/screens/universal_playlist_preview_screen.dart';
@@ -24,12 +25,14 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
   static const Color textDark = Color(0xFF1C1C1C);
 
   final PlaylistProvider _playlistProvider = PlaylistProvider();
+  final PlaylistSongProvider _playlistSongProvider = PlaylistSongProvider();
   final UserProvider _userProvider = UserProvider();
   final TextEditingController _searchController = TextEditingController();
 
   bool _isLoading = true;
   String? _error;
   List<PlaylistResponse> _playlists = [];
+  Map<int, int> _playlistSongCounts = {};
   Timer? _searchDebounce;
 
   @override
@@ -89,11 +92,13 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
             "FTS": _searchController.text.trim(),
         },
       );
+      final songCounts = await _loadPlaylistSongCounts(result.items);
 
       if (!mounted) return;
 
       setState(() {
         _playlists = result.items;
+        _playlistSongCounts = songCounts;
         _isLoading = false;
       });
     } catch (e) {
@@ -104,6 +109,27 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<Map<int, int>> _loadPlaylistSongCounts(
+    List<PlaylistResponse> playlists,
+  ) async {
+    final entries = await Future.wait(
+      playlists.map((playlist) async {
+        final result = await _playlistSongProvider.get(
+          filter: {
+            "PlaylistId": playlist.id,
+            "Page": 0,
+            "PageSize": 1,
+            "IncludeTotalCount": true,
+          },
+        );
+
+        return MapEntry(playlist.id, result.totalCount);
+      }),
+    );
+
+    return Map<int, int>.fromEntries(entries);
   }
 
   void _onSearchChanged(String value) {
@@ -303,6 +329,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
 
   Widget _playlistCard(PlaylistResponse playlist) {
     final imageUrl = ImageHelper.playlistImageUrl(playlist.coverImageUrl);
+    final songCount = _playlistSongCounts[playlist.id] ?? playlist.songCount;
 
     return InkWell(
       borderRadius: BorderRadius.circular(22),
@@ -312,7 +339,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
           MaterialPageRoute(
             builder: (_) => UniversalPlaylistPreviewScreen(playlist: playlist),
           ),
-        );
+        ).then((_) => _loadPlaylists());
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
@@ -381,7 +408,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "${playlist.songCount} songs • ${playlist.isPublic ? "Public" : "Private"}",
+                    "$songCount songs • ${playlist.isPublic ? "Public" : "Private"}",
                     style: const TextStyle(
                       color: primary,
                       fontSize: 12,

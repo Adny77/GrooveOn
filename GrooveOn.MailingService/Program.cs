@@ -23,15 +23,22 @@ var rabbitSettings = new RabbitMqSettings
     VirtualHost = Environment.GetEnvironmentVariable("RABBITMQ_VIRTUALHOST") ?? "/"
 };
 
+var smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST")
+    ?? throw new InvalidOperationException("Missing required env var: SMTP_HOST");
+var smtpUser = Environment.GetEnvironmentVariable("SMTP_USER")
+    ?? throw new InvalidOperationException("Missing required env var: SMTP_USER");
+var fromEmail = Environment.GetEnvironmentVariable("FROM_EMAIL")
+    ?? throw new InvalidOperationException("Missing required env var: FROM_EMAIL");
+
 var smtpSettings = new SmtpSettings
 {
-    Host = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "smtp.gmail.com",
-    Port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "465"),
-    User = Environment.GetEnvironmentVariable("SMTP_USER") ?? "testnimuzicar@gmail.com",
+    Host = smtpHost,
+    Port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587"),
+    User = smtpUser,
     Password = Environment.GetEnvironmentVariable("SMTP_PASS") ?? "",
-    FromEmail = Environment.GetEnvironmentVariable("FROM_EMAIL") ?? "testnimuzicar@gmail.com",
+    FromEmail = fromEmail,
     FromName = Environment.GetEnvironmentVariable("FROM_NAME") ?? "GrooveOn",
-    UseSsl = bool.Parse(Environment.GetEnvironmentVariable("SMTP_SSL") ?? "true")
+    UseSsl = bool.Parse(Environment.GetEnvironmentVariable("SMTP_SSL") ?? "false")
 };
 
 builder.Services.AddEmailConsumer(rabbitSettings, smtpSettings);
@@ -39,6 +46,7 @@ builder.Services.AddEmailConsumer(rabbitSettings, smtpSettings);
 builder.Services.Configure<AppConfig>(options =>
 {
     options.ResetPasswordQueue = "email.reset-password";
+    options.PasswordChangedQueue = "email.password-changed";
 });
 
 

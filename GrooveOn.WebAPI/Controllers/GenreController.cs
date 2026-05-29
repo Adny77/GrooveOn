@@ -1,4 +1,4 @@
-using GrooveOn.Model.RequestObjects;
+﻿using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Interfaces;
@@ -16,35 +16,35 @@ namespace GrooveOn.API.Controllers
             _genreService = service;
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("")]
         public override Task<PagedResult<GenreResponse>> Get([FromQuery] GenreSearchObject? search = null)
         {
             return base.Get(search);
         }
 
-        [Authorize(Roles = "User,Admin")]
+        [Authorize(Roles = Roles.UserAndAdmin)]
         [HttpGet("{id}")]
         public override Task<GenreResponse?> GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost]
         public override Task<GenreResponse> Create([FromBody] GenreUpsertRequest request)
         {
             return base.Create(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPut("{id}")]
         public override Task<GenreResponse?> Update(int id, [FromBody] GenreUpsertRequest request)
         {
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin)]
         [HttpDelete("{id}")]
         public override Task<bool> Delete(int id)
         {

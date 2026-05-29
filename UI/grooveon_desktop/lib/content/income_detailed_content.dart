@@ -72,7 +72,7 @@ class _IncomeDetailedContentState extends State<IncomeDetailedContent> {
     final lastCompletedMonth = year < now.year
         ? 12
         : year == now.year
-            ? now.month - 1
+            ? now.month
             : 0;
 
     final incomeMap = <int, double>{};

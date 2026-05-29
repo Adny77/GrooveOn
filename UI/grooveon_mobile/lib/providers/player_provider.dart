@@ -204,14 +204,13 @@ class PlayerProvider with ChangeNotifier {
       return;
     }
 
-    await _audioPlayer.play();
-
     _isPlaying = true;
     _isCompleted = false;
 
     _startRepeatTimerFromCurrentPosition();
 
     notifyListeners();
+    _playWithoutBlocking();
   }
 
   Future<void> togglePlayPause() async {
@@ -229,7 +228,6 @@ class PlayerProvider with ChangeNotifier {
     _isChangingSong = true;
 
     await _audioPlayer.seek(Duration.zero);
-    await _audioPlayer.play();
 
     _isChangingSong = false;
 
@@ -240,33 +238,34 @@ class PlayerProvider with ChangeNotifier {
     _startRepeatTimerFromCurrentPosition();
 
     notifyListeners();
+    _playWithoutBlocking();
   }
 
   Future<void> stopPlayer() async {
-  try {
-    _repeatTimer?.cancel();
+    try {
+      _repeatTimer?.cancel();
 
-    await _audioPlayer.stop();
+      await _audioPlayer.stop();
 
-    _currentSong = null;
-    _currentRequest = null;
+      _currentSong = null;
+      _currentRequest = null;
 
-    _isPlaying = false;
-    _isLoading = false;
-    _isCompleted = false;
-    _isChangingSong = false;
+      _isPlaying = false;
+      _isLoading = false;
+      _isCompleted = false;
+      _isChangingSong = false;
 
-    _hasNext = false;
-    _hasPrevious = false;
+      _hasNext = false;
+      _hasPrevious = false;
 
-    _position = Duration.zero;
-    _duration = Duration.zero;
+      _position = Duration.zero;
+      _duration = Duration.zero;
 
-    notifyListeners();
-  } catch (e) {
-    debugPrint("STOP ERROR: $e");
+      notifyListeners();
+    } catch (e) {
+      debugPrint("STOP ERROR: $e");
+    }
   }
-}
 
   Future<void> seek(Duration position) async {
     await _audioPlayer.seek(position);
@@ -302,7 +301,6 @@ class PlayerProvider with ChangeNotifier {
 
     await _audioPlayer.stop();
     await _audioPlayer.setUrl(previewUrl);
-    await _audioPlayer.play();
 
     _isChangingSong = false;
 
@@ -312,14 +310,29 @@ class PlayerProvider with ChangeNotifier {
     _startRepeatTimerFromCurrentPosition();
 
     notifyListeners();
+    _playWithoutBlocking();
+  }
+
+  void _playWithoutBlocking() {
+    unawaited(
+      _audioPlayer.play().catchError((error) {
+        debugPrint("AUDIO PLAY ERROR: $error");
+        _isLoading = false;
+        _isPlaying = false;
+        notifyListeners();
+      }),
+    );
   }
 
   Future<String?> _resolvePreviewUrl(PlayerResponse result) async {
-    if (result.previewUrl != null && result.previewUrl!.trim().isNotEmpty) {
-      return result.previewUrl;
+    if (result.externalTrackId.trim().isNotEmpty) {
+      final fresh = await DeezerTrackProvider.getPreviewUrl(
+        result.externalTrackId,
+      );
+      if (fresh != null && fresh.trim().isNotEmpty) return fresh;
     }
 
-    return DeezerTrackProvider.getPreviewUrl(result.externalTrackId);
+    return result.previewUrl;
   }
 
   void _startRepeatTimerFromCurrentPosition() {

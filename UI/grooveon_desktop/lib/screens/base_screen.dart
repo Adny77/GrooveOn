@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grooveon_desktop/screens/income_screen.dart';
 import 'package:grooveon_desktop/screens/music_screen.dart';
+import 'package:grooveon_desktop/screens/reference_data_screen.dart';
 import 'package:grooveon_desktop/screens/users_screen.dart';
 import 'package:grooveon_desktop/widgets/sidebar_widget.dart';
 
@@ -18,6 +19,7 @@ class _BaseScreenState extends State<BaseScreen> {
     MusicScreen(),
     UsersScreen(),
     IncomeScreen(),
+    ReferenceDataScreen(),
   ];
 
   void _onMenuChanged(int index) {

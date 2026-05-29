@@ -23,5 +23,7 @@ namespace GrooveOn.Model.Responses
         public bool IsActive { get; set; }
         public DateTime? LastSyncedAt { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public string? WhyRecommended { get; set; }
     }
 }

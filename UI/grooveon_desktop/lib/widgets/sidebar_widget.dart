@@ -14,6 +14,7 @@ import 'package:grooveon_desktop/widgets/sidebar_item_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../models/response/user.dart';
+import '../validation/user_validation.dart';
 
 class SidebarWidget extends StatefulWidget {
   final int selectedIndex;
@@ -44,25 +45,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
   File? _pickedImage;
   bool _isImageChanged = false;
 
-  final _formKey = GlobalKey<FormState>();
-
-  late TextEditingController _firstNameController;
-  late TextEditingController _lastNameController;
-  late TextEditingController _emailController;
-  late TextEditingController _usernameController;
-  late TextEditingController _phoneNumberController;
-  late TextEditingController _birthDateController;
-
   @override
   void initState() {
     super.initState();
-
-    _firstNameController = TextEditingController();
-    _lastNameController = TextEditingController();
-    _emailController = TextEditingController();
-    _usernameController = TextEditingController();
-    _phoneNumberController = TextEditingController();
-    _birthDateController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _userProvider = context.read<UserProvider>();
@@ -72,62 +57,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _usernameController.dispose();
-    _phoneNumberController.dispose();
-    _birthDateController.dispose();
     super.dispose();
   }
 
-  String? _validatePhone(String? value, {bool required = true}) {
-    final v = value?.trim() ?? '';
-
-    if (!required && v.isEmpty) return null;
-    if (v.isEmpty) return "Phone number is required.";
-
-    final allowedChars = RegExp(r'^[0-9+\-\s()]+$');
-    if (!allowedChars.hasMatch(v)) {
-      return "Enter a valid phone number.";
-    }
-
-    if (v.contains('+') && !v.startsWith('+')) {
-      return "The + sign can only be at the beginning.";
-    }
-
-    final digits = v.replaceAll(RegExp(r'\D'), '');
-
-    if (digits.startsWith('060')) {
-      if (digits.length != 10) {
-        return "060 must have 7 digits after prefix.";
-      }
-      return null;
-    }
-
-    if (digits.startsWith('061') || digits.startsWith('062')) {
-      if (digits.length != 9) {
-        return "061/062 must have 6 digits after prefix.";
-      }
-      return null;
-    }
-
-    if (digits.startsWith('38760')) {
-      if (digits.length != 12) {
-        return "38760 must have 7 digits after prefix.";
-      }
-      return null;
-    }
-
-    if (digits.startsWith('38761') || digits.startsWith('38762')) {
-      if (digits.length != 11) {
-        return "38761/38762 must have 6 digits after prefix.";
-      }
-      return null;
-    }
-
-    return "Allowed formats: 060, 061, 062 or +387 / 387 variants.";
-  }
 
   Future<void> _loadLoggedUser() async {
     try {
@@ -293,130 +225,139 @@ class _SidebarWidgetState extends State<SidebarWidget> {
     _isImageChanged = false;
 
     final user = _loggedUser;
-    if (user != null) {
-      _firstNameController.text = user.firstName ?? '';
-      _lastNameController.text = user.lastName ?? '';
-      _emailController.text = user.email ?? '';
-      _usernameController.text = user.username ?? '';
-      _phoneNumberController.text = user.phoneNumber ?? '';
 
-      if (user.dateOfBirth != null) {
-        _birthDateController.text =
-            "${user.dateOfBirth!.day.toString().padLeft(2, '0')}."
-            "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
-            "${user.dateOfBirth!.year}.";
-      } else {
-        _birthDateController.text = '';
-      }
-    }
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setStateDialog) {
-          bool hasChanges() {
-            if (_isImageChanged) return true;
-            if (user == null) return false;
-
-            final originalBirthDate = user.dateOfBirth != null
-                ? "${user.dateOfBirth!.day.toString().padLeft(2, '0')}."
-                    "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
-                    "${user.dateOfBirth!.year}."
-                : "";
-
-            return _firstNameController.text != (user.firstName ?? '') ||
-                _lastNameController.text != (user.lastName ?? '') ||
-                _emailController.text != (user.email ?? '') ||
-                _usernameController.text != (user.username ?? '') ||
-                _phoneNumberController.text != (user.phoneNumber ?? '') ||
-                _birthDateController.text != originalBirthDate;
-          }
-
-          return BaseDialog(
-            title: "Profile settings",
-            width: 680,
-            height: 690,
-            onClose: () {
-              Navigator.pop(context);
-            },
-            child: _userSettingsContent(
-              user: user,
-              onChangeImage: () async {
-                final picked = await ImageHelper.openImagePicker();
-                if (picked == null) return;
-
-                setStateDialog(() {
-                  _pickedImage = picked;
-                  _isImageChanged = true;
-                });
-              },
-              onAnyChanged: () => setStateDialog(() {}),
-              isSaveEnabled: hasChanges(),
-              onSave: () async {
-                final ok = _formKey.currentState?.validate() ?? false;
-                if (!ok || user == null) return;
-
-                try {
-                  String? finalImage = user.userImage;
-
-                  if (_pickedImage != null) {
-                    final uploadedFileName = await ImageAppProvider.upload(
-                      file: _pickedImage!,
-                      folder: "users",
-                    );
-
-                    finalImage = uploadedFileName;
-                  }
-
-                  await _userProvider.update(Session.userId!, {
-                    'firstName': _firstNameController.text.trim(),
-                    'lastName': _lastNameController.text.trim(),
-                    'email': _emailController.text.trim(),
-                    'username': _usernameController.text.trim(),
-                    'phoneNumber': _phoneNumberController.text.trim(),
-                    'dateOfBirth': _formatDateForApi(_birthDateController.text),
-                    'userImage': finalImage,
-                  });
-
-                  await _loadLoggedUser();
-
-                  if (!context.mounted) return;
-
-                  Navigator.pop(context);
-
-                  if (!mounted) return;
-                  SnackbarHelper.showSuccess(
-                    this.context,
-                    "Profile updated successfully.",
-                  );
-                } catch (e) {
-                  if (!context.mounted) return;
-
-                  SnackbarHelper.showError(
-                    context,
-                    e.toString(),
-                  );
-                }
-              },
-            ),
-          );
-        },
-      ),
+    final formKey = GlobalKey<FormState>();
+    final firstNameCtrl = TextEditingController(text: user?.firstName ?? '');
+    final lastNameCtrl = TextEditingController(text: user?.lastName ?? '');
+    final emailCtrl = TextEditingController(text: user?.email ?? '');
+    final usernameCtrl = TextEditingController(text: user?.username ?? '');
+    final phoneCtrl = TextEditingController(text: user?.phoneNumber ?? '');
+    final birthDateCtrl = TextEditingController(
+      text: user?.dateOfBirth != null
+          ? "${user!.dateOfBirth!.day.toString().padLeft(2, '0')}."
+              "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
+              "${user.dateOfBirth!.year}."
+          : '',
     );
+
+    try {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => StatefulBuilder(
+          builder: (context, setStateDialog) {
+            bool hasChanges() {
+              if (_isImageChanged) return true;
+              if (user == null) return false;
+
+              final originalBirthDate = user.dateOfBirth != null
+                  ? "${user.dateOfBirth!.day.toString().padLeft(2, '0')}."
+                      "${user.dateOfBirth!.month.toString().padLeft(2, '0')}."
+                      "${user.dateOfBirth!.year}."
+                  : "";
+
+              return firstNameCtrl.text != (user.firstName ?? '') ||
+                  lastNameCtrl.text != (user.lastName ?? '') ||
+                  emailCtrl.text != (user.email ?? '') ||
+                  usernameCtrl.text != (user.username ?? '') ||
+                  phoneCtrl.text != (user.phoneNumber ?? '') ||
+                  birthDateCtrl.text != originalBirthDate;
+            }
+
+            return BaseDialog(
+              title: "Profile settings",
+              width: 680,
+              height: 690,
+              onClose: () => Navigator.pop(context),
+              child: _userSettingsContent(
+                user: user,
+                formKey: formKey,
+                firstNameCtrl: firstNameCtrl,
+                lastNameCtrl: lastNameCtrl,
+                emailCtrl: emailCtrl,
+                usernameCtrl: usernameCtrl,
+                phoneCtrl: phoneCtrl,
+                birthDateCtrl: birthDateCtrl,
+                onChangeImage: () async {
+                  final picked = await ImageHelper.openImagePicker();
+                  if (picked == null) return;
+                  setStateDialog(() {
+                    _pickedImage = picked;
+                    _isImageChanged = true;
+                  });
+                },
+                onAnyChanged: () => setStateDialog(() {}),
+                isSaveEnabled: hasChanges(),
+                onSave: () async {
+                  final ok = formKey.currentState?.validate() ?? false;
+                  if (!ok || user == null) return;
+
+                  try {
+                    String? finalImage = user.userImage;
+
+                    if (_pickedImage != null) {
+                      finalImage = await ImageAppProvider.upload(
+                        file: _pickedImage!,
+                        folder: "users",
+                      );
+                    }
+
+                    await _userProvider.update(Session.userId!, {
+                      'firstName': firstNameCtrl.text.trim(),
+                      'lastName': lastNameCtrl.text.trim(),
+                      'email': emailCtrl.text.trim(),
+                      'username': usernameCtrl.text.trim(),
+                      'phoneNumber': phoneCtrl.text.trim(),
+                      'dateOfBirth': _formatDateForApi(birthDateCtrl.text),
+                      'userImage': finalImage,
+                    });
+
+                    await _loadLoggedUser();
+
+                    if (!context.mounted) return;
+                    Navigator.pop(context);
+
+                    if (!mounted) return;
+                    SnackbarHelper.showSuccess(
+                      this.context,
+                      "Profile updated successfully.",
+                    );
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    SnackbarHelper.showError(context, e.toString());
+                  }
+                },
+              ),
+            );
+          },
+        ),
+      );
+    } finally {
+      firstNameCtrl.dispose();
+      lastNameCtrl.dispose();
+      emailCtrl.dispose();
+      usernameCtrl.dispose();
+      phoneCtrl.dispose();
+      birthDateCtrl.dispose();
+    }
   }
 
   Widget _userSettingsContent({
     required User? user,
+    required GlobalKey<FormState> formKey,
+    required TextEditingController firstNameCtrl,
+    required TextEditingController lastNameCtrl,
+    required TextEditingController emailCtrl,
+    required TextEditingController usernameCtrl,
+    required TextEditingController phoneCtrl,
+    required TextEditingController birthDateCtrl,
     required Future<void> Function() onChangeImage,
     required VoidCallback onAnyChanged,
     required bool isSaveEnabled,
     required Future<void> Function() onSave,
   }) {
     if (user == null) {
-      return const Center(
-        child: Text("User was not loaded."),
-      );
+      return const Center(child: Text("User was not loaded."));
     }
 
     final fullName =
@@ -452,12 +393,10 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
                                   ImageHelper.userPlaceholder(
-                                user.username ?? "User",
-                              ),
+                                      user.username ?? "User"),
                             )
                           : ImageHelper.userPlaceholder(
-                              user.username ?? "User",
-                            )),
+                              user.username ?? "User")),
                 ),
               ),
               const SizedBox(width: 16),
@@ -493,11 +432,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: SidebarWidget.primaryColor,
                         side: const BorderSide(
-                          color: SidebarWidget.primaryColor,
-                        ),
+                            color: SidebarWidget.primaryColor),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ],
@@ -516,7 +453,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
               border: Border.all(color: SidebarWidget.borderColor),
             ),
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -525,7 +462,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                         Expanded(
                           child: _settingsField(
                             label: "First name",
-                            controller: _firstNameController,
+                            controller: firstNameCtrl,
                             validator: (v) => (v == null || v.trim().isEmpty)
                                 ? "First name is required."
                                 : null,
@@ -536,7 +473,7 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                         Expanded(
                           child: _settingsField(
                             label: "Last name",
-                            controller: _lastNameController,
+                            controller: lastNameCtrl,
                             validator: (v) => (v == null || v.trim().isEmpty)
                                 ? "Last name is required."
                                 : null,
@@ -551,25 +488,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                         Expanded(
                           child: _settingsField(
                             label: "Email",
-                            controller: _emailController,
+                            controller: emailCtrl,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (v) {
-                              final value = v?.trim() ?? "";
-
-                              if (value.isEmpty) {
-                                return "Email is required.";
-                              }
-
-                              final regex = RegExp(
-                                r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
-                              );
-
-                              if (!regex.hasMatch(value)) {
-                                return "Enter a valid email.";
-                              }
-
-                              return null;
-                            },
+                            validator: (v) => Validators.email(v),
                             onChanged: (_) => onAnyChanged(),
                           ),
                         ),
@@ -577,10 +498,8 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                         Expanded(
                           child: _settingsField(
                             label: "Username",
-                            controller: _usernameController,
-                            validator: (v) => (v == null || v.trim().length < 3)
-                                ? "Username min 3 characters."
-                                : null,
+                            controller: usernameCtrl,
+                            validator: (v) => Validators.username(v),
                             onChanged: (_) => onAnyChanged(),
                           ),
                         ),
@@ -590,15 +509,15 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                     _datePickerField(
                       context: context,
                       label: "Date of birth",
-                      controller: _birthDateController,
+                      controller: birthDateCtrl,
                       onAnyChanged: onAnyChanged,
                     ),
                     const SizedBox(height: 12),
                     _settingsField(
                       label: "Phone number",
-                      controller: _phoneNumberController,
+                      controller: phoneCtrl,
                       keyboardType: TextInputType.phone,
-                      validator: (v) => _validatePhone(v, required: true),
+                      validator: (v) => Validators.phone(v, required: true),
                       onChanged: (_) => onAnyChanged(),
                     ),
                   ],
@@ -617,19 +536,14 @@ class _SidebarWidgetState extends State<SidebarWidget> {
               label: const Text(
                 "Log out",
                 style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w700,
-                ),
+                    color: Colors.red, fontWeight: FontWeight.w700),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.red),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                    horizontal: 16, vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
             ElevatedButton(
@@ -638,12 +552,9 @@ class _SidebarWidgetState extends State<SidebarWidget> {
                 backgroundColor: SidebarWidget.primaryColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
+                    horizontal: 18, vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
                 "Save changes",
@@ -727,6 +638,12 @@ class _SidebarWidgetState extends State<SidebarWidget> {
             title: "Income",
             selected: widget.selectedIndex == 2,
             onTap: () => widget.onItemSelected(2),
+          ),
+          SidebarItemWidget(
+            icon: Icons.tune_outlined,
+            title: "Ref. Data",
+            selected: widget.selectedIndex == 3,
+            onTap: () => widget.onItemSelected(3),
           ),
           const Spacer(),
           SidebarItemWidget(

@@ -12,9 +12,15 @@ namespace GrooveOn.Services.Services
     public class AnswerService
         : BaseCRUDService<AnswerResponse, AnswerSearchObject, Answer, AnswerUpsertRequest, AnswerUpsertRequest>, IAnswerService
     {
-        public AnswerService(GrooveOnDbContext context, IMapper mapper)
+        private readonly INotificationService _notificationService;
+
+        public AnswerService(
+            GrooveOnDbContext context,
+            IMapper mapper,
+            INotificationService notificationService)
             : base(context, mapper)
         {
+            _notificationService = notificationService;
         }
 
         protected override IQueryable<Answer> AddInclude(IQueryable<Answer> query, AnswerSearchObject search)
@@ -75,6 +81,12 @@ namespace GrooveOn.Services.Services
             question.AnsweredAt = entity.CreatedAt;
             question.Status = "Answered";
 
+            _notificationService.AddForUser(
+                question.UserId,
+                $"Odgovor na pitanje: {question.Title}",
+                "Administrator je odgovorio na vaše pitanje. Otvorite sekciju pitanja za detalje.",
+                "question_answered");
+
             await base.BeforeInsert(entity, request);
         }
 
@@ -87,6 +99,12 @@ namespace GrooveOn.Services.Services
             question.Answer = request.Message;
             question.AnsweredAt = DateTime.UtcNow;
             question.Status = "Answered";
+
+            _notificationService.AddForUser(
+                question.UserId,
+                $"Ažuriran odgovor: {question.Title}",
+                "Administrator je ažurirao odgovor na vaše pitanje.",
+                "question_answered");
 
             await base.BeforeUpdate(entity, request);
         }

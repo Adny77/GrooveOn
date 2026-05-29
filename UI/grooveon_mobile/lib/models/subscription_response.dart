@@ -10,6 +10,7 @@ class SubscriptionResponse {
   final String? userFullName;
   final int subscriptionPlanId;
   final String? subscriptionPlanName;
+  final String? subscriptionPlanCode;
   final double subscriptionPlanPrice;
   final int subscriptionPlanDurationDays;
   final DateTime startDate;
@@ -24,6 +25,7 @@ class SubscriptionResponse {
     this.userFullName,
     required this.subscriptionPlanId,
     this.subscriptionPlanName,
+    this.subscriptionPlanCode,
     required this.subscriptionPlanPrice,
     required this.subscriptionPlanDurationDays,
     required this.startDate,

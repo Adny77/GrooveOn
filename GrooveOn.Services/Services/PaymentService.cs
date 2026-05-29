@@ -5,9 +5,11 @@ using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Database;
 using GrooveOn.Services.Exceptions;
 using GrooveOn.Services.Interfaces;
+using GrooveOn.Services.PaymentStateMachine;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+
 
 namespace GrooveOn.Services.Services
 {
@@ -17,16 +19,19 @@ namespace GrooveOn.Services.Services
     {
         private readonly IStripeService _stripeService;
         private readonly AppConfig _config;
+        private readonly BasePaymentState _paymentState;
 
         public PaymentService(
             GrooveOnDbContext context,
             IMapper mapper,
             IStripeService stripeService,
-            IOptions<AppConfig> config
+            IOptions<AppConfig> config,
+            BasePaymentState paymentState
         ) : base(context, mapper)
         {
             _stripeService = stripeService;
             _config = config.Value;
+            _paymentState = paymentState;
         }
 
         protected override IQueryable<Payment> ApplyFilter(
@@ -46,14 +51,6 @@ namespace GrooveOn.Services.Services
                     || (x.PaymentMethod != null &&
                         x.PaymentMethod.ToLower().Contains(fts))
                     || x.PaymentAmount.ToString().Contains(fts)
-                    || (fts.Contains("paid") && x.PaymentStatus == "Paid")
-                    || (fts.Contains("paid") && x.PaymentStatus == "Paid")
-                    || (fts.Contains("pending") && x.PaymentStatus == "Pending")
-                    || (fts.Contains("pending") && x.PaymentStatus == "Pending")
-                    || (fts.Contains("processing") && x.PaymentStatus == "Processing")
-                    || (fts.Contains("failed") && x.PaymentStatus == "Failed")
-                    || (fts.Contains("failed") && x.PaymentStatus == "Failed")
-                    || (fts.Contains("canceled") && x.PaymentStatus == "Canceled")
                 );
             }
 
@@ -168,6 +165,16 @@ namespace GrooveOn.Services.Services
             if (plan.DurationDays <= 0)
                 throw new UserException("The selected plan is not valid for payment.");
 
+            var hasActiveSubscription = await _context.Subscriptions
+                .AnyAsync(x =>
+                    x.UserId == request.UserId &&
+                    x.IsActive &&
+                    x.SubscriptionPlanId == request.SubscriptionPlanId &&
+                    (x.ExpiryDate == null || x.ExpiryDate > DateTime.UtcNow));
+
+            if (hasActiveSubscription)
+                throw new UserException("You already have an active subscription.");
+
             var alreadyProcessingPayment = await _context.Payments
                 .Include(x => x.Subscription)
                 .AnyAsync(x =>
@@ -178,60 +185,68 @@ namespace GrooveOn.Services.Services
             if (alreadyProcessingPayment)
                 throw new UserException("You already have a payment in progress.");
 
-            var subscription = new Subscription
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                UserId = request.UserId,
-                SubscriptionPlanId = plan.Id,
-                StartDate = DateTime.UtcNow,
-                ExpiryDate = DateTime.UtcNow.AddDays(plan.DurationDays),
-                IsActive = false
-            };
+                var subscription = new Subscription
+                {
+                    UserId = request.UserId,
+                    SubscriptionPlanId = plan.Id,
+                    StartDate = DateTime.UtcNow,
+                    ExpiryDate = DateTime.UtcNow.AddDays(plan.DurationDays),
+                    IsActive = false
+                };
 
-            _context.Subscriptions.Add(subscription);
-            await _context.SaveChangesAsync();
+                _context.Subscriptions.Add(subscription);
+                await _context.SaveChangesAsync();
 
-            var payment = new Payment
+                var payment = new Payment
+                {
+                    SubscriptionId = subscription.Id,
+                    PaymentStatus = "Pending",
+                    CreatedAt = DateTime.UtcNow,
+                    PaymentMethod = "Stripe",
+                    PaymentAmount = plan.Price,
+                    PaymentDate = null
+                };
+
+                _context.Payments.Add(payment);
+                await _context.SaveChangesAsync();
+
+                var metadata = new Dictionary<string, string>
+                {
+                    ["paymentId"] = payment.Id.ToString(),
+                    ["userId"] = user.Id.ToString(),
+                    ["subscriptionId"] = subscription.Id.ToString(),
+                    ["subscriptionPlanId"] = plan.Id.ToString()
+                };
+
+                var intent = await _stripeService.CreatePaymentIntentAsync(
+                    (decimal)plan.Price,
+                    _config.PaymentCurrency,
+                    metadata
+                );
+
+                await _paymentState.GetState(payment.PaymentStatus).ToProcessingAsync(payment, intent.Id);
+                await transaction.CommitAsync();
+
+                return new
+                {
+                    clientSecret = intent.ClientSecret,
+                    intentId = intent.Id,
+                    paymentId = payment.Id,
+                    subscriptionId = subscription.Id,
+                    amount = payment.PaymentAmount,
+                    currency = _config.PaymentCurrency,
+                    planName = plan.Name
+                };
+            }
+            catch
             {
-                SubscriptionId = subscription.Id,
-                PaymentStatus = "Pending",
-                CreatedAt = DateTime.UtcNow,
-                PaymentMethod = "Stripe",
-                PaymentAmount = plan.Price,
-                PaymentDate = null
-            };
-
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
-
-            var metadata = new Dictionary<string, string>
-            {
-                ["paymentId"] = payment.Id.ToString(),
-                ["userId"] = user.Id.ToString(),
-                ["subscriptionId"] = subscription.Id.ToString(),
-                ["subscriptionPlanId"] = plan.Id.ToString()
-            };
-
-            var intent = await _stripeService.CreatePaymentIntentAsync(
-                (decimal)plan.Price,
-                _config.PaymentCurrency,
-                metadata
-            );
-
-            payment.StripePaymentIntentId = intent.Id;
-            payment.PaymentStatus = "Processing";
-
-            await _context.SaveChangesAsync();
-
-            return new
-            {
-                clientSecret = intent.ClientSecret,
-                intentId = intent.Id,
-                paymentId = payment.Id,
-                subscriptionId = subscription.Id,
-                amount = payment.PaymentAmount,
-                currency = _config.PaymentCurrency,
-                planName = plan.Name
-            };
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task HandlePaymentIntentSucceededAsync(
@@ -243,36 +258,10 @@ namespace GrooveOn.Services.Services
             if (payment == null)
                 return;
 
-            var subscription = await _context.Subscriptions
-                .Include(x => x.SubscriptionPlan)
-                .FirstOrDefaultAsync(x => x.Id == payment.SubscriptionId);
-
-            if (subscription == null)
+            if (payment.PaymentStatus == "Paid")
                 return;
 
-            var oldActiveSubscriptions = await _context.Subscriptions
-                .Where(x =>
-                    x.UserId == subscription.UserId &&
-                    x.IsActive &&
-                    x.Id != subscription.Id)
-                .ToListAsync();
-
-            foreach (var oldSub in oldActiveSubscriptions)
-                oldSub.IsActive = false;
-
-            payment.PaymentStatus = "Paid";
-            payment.PaidAt = DateTime.UtcNow;
-            payment.PaymentDate = DateTime.UtcNow;
-            payment.FailureReason = null;
-            payment.PaymentMethod = "Stripe";
-
-            subscription.IsActive = true;
-            subscription.StartDate = DateTime.UtcNow;
-            subscription.ExpiryDate = DateTime.UtcNow.AddDays(
-                subscription.SubscriptionPlan?.DurationDays ?? 30
-            );
-
-            await _context.SaveChangesAsync();
+            await _paymentState.GetState(payment.PaymentStatus).ToPaidAsync(payment);
         }
 
         public async Task HandlePaymentIntentFailedAsync(
@@ -284,19 +273,7 @@ namespace GrooveOn.Services.Services
             if (payment == null)
                 return;
 
-            var subscription = await _context.Subscriptions
-                .FirstOrDefaultAsync(x => x.Id == payment.SubscriptionId);
-
-            payment.PaymentStatus = "Failed";
-            payment.PaidAt = null;
-            payment.PaymentDate = null;
-            payment.FailureReason = "Payment was not completed successfully.";
-            payment.PaymentMethod = "Stripe";
-
-            if (subscription != null)
-                subscription.IsActive = false;
-
-            await _context.SaveChangesAsync();
+            await _paymentState.GetState(payment.PaymentStatus).ToFailedAsync(payment);
         }
 
         public async Task HandlePaymentIntentCanceledAsync(
@@ -308,19 +285,7 @@ namespace GrooveOn.Services.Services
             if (payment == null)
                 return;
 
-            var subscription = await _context.Subscriptions
-                .FirstOrDefaultAsync(x => x.Id == payment.SubscriptionId);
-
-            payment.PaymentStatus = "Canceled";
-            payment.PaidAt = null;
-            payment.PaymentDate = null;
-            payment.FailureReason = "Payment was canceled.";
-            payment.PaymentMethod = "Stripe";
-
-            if (subscription != null)
-                subscription.IsActive = false;
-
-            await _context.SaveChangesAsync();
+            await _paymentState.GetState(payment.PaymentStatus).ToCanceledAsync(payment);
         }
 
         private async Task<Payment?> GetPaymentFromMetadataAsync(

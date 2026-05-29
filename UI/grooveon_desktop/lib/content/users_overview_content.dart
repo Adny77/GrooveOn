@@ -33,7 +33,7 @@ class UsersOverContent extends StatefulWidget {
 
 class _UsersOverContentState extends State<UsersOverContent> {
   bool _yearMode = true;
-  int selectedGrowthYear = 2026;
+  int selectedGrowthYear = DateTime.now().year;
 
   late Future<SubscriptionAnalytics> _futureAnalytics;
   late Future<List<UserGrowthPoint>> _futureGrowth;
@@ -667,16 +667,13 @@ class _UsersOverContentState extends State<UsersOverContent> {
                                   value: selectedGrowthYear,
                                   underline: const SizedBox(),
                                   borderRadius: BorderRadius.circular(12),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 2025,
-                                      child: Text("2025"),
+                                  items: List.generate(
+                                    DateTime.now().year - 2025 + 1,
+                                    (i) => DropdownMenuItem(
+                                      value: 2025 + i,
+                                      child: Text("${2025 + i}"),
                                     ),
-                                    DropdownMenuItem(
-                                      value: 2026,
-                                      child: Text("2026"),
-                                    ),
-                                  ],
+                                  ),
                                   onChanged: (value) {
                                     if (value == null) return;
                                     _changeGrowthYear(value);

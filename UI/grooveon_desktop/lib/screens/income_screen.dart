@@ -26,7 +26,7 @@ class IncomeScreen extends StatefulWidget {
 
 class _IncomeScreenState extends State<IncomeScreen> {
   IncomeTab _selectedTab = IncomeTab.overview;
-  int _selectedYear = 2026;
+  int _selectedYear = DateTime.now().year;
 
   void _changeTab(IncomeTab tab) {
     setState(() {
