@@ -29,8 +29,8 @@ namespace GrooveOn.Services.PaymentStateMachine
 
                 _serviceProvider.GetRequiredService<INotificationService>().AddForUser(
                     subscription.UserId,
-                    "Uplata otkazana",
-                    "Vaša uplata je otkazana i članarina nije aktivirana.",
+                    "Payment Canceled",
+                    "Your payment has been canceled and the subscription was not activated.",
                     "payment_canceled");
             }
 

@@ -47,6 +47,23 @@ Future<bool> hasPremium() async {
   return response.body.toLowerCase() == "true";
 }
 
+Future<bool> resetPassword(String token, String newPassword) async {
+  final url = Uri.parse("${ApiConfig.apiBase}/api/User/reset-password");
+
+  final response = await http.post(
+    url,
+    headers: HttpHelper.getHeaders(),
+    body: jsonEncode({
+      "token": token,
+      "newPassword": newPassword,
+    }),
+  );
+
+  HttpHelper.checkResponse(response);
+
+  return true;
+}
+
 Future<void> changePassword(Map<String, dynamic> request) async {
   final url = Uri.parse("${ApiConfig.apiBase}/api/User/change-password");
 

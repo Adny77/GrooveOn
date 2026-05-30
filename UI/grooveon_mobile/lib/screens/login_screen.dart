@@ -224,6 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       : () async {
                                           await showDialog(
                                             context: context,
+                                            barrierDismissible: false,
                                             builder: (_) =>
                                                 const ForgotPasswordDialog(),
                                           );
@@ -250,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     foregroundColor: Colors.white,
                                     disabledBackgroundColor: LoginScreen
                                         .darkPurple
-                                        .withOpacity(0.65),
+                                        .withValues(alpha: 0.65),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(18),
                                     ),
@@ -335,7 +336,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             boxShadow: [
               BoxShadow(
-                color: LoginScreen.primaryPurple.withOpacity(0.30),
+                color: LoginScreen.primaryPurple.withValues(alpha: 0.30),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),

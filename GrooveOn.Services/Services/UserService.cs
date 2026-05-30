@@ -120,8 +120,8 @@ namespace GrooveOn.Services.Services
             _context.Set<Notification>().Add(new Notification
             {
                 UserId = user.Id,
-                Title = "Lozinka promijenjena",
-                Content = $"Vaša lozinka je uspješno promijenjena dana {DateTime.UtcNow:dd.MM.yyyy} u {DateTime.UtcNow:HH:mm} UTC.",
+                Title = "Password Changed",
+                Content = $"Your password was successfully changed on {DateTime.UtcNow:dd.MM.yyyy} at {DateTime.UtcNow:HH:mm} UTC.",
                 Type = "password_changed",
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow

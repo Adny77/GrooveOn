@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
+import 'package:grooveon_mobile/dialogs/forgot_password_dialog.dart';
 import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/user.dart';
@@ -287,6 +288,14 @@ class UserScreenState extends State<UserScreen> {
     if (changed == true && mounted) {
       SnackbarHelper.showSuccess(context, "Password changed successfully.");
     }
+  }
+
+  Future<void> _openResetViaEmailDialog() async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const ForgotPasswordDialog(),
+    );
   }
 
   Future<void> _logout() async {
@@ -578,24 +587,78 @@ class UserScreenState extends State<UserScreen> {
     return _card(
       icon: Icons.lock_outline_rounded,
       title: "Security",
-      subtitle: "Change your account password.",
-      child: SizedBox(
-        width: double.infinity,
-        height: 48,
-        child: OutlinedButton.icon(
-          onPressed: _openChangePasswordDialog,
-          icon: const Icon(Icons.password_rounded),
-          label: const Text(
-            "Change password",
-            style: TextStyle(fontWeight: FontWeight.w800),
+      subtitle: "Manage your account password.",
+      child: Column(
+        children: [
+          _securityOption(
+            icon: Icons.password_rounded,
+            title: "Change password",
+            description: "Use your current password to set a new one.",
+            onTap: _openChangePasswordDialog,
           ),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: primary,
-            side: const BorderSide(color: primary),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Divider(color: Color(0xFFEEEEEE), height: 1),
+          ),
+          _securityOption(
+            icon: Icons.mark_email_unread_outlined,
+            title: "Reset via email",
+            description: "Forgot your password? Send a reset code to your email.",
+            onTap: _openResetViaEmailDialog,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _securityOption({
+    required IconData icon,
+    required String title,
+    required String description,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: primary),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Color(0xFF1C1C1C),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF6E6E6E),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: Color(0xFFBBBBBB)),
+          ],
         ),
       ),
     );

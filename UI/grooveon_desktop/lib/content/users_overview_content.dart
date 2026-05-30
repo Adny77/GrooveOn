@@ -1242,7 +1242,7 @@ class _UserGrowthOverviewCardState extends State<_UserGrowthOverviewCard> {
     required List<UserGrowthPoint> data,
     required int selectedYear,
   }) {
-    final filteredData = _filterDataByAllowedMonths(data, selectedYear);
+    final filteredData = _buildCompleteMonthData(data, selectedYear);
     if (filteredData.isEmpty) return null;
 
     const leftPadding = 38.0;
@@ -1284,16 +1284,25 @@ class _UserGrowthOverviewCardState extends State<_UserGrowthOverviewCard> {
     return closestDistance <= 18 ? closestIndex : null;
   }
 
-  List<UserGrowthPoint> _filterDataByAllowedMonths(
+  List<UserGrowthPoint> _buildCompleteMonthData(
     List<UserGrowthPoint> data,
     int year,
   ) {
-    final maxMonth = _maxAllowedMonthForYear(year);
+    const monthLabels = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
 
-    return data.where((e) {
-      final month = _monthFromLabel(e.label);
-      return month > 0 && month <= maxMonth;
-    }).toList();
+    final maxMonth = _maxAllowedMonthForYear(year);
+    final countMap = <String, int>{};
+    for (final point in data) {
+      countMap[point.label] = point.count;
+    }
+
+    return List.generate(maxMonth, (i) {
+      final label = monthLabels[i];
+      return UserGrowthPoint(label: label, count: countMap[label] ?? 0);
+    });
   }
 
   int _maxAllowedMonthForYear(int year) {
@@ -1302,25 +1311,6 @@ class _UserGrowthOverviewCardState extends State<_UserGrowthOverviewCard> {
     if (year < now.year) return 12;
     if (year == now.year) return now.month;
     return 0;
-  }
-
-  int _monthFromLabel(String label) {
-    const months = {
-      "Jan": 1,
-      "Feb": 2,
-      "Mar": 3,
-      "Apr": 4,
-      "May": 5,
-      "Jun": 6,
-      "Jul": 7,
-      "Aug": 8,
-      "Sep": 9,
-      "Oct": 10,
-      "Nov": 11,
-      "Dec": 12,
-    };
-
-    return months[label] ?? 0;
   }
 
   double _niceUpperBound(double maxValue) {
@@ -1345,7 +1335,7 @@ class _UserGrowthPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final filteredData = _filterDataByAllowedMonths(data, selectedYear);
+    final filteredData = _buildCompleteMonthData(data, selectedYear);
 
     final gridPaint = Paint()
       ..color = const Color(0xFFD8D8DE)
@@ -1357,7 +1347,7 @@ class _UserGrowthPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final fillPaint = Paint()
-      ..color = UsersOverContent.lightPurple.withOpacity(0.15)
+      ..color = UsersOverContent.lightPurple.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
 
     final labelStyle = const TextStyle(
@@ -1461,7 +1451,7 @@ class _UserGrowthPainter extends CustomPainter {
         canvas.drawCircle(
           points[i],
           8,
-          Paint()..color = UsersOverContent.primaryColor.withOpacity(0.18),
+          Paint()..color = UsersOverContent.primaryColor.withValues(alpha: 0.18),
         );
       }
 
@@ -1500,16 +1490,25 @@ class _UserGrowthPainter extends CustomPainter {
     }
   }
 
-  List<UserGrowthPoint> _filterDataByAllowedMonths(
+  List<UserGrowthPoint> _buildCompleteMonthData(
     List<UserGrowthPoint> data,
     int year,
   ) {
-    final maxMonth = _maxAllowedMonthForYear(year);
+    const monthLabels = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
 
-    return data.where((e) {
-      final month = _monthFromLabel(e.label);
-      return month > 0 && month <= maxMonth;
-    }).toList();
+    final maxMonth = _maxAllowedMonthForYear(year);
+    final countMap = <String, int>{};
+    for (final point in data) {
+      countMap[point.label] = point.count;
+    }
+
+    return List.generate(maxMonth, (i) {
+      final label = monthLabels[i];
+      return UserGrowthPoint(label: label, count: countMap[label] ?? 0);
+    });
   }
 
   int _maxAllowedMonthForYear(int year) {
@@ -1518,25 +1517,6 @@ class _UserGrowthPainter extends CustomPainter {
     if (year < now.year) return 12;
     if (year == now.year) return now.month;
     return 0;
-  }
-
-  int _monthFromLabel(String label) {
-    const months = {
-      "Jan": 1,
-      "Feb": 2,
-      "Mar": 3,
-      "Apr": 4,
-      "May": 5,
-      "Jun": 6,
-      "Jul": 7,
-      "Aug": 8,
-      "Sep": 9,
-      "Oct": 10,
-      "Nov": 11,
-      "Dec": 12,
-    };
-
-    return months[label] ?? 0;
   }
 
   void _drawTooltip(

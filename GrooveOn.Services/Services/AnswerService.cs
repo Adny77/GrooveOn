@@ -83,8 +83,8 @@ namespace GrooveOn.Services.Services
 
             _notificationService.AddForUser(
                 question.UserId,
-                $"Odgovor na pitanje: {question.Title}",
-                "Administrator je odgovorio na vaše pitanje. Otvorite sekciju pitanja za detalje.",
+                $"Answer to your question: {question.Title}",
+                "An administrator has answered your question. Open the questions section for details.",
                 "question_answered");
 
             await base.BeforeInsert(entity, request);
@@ -102,8 +102,8 @@ namespace GrooveOn.Services.Services
 
             _notificationService.AddForUser(
                 question.UserId,
-                $"Ažuriran odgovor: {question.Title}",
-                "Administrator je ažurirao odgovor na vaše pitanje.",
+                $"Updated answer: {question.Title}",
+                "An administrator has updated the answer to your question.",
                 "question_answered");
 
             await base.BeforeUpdate(entity, request);

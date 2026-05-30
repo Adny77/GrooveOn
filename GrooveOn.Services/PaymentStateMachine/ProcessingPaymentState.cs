@@ -39,8 +39,8 @@ namespace GrooveOn.Services.PaymentStateMachine
 
                 _serviceProvider.GetRequiredService<INotificationService>().AddForUser(
                     subscription.UserId,
-                    "Članarina je aktivirana",
-                    $"Uplata za {planName} plan je uspješna. Vaša članarina vrijedi do {expiryText}.",
+                    "Subscription Activated",
+                    $"Payment for the {planName} plan was successful. Your subscription is valid until {expiryText}.",
                     "subscription_paid");
             }
 
@@ -65,8 +65,8 @@ namespace GrooveOn.Services.PaymentStateMachine
             {
                 _serviceProvider.GetRequiredService<INotificationService>().AddForUser(
                     subscription.UserId,
-                    "Uplata nije uspjela",
-                    "Vaša uplata nije mogla biti završena. Pokušajte ponovo ili koristite drugi način plaćanja.",
+                    "Payment Failed",
+                    "Your payment could not be completed. Please try again or use a different payment method.",
                     "payment_failed");
             }
 
@@ -91,8 +91,8 @@ namespace GrooveOn.Services.PaymentStateMachine
             {
                 _serviceProvider.GetRequiredService<INotificationService>().AddForUser(
                     subscription.UserId,
-                    "Uplata otkazana",
-                    "Vaša uplata je otkazana i članarina nije aktivirana.",
+                    "Payment Canceled",
+                    "Your payment has been canceled and the subscription was not activated.",
                     "payment_canceled");
             }
 
