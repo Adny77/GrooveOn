@@ -65,7 +65,7 @@ docker compose up -d --build
 
 ## ▶️ Pokretanje aplikacije
 
-Arhiva: IB220034-GrooveOn-Apps.7z\
+Arhiva: fit-build-2026-06-17.7z\
 Šifra: fit
 
 Sadrži: 
