@@ -14,19 +14,36 @@ class PaymentProvider extends BaseProvider<PaymentResponse> {
     return PaymentResponse.fromJson(json);
   }
 
-  Future<String> createNewIntent(Map<String, dynamic> request) async {
+  Future<({String clientSecret, int paymentId})> createNewIntent(
+      Map<String, dynamic> request) async {
     final url = "${ApiConfig.apiBase}/api/Payment/create-new-intent";
 
     final response = await http.post(
       Uri.parse(url),
-      headers: HttpHelper.getHeaders(), 
+      headers: HttpHelper.getHeaders(),
       body: jsonEncode(request),
     );
 
     HttpHelper.checkResponse(response);
 
-    final data = jsonDecode(response.body);
-    return data["clientSecret"];
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return (
+      clientSecret: data["clientSecret"] as String,
+      paymentId: (data["paymentId"] as num).toInt(),
+    );
+  }
 
+  Future<String> getMyStatus(int paymentId) async {
+    final url = "${ApiConfig.apiBase}/api/Payment/my-status/$paymentId";
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: HttpHelper.getHeaders(),
+    );
+
+    HttpHelper.checkResponse(response);
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    return data["status"] as String;
   }
 }

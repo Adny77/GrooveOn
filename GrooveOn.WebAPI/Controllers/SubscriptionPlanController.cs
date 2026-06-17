@@ -1,4 +1,4 @@
-﻿using GrooveOn.API.Controllers;
+﻿using GrooveOn.WebAPI.Controllers;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;

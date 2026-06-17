@@ -1,5 +1,5 @@
-using System.Security.Claims;
-using GrooveOn.API.Controllers;
+﻿using System.Security.Claims;
+using GrooveOn.WebAPI.Controllers;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Models.SearchObjects;
@@ -53,6 +53,14 @@ namespace GrooveOn.WebAPI.Controllers
         {
             var result = await _notificationService.MarkAsReadAsync(id, GetCurrentUserId());
             return result == null ? NotFound() : Ok(result);
+        }
+
+        [Authorize(Roles = Roles.User)]
+        [HttpPut("mark-all-read")]
+        public async Task<ActionResult> MarkAllAsRead()
+        {
+            var count = await _notificationService.MarkAllAsReadAsync(GetCurrentUserId());
+            return Ok(new { marked = count });
         }
 
         [Authorize(Roles = Roles.Admin)]

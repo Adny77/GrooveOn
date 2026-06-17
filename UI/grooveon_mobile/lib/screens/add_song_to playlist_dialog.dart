@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/base_dialogs.dart';
 import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
@@ -7,6 +7,7 @@ import 'package:grooveon_mobile/models/playlist_response.dart';
 import 'package:grooveon_mobile/providers/playlist_provider.dart';
 import 'package:grooveon_mobile/providers/playlist_song_provider.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class AddSongToPlaylistDialog extends StatefulWidget {
   final MusicSearchItemResponse song;
@@ -83,7 +84,7 @@ class _AddSongToPlaylistDialogState extends State<AddSongToPlaylistDialog> {
       if (!mounted) return;
 
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _loading = false;
       });
     }
@@ -114,7 +115,7 @@ class _AddSongToPlaylistDialogState extends State<AddSongToPlaylistDialog> {
 
       SnackbarHelper.showError(
         context,
-        e.toString(),
+        extractErrorMessage(e),
       );
     }
   }

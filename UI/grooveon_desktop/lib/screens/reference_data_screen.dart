@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:grooveon_desktop/content/artist_content.dart';
 import 'package:grooveon_desktop/content/genre_content.dart';
 import 'package:grooveon_desktop/content/role_content.dart';
 import 'package:grooveon_desktop/content/subscription_plan_content.dart';
 
-enum _RefTab { genres, roles, plans }
+enum _RefTab { genres, roles, plans, artists }
 
 class ReferenceDataScreen extends StatefulWidget {
   const ReferenceDataScreen({super.key});
@@ -26,6 +27,7 @@ class _ReferenceDataScreenState extends State<ReferenceDataScreen> {
       _RefTab.genres => const GenreContent(),
       _RefTab.roles => const RoleContent(),
       _RefTab.plans => const SubscriptionPlanContent(),
+      _RefTab.artists => const ArtistContent(),
     };
   }
 
@@ -80,6 +82,8 @@ class _TabBar extends StatelessWidget {
         const SizedBox(width: 8),
         _tab(_RefTab.plans, 'Subscription Plans',
             Icons.workspace_premium_outlined),
+        const SizedBox(width: 8),
+        _tab(_RefTab.artists, 'Artists', Icons.person_outlined),
       ],
     );
   }

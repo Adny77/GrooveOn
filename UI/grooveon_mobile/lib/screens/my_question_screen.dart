@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/helper/universal_paging_helper.dart';
 import 'package:grooveon_mobile/models/question_response.dart';
 import 'package:grooveon_mobile/models/search_results.dart';
@@ -6,6 +6,7 @@ import 'package:grooveon_mobile/providers/question_provider.dart';
 import 'package:grooveon_mobile/screens/ask_question_screen.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
 import 'package:grooveon_mobile/widgets/swipe_widget.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class MyQuestionsScreen extends StatefulWidget {
   const MyQuestionsScreen({super.key});
@@ -114,7 +115,7 @@ class _MyQuestionsScreenState extends State<MyQuestionsScreen>
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _loading = false;
       });
     }

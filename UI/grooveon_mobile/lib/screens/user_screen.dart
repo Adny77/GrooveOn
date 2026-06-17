@@ -1,4 +1,5 @@
-import 'dart:io';
+﻿import 'dart:io';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
@@ -201,7 +202,7 @@ class UserScreenState extends State<UserScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _loading = false;
       });
     }
@@ -272,7 +273,7 @@ class UserScreenState extends State<UserScreen> {
       await _loadUser();
     } catch (e) {
       if (!mounted) return;
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -878,7 +879,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
 
       setState(() => _submitting = false);
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 

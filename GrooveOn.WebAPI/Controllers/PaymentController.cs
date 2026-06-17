@@ -1,4 +1,4 @@
-﻿using GrooveOn.API.Controllers;
+﻿using GrooveOn.WebAPI.Controllers;
 using GrooveOn.Model.RequestObjects;
 using GrooveOn.Model.ResponseObjects;
 using GrooveOn.Model.SearchObjects;
@@ -97,6 +97,21 @@ namespace GrooveOn.WebAPI.Controllers
             {
                 return StatusCode(500, "Error while creating the payment intent.");
             }
+        }
+
+        [Authorize(Roles = Roles.User)]
+        [HttpGet("my-status/{paymentId}")]
+        public async Task<IActionResult> GetMyPaymentStatus(int paymentId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized("Invalid token.");
+
+            var payment = await _service.GetByIdAsync(paymentId);
+            if (payment == null || payment.UserId != userId)
+                return NotFound("Payment not found.");
+
+            return Ok(new { paymentId = payment.Id, status = payment.PaymentStatus });
         }
 
         [AllowAnonymous]

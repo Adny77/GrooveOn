@@ -67,89 +67,54 @@ namespace GrooveOn.Services.Services
 
         public async Task<MobileHomeResponse> GetMobileHomeAsync(int takeTracks = 4, int takeArtists = 8)
         {
-            var topTracks = await _context.PlayHistories
-                .GroupBy(ph => ph.SongId)
-                .Select(g => new
+            // Single DB query: GroupBy includes song columns in the key so EF Core
+            // generates one JOIN + GROUP BY without a second round-trip.
+            var pool = Math.Max(takeTracks, 10);
+
+            var topTrackPool = await _context.PlayHistories
+                .Where(ph => ph.Song != null)
+                .GroupBy(ph => new
                 {
-                    SongId = g.Key,
+                    ph.SongId,
+                    Title = ph.Song!.Title,
+                    CoverUrl = ph.Song!.CoverUrl
+                })
+                .Select(g => new MusicStatItemResponse
+                {
+                    Id = g.Key.SongId,
+                    Title = g.Key.Title,
+                    ImageUrl = g.Key.CoverUrl,
                     PlayCount = g.Count()
                 })
                 .OrderByDescending(x => x.PlayCount)
-                .Take(10)
+                .Take(pool)
                 .ToListAsync();
 
-            var songIds = topTracks.Select(x => x.SongId).ToList();
-
-            var songs = await _context.Songs
-                .Where(s => songIds.Contains(s.Id))
-                .ToListAsync();
-
-            var topTracksResponse = topTracks
-                .Take(takeTracks)
-                .Select(x =>
-                {
-                    var song = songs.FirstOrDefault(s => s.Id == x.SongId);
-
-                    return new MusicStatItemResponse
-                    {
-                        Id = song!.Id,
-                        Title = song.Title,
-                        ImageUrl = song.CoverUrl,
-                        PlayCount = x.PlayCount
-                    };
-                })
-                .ToList();
+            var topTracksResponse = topTrackPool.Take(takeTracks).ToList();
 
             MusicStatItemResponse? songOfTheDay = null;
+            if (topTrackPool.Count > 0)
+                songOfTheDay = topTrackPool[new Random().Next(topTrackPool.Count)];
 
-            if (topTracks.Any())
-            {
-                var random = new Random();
-                var picked = topTracks[random.Next(topTracks.Count)];
-
-                var song = songs.First(s => s.Id == picked.SongId);
-
-                songOfTheDay = new MusicStatItemResponse
+            // Single DB query: GroupBy includes artist columns so no extra round-trip.
+            var topArtistsResponse = await _context.PlayHistories
+                .Where(ph => ph.Song != null && ph.Song.Artist != null)
+                .GroupBy(ph => new
                 {
-                    Id = song.Id,
-                    Title = song.Title,
-                    ImageUrl = song.CoverUrl,
-                    PlayCount = picked.PlayCount
-                };
-            }
-
-            var topArtists = await _context.PlayHistories
-                .Where(ph => ph.Song != null)
-                .GroupBy(ph => ph.Song!.ArtistId)
-                .Select(g => new
+                    ArtistId = ph.Song!.ArtistId,
+                    Name = ph.Song!.Artist!.Name,
+                    Picture = ph.Song!.Artist!.Picture
+                })
+                .Select(g => new MusicStatItemResponse
                 {
-                    ArtistId = g.Key,
+                    Id = g.Key.ArtistId,
+                    Title = g.Key.Name,
+                    ImageUrl = g.Key.Picture,
                     PlayCount = g.Count()
                 })
                 .OrderByDescending(x => x.PlayCount)
                 .Take(takeArtists)
                 .ToListAsync();
-
-            var artistIds = topArtists.Select(x => x.ArtistId).ToList();
-
-            var artists = await _context.Artists
-                .Where(a => artistIds.Contains(a.Id))
-                .ToListAsync();
-
-            var topArtistsResponse = topArtists
-                .Select(x =>
-                {
-                    var artist = artists.First(a => a.Id == x.ArtistId);
-
-                    return new MusicStatItemResponse
-                    {
-                        Id = artist.Id,
-                        Title = artist.Name,
-                        ImageUrl = artist.Picture,
-                        PlayCount = x.PlayCount
-                    };
-                })
-                .ToList();
 
             return new MobileHomeResponse
             {
@@ -196,7 +161,7 @@ namespace GrooveOn.Services.Services
 
         public async Task<List<UserGrowthPointResponse>> GetUserGrowthByMonthAsync(int year)
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow;
             int currentYear = today.Year;
             int currentMonth = today.Month;
 
@@ -268,7 +233,7 @@ namespace GrooveOn.Services.Services
                 .Select(g => new IncomeByMonthResponse
                 {
                     Month = g.Key,
-                    TotalIncome = (float)g.Sum(x => x.PaymentAmount)
+                    TotalIncome = g.Sum(x => x.PaymentAmount)
                 })
                 .OrderBy(x => x.Month)
                 .ToListAsync();

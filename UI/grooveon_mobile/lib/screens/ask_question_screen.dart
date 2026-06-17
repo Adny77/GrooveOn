@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/providers/question_provider.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
 import 'package:provider/provider.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class AskQuestionDialog extends StatefulWidget {
   const AskQuestionDialog({super.key});
@@ -51,7 +52,7 @@ class _AskQuestionDialogState extends State<AskQuestionDialog> {
       SnackbarHelper.showSuccess(context, "Question successfully sent!");
     } catch (e) {
       if (!mounted) return;
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

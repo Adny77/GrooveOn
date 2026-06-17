@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:grooveon_mobile/models/search_results.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 
 typedef PagedFetcher<T> =
@@ -60,7 +61,7 @@ class UniversalPagingProvider<T> with ChangeNotifier {
       );
       _result = result;
     } catch (e) {
-      _error = e.toString();
+      _error = extractErrorMessage(e);
       _result.clear();
     } finally {
       _isLoading = false;

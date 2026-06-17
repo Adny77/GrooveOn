@@ -1,4 +1,5 @@
-import 'dart:async';
+﻿import 'dart:async';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
@@ -65,7 +66,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 
@@ -105,7 +106,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
       if (!mounted) return;
 
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _isLoading = false;
       });
     }
@@ -190,7 +191,7 @@ class _MyPlaylistsScreenState extends State<MyPlaylistsScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 

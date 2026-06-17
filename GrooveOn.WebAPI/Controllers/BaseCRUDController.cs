@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using GrooveOn.Model.SearchObjects;
 using GrooveOn.Services.Interfaces;
 
-namespace GrooveOn.API.Controllers
+namespace GrooveOn.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

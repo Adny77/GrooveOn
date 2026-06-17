@@ -6,12 +6,13 @@ import 'package:grooveon_mobile/providers/image_provider.dart';
 import 'package:grooveon_mobile/providers/user_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_mobile/helper/date_helper.dart';
+import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/routes/app_routes.dart';
 import 'package:grooveon_mobile/validation/validation_model/validation_field_rule.dart';
 import 'package:grooveon_mobile/validation/validation_model/validation_rules.dart';
 import 'package:grooveon_mobile/validation/validation_use/universal_error_removal.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 import 'package:grooveon_mobile/validation/validation_use/universal_validator.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -568,11 +569,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => _pickedImage = File(file.path));
     } catch (e) {
       if (!mounted) return;
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Error",
-        message: "Cannot open gallery.\n$e",
-      );
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 
@@ -679,11 +676,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Success",
-        message: "Account created. You can now sign in.",
-      );
+      SnackbarHelper.showSuccess(context, "Your account has been created. You can now sign in.");
 
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.login,
@@ -691,11 +684,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      await ConfirmDialogs.okConfirmation(
-        context,
-        title: "Error",
-        message: e.toString(),
-      );
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     } finally {
       if (mounted) setState(() => _submitting = false);
     }

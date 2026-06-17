@@ -8,6 +8,7 @@ namespace GrooveOn.Services.Interfaces
         : ICRUDService<NotificationResponse, NotificationSearchObject, NotificationUpsertRequest, NotificationUpsertRequest>
     {
         Task<NotificationResponse?> MarkAsReadAsync(int id, int userId);
+        Task<int> MarkAllAsReadAsync(int userId);
         void AddForUser(int userId, string title, string content, string type);
     }
 }

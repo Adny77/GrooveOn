@@ -1,4 +1,5 @@
-import 'dart:async';
+﻿import 'dart:async';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/models/notification_response.dart';
@@ -64,10 +65,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _markAllAsRead() async {
+    if (unreadCount == 0) return;
+
+    await context.read<NotificationProvider>().markAllAsRead();
+
+    if (!mounted) return;
+
+    setState(() {
+      _items = _items.map((x) => x.isRead
+          ? x
+          : NotificationResponse(
+              id: x.id,
+              userId: x.userId,
+              title: x.title,
+              content: x.content,
+              type: x.type,
+              isRead: true,
+              createdAt: x.createdAt,
+            )).toList(growable: false);
+    });
+    widget.onUnreadChanged?.call(0);
   }
 
   Future<void> _markAsRead(NotificationResponse item) async {
@@ -125,7 +149,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
           ),
-          if (unreadCount > 0)
+          if (unreadCount > 0) ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
@@ -141,6 +165,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
               ),
             ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: _markAllAsRead,
+              child: const Text(
+                "Mark all",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.white70,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

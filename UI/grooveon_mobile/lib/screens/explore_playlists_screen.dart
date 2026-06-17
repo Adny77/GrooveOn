@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/helper/image_helper.dart';
 import 'package:grooveon_mobile/helper/universal_paging_helper.dart';
 import 'package:grooveon_mobile/models/playlist_response.dart';
@@ -6,6 +6,7 @@ import 'package:grooveon_mobile/providers/playlist_provider.dart';
 import 'package:grooveon_mobile/screens/universal_playlist_preview_screen.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
 import 'package:grooveon_mobile/widgets/swipe_widget.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class ExplorePlaylistsScreen extends StatefulWidget {
   const ExplorePlaylistsScreen({super.key});
@@ -73,7 +74,7 @@ class _ExplorePlaylistsScreenState extends State<ExplorePlaylistsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _initialLoading = false;
       });
     }

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/providers/user_provider.dart';
@@ -101,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 
@@ -119,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 
@@ -377,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
               } catch (e) {
                 if (!mounted) return;
 
-                SnackbarHelper.showError(context, e.toString());
+                SnackbarHelper.showError(context, extractErrorMessage(e));
               }
             },
       child: Container(

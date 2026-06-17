@@ -7,7 +7,7 @@ using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GrooveOn.API.Controllers
+namespace GrooveOn.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

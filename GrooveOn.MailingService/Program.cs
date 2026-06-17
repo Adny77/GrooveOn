@@ -30,12 +30,16 @@ var smtpUser = Environment.GetEnvironmentVariable("SMTP_USER")
 var fromEmail = Environment.GetEnvironmentVariable("FROM_EMAIL")
     ?? throw new InvalidOperationException("Missing required env var: FROM_EMAIL");
 
+var smtpPass = Environment.GetEnvironmentVariable("SMTP_PASS");
+if (string.IsNullOrEmpty(smtpPass))
+    throw new InvalidOperationException("Missing required env var: SMTP_PASS");
+
 var smtpSettings = new SmtpSettings
 {
     Host = smtpHost,
     Port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT") ?? "587"),
     User = smtpUser,
-    Password = Environment.GetEnvironmentVariable("SMTP_PASS") ?? "",
+    Password = smtpPass,
     FromEmail = fromEmail,
     FromName = Environment.GetEnvironmentVariable("FROM_NAME") ?? "GrooveOn",
     UseSsl = bool.Parse(Environment.GetEnvironmentVariable("SMTP_SSL") ?? "false")

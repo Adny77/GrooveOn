@@ -332,7 +332,7 @@ class PlayerProvider with ChangeNotifier {
       if (fresh != null && fresh.trim().isNotEmpty) return fresh;
     }
 
-    return result.previewUrl;
+    return null;
   }
 
   void _startRepeatTimerFromCurrentPosition() {

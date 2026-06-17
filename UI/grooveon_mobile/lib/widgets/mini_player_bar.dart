@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+﻿import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../providers/player_provider.dart';
 import '../deezer/provider/deezer_track_provider.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class MiniPlayerBar extends StatefulWidget {
   const MiniPlayerBar({super.key});
@@ -358,7 +359,7 @@ class _FullContentState extends State<_FullContent> {
     } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     } finally {
       if (mounted) {
         setState(() => _isDownloading = false);

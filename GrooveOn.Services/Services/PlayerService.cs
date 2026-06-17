@@ -133,6 +133,7 @@ namespace GrooveOn.Services.Services
             var orderedSongs = orderedIds
                 .Select(id => songs.FirstOrDefault(x => x.Id == id))
                 .Where(x => x != null)
+                .DistinctBy(x => x!.Id)
                 .ToList();
 
             await ClearUserQueueAsync(request.UserId);
@@ -197,6 +198,7 @@ namespace GrooveOn.Services.Services
             var orderedSongs = songIds
                 .Select(id => songs.FirstOrDefault(x => x.Id == id))
                 .Where(x => x != null)
+                .DistinctBy(x => x!.Id)
                 .ToList();
 
             await ClearUserQueueAsync(request.UserId);
@@ -246,7 +248,12 @@ namespace GrooveOn.Services.Services
                 return MapToPlayerResponse(next, next.Song, next.OrderIndex > 1, true);
             }
 
-            var randomSong = await GetRandomSongAsync(request);
+            var existingSongIds = await _context.Set<Player>()
+                .Where(x => x.UserId == request.UserId && x.Purpose == request.Purpose)
+                .Select(x => x.SongId!.Value)
+                .ToListAsync();
+
+            var randomSong = await GetRandomSongAsync(request, existingSongIds);
 
             var newItem = new Player
             {
@@ -341,6 +348,20 @@ namespace GrooveOn.Services.Services
         }
 
 
+        protected override async Task BeforeInsert(Player entity, PlayerUpsertRequest request)
+        {
+            var duplicate = await _context.Set<Player>()
+                .AnyAsync(x =>
+                    x.UserId == request.UserId &&
+                    x.Purpose == request.Purpose &&
+                    x.SongId == request.SongId);
+
+            if (duplicate)
+                throw new UserException("This song already exists in the queue for this purpose.");
+
+            await base.BeforeInsert(entity, request);
+        }
+
         private void ValidatePlayerRequest(PlayerUpsertRequest request)
         {
             if (request.UserId <= 0)
@@ -375,7 +396,7 @@ namespace GrooveOn.Services.Services
             return item;
         }
 
-        private async Task<Song> GetRandomSongAsync(PlayerUpsertRequest request)
+        private async Task<Song> GetRandomSongAsync(PlayerUpsertRequest request, ICollection<int>? excludeSongIds = null)
         {
             var query = _context.Set<Song>()
                 .Where(x => x.ExternalTrackId != null);
@@ -383,18 +404,29 @@ namespace GrooveOn.Services.Services
             if (request.Purpose == "RandomMusicArtist")
                 query = query.Where(x => x.ArtistId == request.ArtistId);
 
+            if (excludeSongIds != null && excludeSongIds.Count > 0)
+                query = query.Where(x => !excludeSongIds.Contains(x.Id));
+
             var count = await query.CountAsync();
+
+            if (count == 0)
+            {
+                // All unique songs exhausted — fall back without exclusion
+                query = _context.Set<Song>().Where(x => x.ExternalTrackId != null);
+                if (request.Purpose == "RandomMusicArtist")
+                    query = query.Where(x => x.ArtistId == request.ArtistId);
+                count = await query.CountAsync();
+            }
+
             if (count == 0)
                 throw new UserException("No songs available.");
 
             var skip = new Random().Next(count);
 
-            var song = await query
+            return await query
                 .Include(x => x.Artist)
                 .Skip(skip)
                 .FirstAsync();
-
-            return song;
         }
 
         private async Task ClearUserQueueAsync(int userId)

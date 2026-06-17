@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/forgot_password_dialog.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/models/login_request.dart';
 import 'package:grooveon_mobile/providers/auth_provider.dart';
 import 'package:grooveon_mobile/routes/app_routes.dart';
 import 'package:provider/provider.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushReplacementNamed(context, AppRoutes.navigation);
     } catch (e) {
       if (!mounted) return;
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

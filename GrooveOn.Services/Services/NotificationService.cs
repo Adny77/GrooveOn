@@ -69,6 +69,19 @@ namespace GrooveOn.Services.Services
             return MapToResponse(notification);
         }
 
+        public async Task<int> MarkAllAsReadAsync(int userId)
+        {
+            var unread = await _context.Notifications
+                .Where(x => x.UserId == userId && !x.IsRead)
+                .ToListAsync();
+
+            foreach (var n in unread)
+                n.IsRead = true;
+
+            await _context.SaveChangesAsync();
+            return unread.Count;
+        }
+
         public void AddForUser(int userId, string title, string content, string type)
         {
             _context.Notifications.Add(new Notification

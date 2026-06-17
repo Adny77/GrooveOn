@@ -26,4 +26,17 @@ class NotificationProvider extends BaseProvider<NotificationResponse> {
     HttpHelper.checkResponse(response);
     return fromJson(jsonDecode(response.body));
   }
+
+  Future<int> markAllAsRead() async {
+    final url = "${ApiConfig.apiBase}/api/Notification/mark-all-read";
+
+    final response = await http.put(
+      Uri.parse(url),
+      headers: HttpHelper.getHeaders(),
+    );
+
+    HttpHelper.checkResponse(response);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return body['marked'] as int? ?? 0;
+  }
 }

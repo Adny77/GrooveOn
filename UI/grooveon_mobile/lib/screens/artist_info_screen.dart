@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/screens/universal_album_preview_screen.dart';
 import 'package:provider/provider.dart';
@@ -141,7 +142,7 @@ class _ArtistInfoScreenState extends State<ArtistInfoScreen>
       if (!mounted) return;
 
       setState(() {
-        _headerError = e.toString();
+        _headerError = extractErrorMessage(e);
         _headerLoading = false;
       });
     }

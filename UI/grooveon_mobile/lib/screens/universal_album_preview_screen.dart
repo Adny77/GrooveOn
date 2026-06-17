@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:provider/provider.dart';
 
@@ -95,7 +96,7 @@ class _UniversalAlbumPreviewScreenState
       if (!mounted) return;
 
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _loading = false;
       });
     }

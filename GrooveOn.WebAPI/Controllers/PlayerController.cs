@@ -7,7 +7,7 @@ using GrooveOn.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GrooveOn.API.Controllers
+namespace GrooveOn.WebAPI.Controllers
 {
     public class PlayerController
         : BaseCRUDController<PlayerResponse, PlayerSearchObject, PlayerUpsertRequest, PlayerUpsertRequest>
@@ -38,6 +38,7 @@ namespace GrooveOn.API.Controllers
         [HttpPost]
         public override Task<PlayerResponse> Create([FromBody] PlayerUpsertRequest request)
         {
+            request.UserId = GetCurrentUserId();
             return base.Create(request);
         }
 
@@ -45,6 +46,7 @@ namespace GrooveOn.API.Controllers
         [HttpPut("{id}")]
         public override Task<PlayerResponse?> Update(int id, [FromBody] PlayerUpsertRequest request)
         {
+            request.UserId = GetCurrentUserId();
             return base.Update(id, request);
         }
 

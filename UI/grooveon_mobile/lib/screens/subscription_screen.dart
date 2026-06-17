@@ -1,8 +1,12 @@
+﻿import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/helper/stripe_payment_helper.dart';
 import 'package:grooveon_mobile/models/subscription_plan_response.dart';
 import 'package:grooveon_mobile/models/subscription_response.dart';
+import 'package:grooveon_mobile/providers/payment_provider.dart';
 import 'package:grooveon_mobile/providers/subscription_plan_provider.dart';
 import 'package:grooveon_mobile/providers/subscription_provider.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
@@ -21,11 +25,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   bool _isLoading = true;
   bool _isPaying = false;
+  bool _isPolling = false;
 
   SubscriptionResponse? _activeSubscription;
   List<SubscriptionPlanResponse> _plans = [];
-
-  bool get _hasActiveSubscription => _activeSubscription != null;
 
   bool get _hasLockedSubscription {
     final sub = _activeSubscription;
@@ -65,74 +68,133 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
       setState(() => _isLoading = false);
 
-     SnackbarHelper.showError(context, e.toString());
+     SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 
   Future<void> _payForPlan(SubscriptionPlanResponse plan) async {
-  if (_isPaying) return;
+    if (_isPaying) return;
 
-  if (_hasLockedSubscription) {
-    SnackbarHelper.showError(
-      context,
-      "You already have an active subscription.",
-    );
-    return;
-  }
+    if (_hasLockedSubscription) {
+      SnackbarHelper.showError(context, "You already have an active subscription.");
+      return;
+    }
 
-  final userId = Session.userId;
+    final userId = Session.userId;
+    if (userId == null) {
+      SnackbarHelper.showError(context, "User is not logged in.");
+      return;
+    }
 
-  if (userId == null) {
-    SnackbarHelper.showError(context, "User is not logged in.");
-    return;
-  }
+    final paymentProvider = context.read<PaymentProvider>();
 
-  final confirm = await showDialog<bool>(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text("Payment confirmation"),
-      content: Text(
-        "Do you want to purchase the '${plan.name}' plan for €${plan.price.toStringAsFixed(2)}?",
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text("Cancel"),
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Payment confirmation"),
+        content: Text(
+          "Do you want to purchase the '${plan.name}' plan for €${plan.price.toStringAsFixed(2)}?",
         ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primary,
-            foregroundColor: Colors.white,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
           ),
-          child: const Text("Continue"),
-        ),
-      ],
-    ),
-  );
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text("Continue"),
+          ),
+        ],
+      ),
+    );
 
-  if (confirm != true) return;
+    if (confirm != true) return;
+    if (!mounted) return;
 
-  setState(() => _isPaying = true);
+    setState(() => _isPaying = true);
 
-  final success = await StripePaymentHelper.paySubscription(
-    context,
-    userId: userId,
-    subscriptionPlanId: plan.id,
-  );
+    int? paymentId;
+    try {
+      paymentId = await StripePaymentHelper.paySubscription(
+        context,
+        userId: userId,
+        subscriptionPlanId: plan.id,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isPaying = false);
+      SnackbarHelper.showError(context, extractErrorMessage(e));
+      return;
+    }
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  setState(() => _isPaying = false);
+    if (paymentId == null) {
+      // User explicitly closed the sheet — show a message and re-enable button
+      setState(() => _isPaying = false);
+      SnackbarHelper.showError(context, "Payment was not completed.");
+      return;
+    }
 
-  if (success) {
-    SnackbarHelper.showSuccess(context, "Payment started successfully.");
-
-    await _loadData();
-  } else {
-    SnackbarHelper.showError(context, "Payment was not completed.");
+    // Stripe sheet finished — show overlay and poll until webhook confirms status
+    setState(() => _isPolling = true);
+    await _pollPaymentStatus(paymentId, paymentProvider);
   }
-}
+
+  Future<void> _pollPaymentStatus(int paymentId, PaymentProvider paymentProvider) async {
+    const maxWait = Duration(seconds: 30);
+    const interval = Duration(seconds: 2);
+    final deadline = DateTime.now().add(maxWait);
+
+    while (DateTime.now().isBefore(deadline)) {
+      await Future.delayed(interval);
+      if (!mounted) return;
+
+      try {
+        final status = await paymentProvider.getMyStatus(paymentId);
+
+        if (!mounted) return;
+
+        if (status == 'Paid') {
+          setState(() { _isPaying = false; _isPolling = false; });
+          SnackbarHelper.showSuccess(context, "Payment successful! Your subscription is now active.");
+          await _loadData();
+          return;
+        }
+
+        if (status == 'Failed' || status == 'Canceled') {
+          setState(() { _isPaying = false; _isPolling = false; });
+          SnackbarHelper.showError(
+            context,
+            status == 'Failed'
+                ? "Payment failed. Please try again."
+                : "Payment was canceled.",
+          );
+          return;
+        }
+
+        // Still Processing — continue polling
+      } catch (e) {
+        if (!mounted) return;
+        setState(() { _isPaying = false; _isPolling = false; });
+        SnackbarHelper.showError(context, extractErrorMessage(e));
+        return;
+      }
+    }
+
+    // Timeout reached
+    if (mounted) {
+      setState(() { _isPaying = false; _isPolling = false; });
+      SnackbarHelper.showInfo(
+        context,
+        "Payment is being processed. Check back shortly.",
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,8 +209,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F5FA),
-      body: SafeArea(
-        child: RefreshIndicator(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: RefreshIndicator(
           color: primary,
           onRefresh: _loadData,
           child: ListView(
@@ -189,6 +253,29 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             ],
           ),
         ),
+          ),
+          if (_isPolling)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: Colors.white),
+                    SizedBox(height: 16),
+                    Text(
+                      "Processing payment...",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

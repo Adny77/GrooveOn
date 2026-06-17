@@ -215,6 +215,31 @@ app.UseExceptionHandler(errorApp =>
                 await context.Response.WriteAsJsonAsync(new { message = ex.Message });
                 break;
 
+            case UnauthorizedAccessException ex:
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                logger.LogWarning(ex, "Unauthorized: {Message} | Path: {Path}",
+                    ex.Message, context.Request.Path);
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case ArgumentException ex:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                logger.LogWarning(ex, "Argument error: {Message} | Path: {Path}",
+                    ex.Message, context.Request.Path);
+                await context.Response.WriteAsJsonAsync(new { message = ex.Message });
+                break;
+
+            case DbUpdateException dbEx
+                when dbEx.InnerException?.Message.Contains("UNIQUE", StringComparison.OrdinalIgnoreCase) == true
+                  || dbEx.InnerException?.Message.Contains("duplicate key", StringComparison.OrdinalIgnoreCase) == true:
+                context.Response.StatusCode = StatusCodes.Status409Conflict;
+                logger.LogWarning(dbEx, "Unique constraint violation | Path: {Path}", context.Request.Path);
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    message = "A record with the same data already exists."
+                });
+                break;
+
             case DbUpdateException dbEx
                 when dbEx.InnerException?.Message.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) == true
                   || dbEx.InnerException?.Message.Contains("REFERENCE", StringComparison.OrdinalIgnoreCase) == true:

@@ -14,24 +14,32 @@ class HttpHelper {
       return;
     }
 
-    String message = extractApiErrorMessage(response.body);
+    final message = extractApiErrorMessage(response.body);
 
     if (response.statusCode == 401) {
-      Session.logout();
-      navigatorKey.currentState
-          ?.pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
-      throw ApiException("Session expired. Please sign in again.");
+      if (Session.isLoggedIn) {
+        Session.logout();
+        navigatorKey.currentState
+            ?.pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+        throw ApiException("Session expired. Please sign in again.");
+      }
+      throw ApiException(message.isNotEmpty ? message : "Invalid credentials.");
     }
 
     if (response.statusCode == 403) {
-      throw ApiException(message.isNotEmpty ? message : "FORBIDDEN");
+      throw ApiException(message.isNotEmpty ? message : "Access denied.");
     }
 
     if (response.statusCode == 404) {
-      throw ApiException(message.isNotEmpty ? message : "NOTFOUND");
+      throw ApiException(message.isNotEmpty ? message : "Resource not found.");
     }
 
-    throw ApiException(message);
+    if (response.statusCode == 409) {
+      throw ApiException(
+          message.isNotEmpty ? message : "A record with the same data already exists.");
+    }
+
+    throw ApiException(message.isNotEmpty ? message : "An unexpected error occurred.");
   }
 
   static Map<String, String> getHeaders({bool withToken = true}) {

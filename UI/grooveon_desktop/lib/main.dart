@@ -6,11 +6,14 @@ import 'package:grooveon_desktop/providers/report_provider.dart';
 import 'package:grooveon_desktop/providers/song_provider.dart';
 import 'package:grooveon_desktop/providers/user_provider.dart';
 import 'package:grooveon_desktop/routes/app_routes.dart';
+import 'package:grooveon_desktop/screens/base_screen.dart';
 import 'package:grooveon_desktop/screens/login_screen.dart';
+import 'package:grooveon_desktop/utils/session.dart';
 import 'package:provider/provider.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Session.load();
 
   runApp(
     MultiProvider(
@@ -41,7 +44,7 @@ class GrooveOnApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const LoginScreen(),
+      home: Session.isLoggedIn ? const BaseScreen() : const LoginScreen(),
     );
   }
 }

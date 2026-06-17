@@ -84,6 +84,19 @@ namespace GrooveOn.Services.Services
             return base.AddInclude(query, search);
         }
 
+        public override async Task<PaymentResponse?> GetByIdAsync(int id)
+        {
+            var entity = await _context.Payments
+                .Include(x => x.Subscription)
+                    .ThenInclude(x => x.User)
+                .Include(x => x.Subscription)
+                    .ThenInclude(x => x.SubscriptionPlan)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (entity == null) return null;
+            return MapToResponse(entity);
+        }
+
         protected override PaymentResponse MapToResponse(Payment entity)
         {
             var response = _mapper.Map<PaymentResponse>(entity);
@@ -175,15 +188,17 @@ namespace GrooveOn.Services.Services
             if (hasActiveSubscription)
                 throw new UserException("You already have an active subscription.");
 
-            var alreadyProcessingPayment = await _context.Payments
+            // Cancel any abandoned Pending/Processing payments so the user can retry
+            var abandonedPayments = await _context.Payments
                 .Include(x => x.Subscription)
-                .AnyAsync(x =>
+                .Where(x =>
                     x.Subscription != null &&
                     x.Subscription.UserId == request.UserId &&
-                    x.PaymentStatus == "Processing");
+                    (x.PaymentStatus == "Processing" || x.PaymentStatus == "Pending"))
+                .ToListAsync();
 
-            if (alreadyProcessingPayment)
-                throw new UserException("You already have a payment in progress.");
+            foreach (var abandoned in abandonedPayments)
+                await _paymentState.GetState(abandoned.PaymentStatus).ToCanceledAsync(abandoned);
 
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -273,6 +288,9 @@ namespace GrooveOn.Services.Services
             if (payment == null)
                 return;
 
+            if (payment.PaymentStatus is "Failed" or "Canceled" or "Paid")
+                return;
+
             await _paymentState.GetState(payment.PaymentStatus).ToFailedAsync(payment);
         }
 
@@ -283,6 +301,9 @@ namespace GrooveOn.Services.Services
             var payment = await GetPaymentFromMetadataAsync(paymentIntentId, metadata);
 
             if (payment == null)
+                return;
+
+            if (payment.PaymentStatus is "Canceled" or "Paid")
                 return;
 
             await _paymentState.GetState(payment.PaymentStatus).ToCanceledAsync(payment);

@@ -1,4 +1,5 @@
-import 'dart:async';
+﻿import 'dart:async';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
@@ -183,7 +184,7 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 
@@ -225,7 +226,7 @@ class _SearchScreenState extends State<SearchScreen> {
   } catch (e) {
     if (!mounted) return;
 
-    SnackbarHelper.showError(context, e.toString());
+    SnackbarHelper.showError(context, extractErrorMessage(e));
   }
 }
 
@@ -256,7 +257,7 @@ class _SearchScreenState extends State<SearchScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      SnackbarHelper.showError(context, e.toString());
+      SnackbarHelper.showError(context, extractErrorMessage(e));
     }
   }
 

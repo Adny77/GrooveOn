@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:grooveon_mobile/providers/image_provider.dart';
@@ -6,6 +6,7 @@ import 'package:grooveon_mobile/providers/playlist_provider.dart';
 import 'package:grooveon_mobile/utils/Session.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:grooveon_mobile/helper/image_helper.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 
 class CreatePlaylistScreen extends StatefulWidget {
   const CreatePlaylistScreen({super.key});
@@ -103,7 +104,7 @@ class _CreatePlaylistScreenState extends State<CreatePlaylistScreen> {
 
     if (!mounted) return;
 
-    SnackbarHelper.showError(context, e.toString());
+    SnackbarHelper.showError(context, extractErrorMessage(e));
   } finally {
     if (mounted) {
       setState(() {

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:grooveon_mobile/helper/exception_read_helper.dart';
 import 'package:grooveon_mobile/dialogs/confirmation_dialogs.dart';
 import 'package:grooveon_mobile/helper/snackBar_helper.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +100,7 @@ class _UniversalPlaylistPreviewScreenState
       if (!mounted) return;
 
       setState(() {
-        _error = e.toString();
+        _error = extractErrorMessage(e);
         _loading = false;
       });
     }
@@ -172,7 +173,7 @@ class _UniversalPlaylistPreviewScreenState
 
       SnackbarHelper.showError(
         context,
-        e.toString(),
+        extractErrorMessage(e),
       );
     }
   }

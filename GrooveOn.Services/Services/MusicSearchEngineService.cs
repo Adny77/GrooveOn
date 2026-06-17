@@ -4,12 +4,10 @@ using GrooveOn.Services.Database;
 using GrooveOn.Services.Interfaces;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GrooveOn.Services.Services
 {
-    public class MusicSearchEngineService 
+    public class MusicSearchEngineService
         : BaseService<MusicSearchItemResponse, MusicSearchSearchObject, Song>, IMusicSearchEngineService
     {
         private readonly GrooveOnDbContext _context;
@@ -24,118 +22,161 @@ namespace GrooveOn.Services.Services
         {
             var fts = search.FTS?.Trim().ToLower();
 
-            // Cap per-type results at DB level to avoid loading entire tables into memory.
-            var perTypeCap = search.RetrieveAll ? 200 : Math.Max((search.PageSize ?? 20) * 4, 60);
-
-            var songsQuery = _context.Songs
-                .Include(x => x.Artist)
-                .Include(x => x.Album)
-                .AsQueryable();
-
-            var albumsQuery = _context.Albums
-                .Include(x => x.Artist)
-                .AsQueryable();
-
-            var artistsQuery = _context.Artists
-                .AsQueryable();
+            var songsQuery = _context.Songs.AsQueryable();
+            var albumsQuery = _context.Albums.AsQueryable();
+            var artistsQuery = _context.Artists.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(fts))
             {
                 songsQuery = songsQuery.Where(x =>
                     x.Title.ToLower().Contains(fts) ||
                     (x.Artist != null && x.Artist.Name.ToLower().Contains(fts)) ||
-                    (x.Album != null && x.Album.Title.ToLower().Contains(fts))
-                );
+                    (x.Album != null && x.Album.Title.ToLower().Contains(fts)));
 
                 albumsQuery = albumsQuery.Where(x =>
                     x.Title.ToLower().Contains(fts) ||
-                    (x.Artist != null && x.Artist.Name.ToLower().Contains(fts))
-                );
+                    (x.Artist != null && x.Artist.Name.ToLower().Contains(fts)));
 
                 artistsQuery = artistsQuery.Where(x =>
-                    x.Name.ToLower().Contains(fts)
-                );
+                    x.Name.ToLower().Contains(fts));
             }
 
-            var songItems = await songsQuery
-                .OrderBy(x => x.Id)
-                .Take(perTypeCap)
-                .Select(x => new MusicSearchItemResponse
-                {
-                    Type = "song",
-                    Id = x.Id,
-                    ExternalTrackId = x.ExternalTrackId,
-                    Title = x.Title,
-                    Subtitle = x.Artist != null ? x.Artist.Name : null,
-                    ImageUrl = x.CoverUrl,
-                    PreviewUrl = x.PreviewUrl,
-                    ArtistId = x.ArtistId,
-                    AlbumId = x.AlbumId
-                })
-                .ToListAsync();
+            // All three COUNT queries run concurrently at DB level.
+            var songCountTask = songsQuery.CountAsync();
+            var albumCountTask = albumsQuery.CountAsync();
+            var artistCountTask = artistsQuery.CountAsync();
 
-            var albumItems = await albumsQuery
-                .OrderBy(x => x.Id)
-                .Take(perTypeCap)
-                .Select(x => new MusicSearchItemResponse
-                {
-                    Type = "album",
-                    Id = x.Id,
-                    Title = x.Title,
-                    Subtitle = x.Artist != null ? x.Artist.Name : null,
-                    ImageUrl = x.CoverUrl,
-                    PreviewUrl = null,
-                    ArtistId = x.ArtistId,
-                    AlbumId = x.Id
-                })
-                .ToListAsync();
+            await Task.WhenAll(songCountTask, albumCountTask, artistCountTask);
 
-            var artistItems = await artistsQuery
-                .OrderBy(x => x.Id)
-                .Take(perTypeCap)
-                .Select(x => new MusicSearchItemResponse
-                {
-                    Type = "artist",
-                    Id = x.Id,
-                    Title = x.Name,
-                    Subtitle = "Artist",
-                    ImageUrl = x.Picture,
-                    PreviewUrl = null,
-                    ArtistId = x.Id,
-                    AlbumId = null
-                })
-                .ToListAsync();
+            var songCount = songCountTask.Result;
+            var albumCount = albumCountTask.Result;
+            var artistCount = artistCountTask.Result;
+            var totalCount = songCount + albumCount + artistCount;
 
-            var combined = songItems
-                .Concat(albumItems)
-                .Concat(artistItems)
-                .OrderBy(x => x.Type == "song" ? 0 : x.Type == "album" ? 1 : 2)
-                .ThenBy(x => x.Title)
-                .ThenBy(x => x.Id)
-                .ToList();
+            List<MusicSearchItemResponse> items;
 
-            int? totalCount = null;
-            if (search.IncludeTotalCount)
+            if (search.RetrieveAll)
             {
-                totalCount = combined.Count;
-            }
+                var songItems = await BuildSongQuery(songsQuery).ToListAsync();
+                var albumItems = await BuildAlbumQuery(albumsQuery).ToListAsync();
+                var artistItems = await BuildArtistQuery(artistsQuery).ToListAsync();
 
-            if (!search.RetrieveAll)
+                items = [.. songItems, .. albumItems, .. artistItems];
+            }
+            else
             {
                 var pageSize = search.PageSize ?? 20;
                 var page = search.Page ?? 0;
+                var globalSkip = page * pageSize;
+                var globalTake = pageSize;
 
-                combined = combined
-                    .Skip(page * pageSize)
-                    .Take(pageSize)
-                    .ToList();
+                items = await FetchPageAsync(
+                    songsQuery, albumsQuery, artistsQuery,
+                    songCount, albumCount, artistCount,
+                    globalSkip, globalTake);
             }
 
             return new PagedResult<MusicSearchItemResponse>
             {
-                Items = combined,
-                TotalCount = totalCount
+                Items = items,
+                TotalCount = search.IncludeTotalCount ? totalCount : null
             };
         }
+
+        // Fetches only the rows needed for the requested page window.
+        // The virtual ordering is: songs first, albums second, artists third.
+        // Each type is ordered by Title then Id.
+        private async Task<List<MusicSearchItemResponse>> FetchPageAsync(
+            IQueryable<Song> songsQuery,
+            IQueryable<Album> albumsQuery,
+            IQueryable<Artist> artistsQuery,
+            int songCount, int albumCount, int artistCount,
+            int globalSkip, int globalTake)
+        {
+            var result = new List<MusicSearchItemResponse>(globalTake);
+
+            // Songs occupy global positions [0, songCount).
+            var songStart = Math.Max(0, globalSkip);
+            var songEnd = Math.Min(songCount, globalSkip + globalTake);
+            if (songStart < songEnd)
+            {
+                var slice = await BuildSongQuery(songsQuery)
+                    .Skip(songStart)
+                    .Take(songEnd - songStart)
+                    .ToListAsync();
+                result.AddRange(slice);
+            }
+
+            // Albums occupy global positions [songCount, songCount + albumCount).
+            var albumGlobalStart = songCount;
+            var albumStart = Math.Max(0, globalSkip - albumGlobalStart);
+            var albumEnd = Math.Min(albumCount, globalSkip + globalTake - albumGlobalStart);
+            if (albumStart < albumEnd)
+            {
+                var slice = await BuildAlbumQuery(albumsQuery)
+                    .Skip(albumStart)
+                    .Take(albumEnd - albumStart)
+                    .ToListAsync();
+                result.AddRange(slice);
+            }
+
+            // Artists occupy global positions [songCount + albumCount, total).
+            var artistGlobalStart = songCount + albumCount;
+            var artistStart = Math.Max(0, globalSkip - artistGlobalStart);
+            var artistEnd = Math.Min(artistCount, globalSkip + globalTake - artistGlobalStart);
+            if (artistStart < artistEnd)
+            {
+                var slice = await BuildArtistQuery(artistsQuery)
+                    .Skip(artistStart)
+                    .Take(artistEnd - artistStart)
+                    .ToListAsync();
+                result.AddRange(slice);
+            }
+
+            return result;
+        }
+
+        private static IQueryable<MusicSearchItemResponse> BuildSongQuery(IQueryable<Song> q) =>
+            q.OrderBy(x => x.Title).ThenBy(x => x.Id)
+             .Select(x => new MusicSearchItemResponse
+             {
+                 Type = "song",
+                 Id = x.Id,
+                 ExternalTrackId = x.ExternalTrackId,
+                 Title = x.Title,
+                 Subtitle = x.Artist != null ? x.Artist.Name : null,
+                 ImageUrl = x.CoverUrl,
+                 PreviewUrl = x.PreviewUrl,
+                 ArtistId = x.ArtistId,
+                 AlbumId = x.AlbumId
+             });
+
+        private static IQueryable<MusicSearchItemResponse> BuildAlbumQuery(IQueryable<Album> q) =>
+            q.OrderBy(x => x.Title).ThenBy(x => x.Id)
+             .Select(x => new MusicSearchItemResponse
+             {
+                 Type = "album",
+                 Id = x.Id,
+                 Title = x.Title,
+                 Subtitle = x.Artist != null ? x.Artist.Name : null,
+                 ImageUrl = x.CoverUrl,
+                 PreviewUrl = null,
+                 ArtistId = x.ArtistId,
+                 AlbumId = x.Id
+             });
+
+        private static IQueryable<MusicSearchItemResponse> BuildArtistQuery(IQueryable<Artist> q) =>
+            q.OrderBy(x => x.Name).ThenBy(x => x.Id)
+             .Select(x => new MusicSearchItemResponse
+             {
+                 Type = "artist",
+                 Id = x.Id,
+                 Title = x.Name,
+                 Subtitle = "Artist",
+                 ImageUrl = x.Picture,
+                 PreviewUrl = null,
+                 ArtistId = x.Id,
+                 AlbumId = null
+             });
     }
 }
